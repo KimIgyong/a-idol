@@ -24,7 +24,7 @@ describe('ITC-VOTE — TICKET vote flow', () => {
       const res = await env.http
         .post(`/api/v1/rounds/${roundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId, method: 'TICKET' })
+        .send({ idol_id: idolId, method: 'TICKET' })
         .expect(402);
       expect(res.body).toMatchObject({ code: 'NOT_ENOUGH_TICKETS' });
     } finally {
@@ -56,7 +56,7 @@ describe('ITC-VOTE — TICKET vote flow', () => {
       const vote = await env.http
         .post(`/api/v1/rounds/${roundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId, method: 'TICKET' })
+        .send({ idol_id: idolId, method: 'TICKET' })
         .expect(200);
       expect(vote.body).toMatchObject({
         method: 'TICKET',

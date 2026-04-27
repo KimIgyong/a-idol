@@ -85,8 +85,8 @@ export async function setupActiveRound(
     .send({
       name: `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       description: 'integration',
-      startAt: start,
-      endAt: end,
+      start_at: start,
+      end_at: end,
     })
     .expect(201);
   const auditionId = aud.body.id as string;
@@ -97,7 +97,7 @@ export async function setupActiveRound(
   await env.http
     .post(`/api/v1/admin/auditions/${auditionId}/entries`)
     .set('Authorization', `Bearer ${adminToken}`)
-    .send({ idolIds: [idolId] })
+    .send({ idol_ids: [idolId] })
     .expect(201);
   await env.http
     .post(`/api/v1/admin/auditions/${auditionId}/activate`)
@@ -107,7 +107,7 @@ export async function setupActiveRound(
   const round = await env.http
     .post(`/api/v1/admin/auditions/${auditionId}/rounds`)
     .set('Authorization', `Bearer ${adminToken}`)
-    .send({ name: 'R1', orderIndex: 1, startAt: start, endAt: end })
+    .send({ name: 'R1', order_index: 1, start_at: start, end_at: end })
     .expect(201);
   const roundId = round.body.id as string;
 
@@ -120,7 +120,12 @@ export async function setupActiveRound(
   await env.http
     .put(`/api/v1/admin/auditions/rounds/${roundId}/vote-rule`)
     .set('Authorization', `Bearer ${adminToken}`)
-    .send(voteRule)
+    .send({
+      heart_weight: voteRule.heartWeight,
+      sms_weight: voteRule.smsWeight,
+      ticket_weight: voteRule.ticketWeight,
+      daily_heart_limit: voteRule.dailyHeartLimit,
+    })
     .expect(200);
   await env.http
     .post(`/api/v1/admin/auditions/rounds/${roundId}/activate`)

@@ -30,7 +30,7 @@ describe('ITC-AUDITION — round close → snapshot → rejects further votes', 
         await env.http
           .post(`/api/v1/rounds/${roundId}/votes`)
           .set('Authorization', `Bearer ${accessToken}`)
-          .send({ idolId, method: 'HEART' })
+          .send({ idol_id: idolId, method: 'HEART' })
           .expect(200);
       }
 
@@ -67,7 +67,7 @@ describe('ITC-AUDITION — round close → snapshot → rejects further votes', 
       const reject = await env.http
         .post(`/api/v1/rounds/${roundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId, method: 'HEART' })
+        .send({ idol_id: idolId, method: 'HEART' })
         .expect(403);
       expect(reject.body).toMatchObject({ code: 'VOTE_ROUND_NOT_ACTIVE' });
     } finally {
@@ -101,7 +101,7 @@ describe('ITC-AUDITION — round close → snapshot → rejects further votes', 
       const res = await env.http
         .post(`/api/v1/rounds/${roundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId, method: 'TICKET' })
+        .send({ idol_id: idolId, method: 'TICKET' })
         .expect(403);
       expect(res.body).toMatchObject({ code: 'VOTE_METHOD_NOT_ALLOWED' });
 

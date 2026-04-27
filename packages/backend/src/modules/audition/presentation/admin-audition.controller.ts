@@ -96,7 +96,11 @@ export class AdminAuditionController {
     @Body() body: CreateAuditionBody,
   ): Promise<AuditionDto> {
     const audition = await this.createAudition.execute({
-      ...body,
+      name: body.name,
+      description: body.description,
+      startAt: body.start_at,
+      endAt: body.end_at,
+      idolIds: body.idol_ids,
       createdBy: admin.id,
     });
     const detail = await this.getAudition.execute(audition.id);
@@ -125,7 +129,12 @@ export class AdminAuditionController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateAuditionBody,
   ): Promise<AuditionDto> {
-    await this.updateAudition.execute(id, body);
+    await this.updateAudition.execute(id, {
+      name: body.name,
+      description: body.description,
+      startAt: body.start_at,
+      endAt: body.end_at,
+    });
     const detail = await this.getAudition.execute(id);
     return toAuditionDto(detail);
   }
@@ -170,7 +179,7 @@ export class AdminAuditionController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: AddEntriesBody,
   ): Promise<AuditionEntryDto[]> {
-    const res = await this.addEntries.execute(id, body.idolIds);
+    const res = await this.addEntries.execute(id, body.idol_ids);
     return res.map(toEntryDto);
   }
 
@@ -191,7 +200,13 @@ export class AdminAuditionController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: CreateRoundBody,
   ): Promise<RoundDto> {
-    const r = await this.createRound.execute(id, body);
+    const r = await this.createRound.execute(id, {
+      name: body.name,
+      orderIndex: body.order_index,
+      startAt: body.start_at,
+      endAt: body.end_at,
+      maxAdvancers: body.max_advancers,
+    });
     return toRoundDto(r);
   }
 
@@ -200,7 +215,13 @@ export class AdminAuditionController {
     @Param('roundId', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateRoundBody,
   ): Promise<RoundDto> {
-    const r = await this.updateRound.execute(id, body);
+    const r = await this.updateRound.execute(id, {
+      name: body.name,
+      orderIndex: body.order_index,
+      startAt: body.start_at,
+      endAt: body.end_at,
+      maxAdvancers: body.max_advancers,
+    });
     return toRoundDto(r);
   }
 
@@ -237,7 +258,12 @@ export class AdminAuditionController {
     @Param('roundId', new ParseUUIDPipe()) roundId: string,
     @Body() body: UpsertVoteRuleBody,
   ): Promise<VoteRuleDto> {
-    const rec = await this.upsertVoteRule.execute(roundId, body);
+    const rec = await this.upsertVoteRule.execute(roundId, {
+      heartWeight: body.heart_weight,
+      smsWeight: body.sms_weight,
+      ticketWeight: body.ticket_weight,
+      dailyHeartLimit: body.daily_heart_limit,
+    });
     return toVoteRuleDto(rec);
   }
 

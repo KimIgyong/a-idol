@@ -311,7 +311,7 @@ export const api = {
   ) =>
     request<CastVoteResultDto>(`/rounds/${roundId}/votes`, {
       method: 'POST',
-      body,
+      body: { idol_id: body.idolId, method: body.method },
       token,
     }),
   getMyVoteTickets: (token: string) =>

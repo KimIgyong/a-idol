@@ -37,10 +37,11 @@ import type { MyVoteEntry } from '../application/interfaces';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0).
 class CastVoteBody {
   @IsString()
-  @Matches(UUID_REGEX, { message: 'idolId must be a UUID' })
-  idolId!: string;
+  @Matches(UUID_REGEX, { message: 'idol_id must be a UUID' })
+  idol_id!: string;
 
   @IsIn(['HEART', 'TICKET'], { message: 'method must be HEART or TICKET (SMS pending)' })
   method!: VoteMethod;
@@ -105,7 +106,7 @@ export class VoteController {
       const res = await this.castTicket.execute({
         userId: user.id,
         roundId,
-        idolId: body.idolId,
+        idolId: body.idol_id,
       });
       return {
         roundId: res.roundId,
@@ -121,7 +122,7 @@ export class VoteController {
     const res = await this.castHeart.execute({
       userId: user.id,
       roundId,
-      idolId: body.idolId,
+      idolId: body.idol_id,
     });
     return {
       roundId: res.roundId,

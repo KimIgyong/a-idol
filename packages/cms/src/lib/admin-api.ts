@@ -228,7 +228,13 @@ export const adminApi = {
   }) =>
     apiFetch<AuditionDto>('/api/v1/admin/auditions', {
       method: 'POST',
-      body,
+      body: {
+        name: body.name,
+        description: body.description,
+        start_at: body.startAt,
+        end_at: body.endAt,
+        idol_ids: body.idolIds,
+      },
       token: token(),
     }),
   updateAudition: (
@@ -242,7 +248,12 @@ export const adminApi = {
   ) =>
     apiFetch<AuditionDto>(`/api/v1/admin/auditions/${id}`, {
       method: 'PATCH',
-      body,
+      body: {
+        name: body.name,
+        description: body.description,
+        start_at: body.startAt,
+        end_at: body.endAt,
+      },
       token: token(),
     }),
   transitionAudition: (id: string, action: 'activate' | 'finish' | 'cancel') =>
@@ -259,7 +270,7 @@ export const adminApi = {
   addEntries: (auditionId: string, idolIds: string[]) =>
     apiFetch<AuditionEntryDto[]>(`/api/v1/admin/auditions/${auditionId}/entries`, {
       method: 'POST',
-      body: { idolIds },
+      body: { idol_ids: idolIds },
       token: token(),
     }),
   removeEntry: (auditionId: string, idolId: string) =>
@@ -280,7 +291,13 @@ export const adminApi = {
   ) =>
     apiFetch<RoundDto>(`/api/v1/admin/auditions/${auditionId}/rounds`, {
       method: 'POST',
-      body,
+      body: {
+        name: body.name,
+        order_index: body.orderIndex,
+        start_at: body.startAt,
+        end_at: body.endAt,
+        max_advancers: body.maxAdvancers,
+      },
       token: token(),
     }),
   transitionRound: (roundId: string, action: 'activate' | 'close') =>
@@ -309,7 +326,12 @@ export const adminApi = {
   ) =>
     apiFetch<VoteRuleDto>(`/api/v1/admin/auditions/rounds/${roundId}/vote-rule`, {
       method: 'PUT',
-      body,
+      body: {
+        heart_weight: body.heartWeight,
+        sms_weight: body.smsWeight,
+        ticket_weight: body.ticketWeight,
+        daily_heart_limit: body.dailyHeartLimit,
+      },
       token: token(),
     }),
 

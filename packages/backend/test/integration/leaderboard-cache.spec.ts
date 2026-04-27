@@ -38,7 +38,7 @@ describe('ITC-LBCACHE — leaderboard cache write-through invalidation', () => {
       await env.http
         .post(`/api/v1/rounds/${roundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId, method: 'HEART' })
+        .send({ idol_id: idolId, method: 'HEART' })
         .expect(200);
     } finally {
       await env.resetUser(userId);

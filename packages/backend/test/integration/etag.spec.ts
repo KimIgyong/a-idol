@@ -119,7 +119,7 @@ describe('ITC-ETAG — /commerce/products and /auditions/:id conditional GET', (
       await env.http
         .post(`/api/v1/admin/auditions/${auditionId}/rounds`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ name: 'R-etag-check', orderIndex: 99, startAt: start, endAt: end })
+        .send({ name: 'R-etag-check', order_index: 99, start_at: start, end_at: end })
         .expect(201);
 
       const after = await env.http

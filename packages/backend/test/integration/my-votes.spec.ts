@@ -60,7 +60,7 @@ describe('ITC-MYVOTES — 내 투표 이력', () => {
       await env.http
         .post(`/api/v1/rounds/${activeRoundId}/votes`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ idolId: candidateIdolId, method: 'HEART' })
+        .send({ idol_id: candidateIdolId, method: 'HEART' })
         .expect(200);
 
       const res = await env.http
