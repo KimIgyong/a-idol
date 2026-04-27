@@ -67,11 +67,10 @@ export async function createIntegrationApp(): Promise<IntegrationApp> {
     }),
   );
   app.useGlobalFilters(new AppExceptionFilter());
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: false,
-  });
+  // Match main.ts — `/api` global prefix + URI versioning (`/api/v1/...`).
+  // `health` / `metrics` 컨트롤러는 `VERSION_NEUTRAL` 이고 global prefix 도 제외.
+  app.setGlobalPrefix('api', { exclude: ['/health', '/metrics'] });
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   await app.init();
 
   const prisma = app.get(PrismaService);

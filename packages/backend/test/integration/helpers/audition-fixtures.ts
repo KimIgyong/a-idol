@@ -23,23 +23,26 @@ export async function operatorLogin(env: IntegrationApp): Promise<string> {
   const email = 'operator@a-idol.dev';
   const password = 'operator-it-0000';
 
-  const existing = await env.prisma.adminUser.findUnique({ where: { email } });
-  if (!existing) {
-    // Same bcrypt cost (10) as the seed — so the login usecase's comparison
-    // works without touching config. Hash inline to avoid pulling bcrypt
-    // import into the helper surface for every test.
-    const { hash } = await import('bcrypt');
-    const passwordHash = await hash(password, 10);
-    await env.prisma.adminUser.create({
-      data: {
-        email,
-        passwordHash,
-        displayName: 'ITC Operator',
-        role: 'operator',
-        status: 'active',
-      },
-    });
-  }
+  // Hash inline (bcrypt 10 — same as seed) and upsert so password 는 항상
+  // 헬퍼가 기대하는 값과 일치. (외부 작업 / 다른 테스트가 password 를 바꿔도
+  // 본 헬퍼 내에서 idempotent.)
+  const { hash } = await import('bcrypt');
+  const passwordHash = await hash(password, 10);
+  await env.prisma.adminUser.upsert({
+    where: { email },
+    update: {
+      passwordHash,
+      role: 'operator',
+      status: 'active',
+    },
+    create: {
+      email,
+      passwordHash,
+      displayName: 'ITC Operator',
+      role: 'operator',
+      status: 'active',
+    },
+  });
 
   const res = await env.http
     .post('/api/v1/admin/auth/login')
