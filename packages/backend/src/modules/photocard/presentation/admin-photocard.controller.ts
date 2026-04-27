@@ -62,7 +62,11 @@ export class AdminPhotocardController {
   @Roles('admin')
   @ApiOperation({ summary: 'Create photocard set' })
   async postSet(@Body() body: CreatePhotocardSetBody): Promise<PhotocardSetDto> {
-    const row = await this.create.execute(body);
+    const row = await this.create.execute({
+      name: body.name,
+      description: body.description,
+      idolId: body.idol_id,
+    });
     return toSetDto(row);
   }
 
@@ -73,7 +77,12 @@ export class AdminPhotocardController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdatePhotocardSetBody,
   ): Promise<PhotocardSetDto> {
-    const row = await this.update.execute(id, body);
+    const row = await this.update.execute(id, {
+      name: body.name,
+      description: body.description,
+      idolId: body.idol_id,
+      isActive: body.is_active,
+    });
     return toSetDto(row);
   }
 
@@ -87,7 +96,12 @@ export class AdminPhotocardController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: AddPhotocardTemplateBody,
   ): Promise<PhotocardSetDto> {
-    await this.addTemplate.execute(id, body);
+    await this.addTemplate.execute(id, {
+      name: body.name,
+      imageUrl: body.image_url,
+      rarity: body.rarity,
+      dropWeight: body.drop_weight,
+    });
     const full = await this.getOne.execute(id);
     return toSetDto(full);
   }

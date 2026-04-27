@@ -57,7 +57,7 @@ describe('ITC-ADMIN-PHOTOCARD-AUTHZ — admin photocard endpoints', () => {
     await env.http
       .post('/api/v1/admin/photocards/sets')
       .set('Authorization', `Bearer ${opToken}`)
-      .send({ name: 'opwrite-test', description: null, idolId: null })
+      .send({ name: 'opwrite-test', description: null, idol_id: null })
       .expect((r) => {
         // RolesGuard 정책에 따라 403 또는 401. 둘 다 forbidden.
         if (r.status !== 403 && r.status !== 401) {

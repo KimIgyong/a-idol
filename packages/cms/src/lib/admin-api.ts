@@ -399,7 +399,11 @@ export const adminApi = {
   }) =>
     apiFetch<PhotocardSetDto>('/api/v1/admin/photocards/sets', {
       method: 'POST',
-      body,
+      body: {
+        name: body.name,
+        description: body.description,
+        idol_id: body.idolId,
+      },
       token: token(),
     }),
   updatePhotocardSet: (
@@ -413,7 +417,12 @@ export const adminApi = {
   ) =>
     apiFetch<PhotocardSetDto>(`/api/v1/admin/photocards/sets/${id}`, {
       method: 'PATCH',
-      body,
+      body: {
+        name: body.name,
+        description: body.description,
+        idol_id: body.idolId,
+        is_active: body.isActive,
+      },
       token: token(),
     }),
   addPhotocardTemplate: (
@@ -427,7 +436,12 @@ export const adminApi = {
   ) =>
     apiFetch<PhotocardSetDto>(`/api/v1/admin/photocards/sets/${setId}/templates`, {
       method: 'POST',
-      body,
+      body: {
+        name: body.name,
+        image_url: body.imageUrl,
+        rarity: body.rarity,
+        drop_weight: body.dropWeight,
+      },
       token: token(),
     }),
 

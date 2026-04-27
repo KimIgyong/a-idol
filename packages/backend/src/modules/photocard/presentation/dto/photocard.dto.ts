@@ -13,6 +13,7 @@ import {
 } from 'class-validator';
 import type { PhotocardRarity } from '@a-idol/shared';
 
+// ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0).
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const RARITIES: PhotocardRarity[] = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
 
@@ -28,11 +29,11 @@ export class CreatePhotocardSetBody {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'idol_id' })
   @IsOptional()
   @IsString()
-  @Matches(UUID_REGEX, { message: 'idolId must be a UUID' })
-  idolId?: string;
+  @Matches(UUID_REGEX, { message: 'idol_id must be a UUID' })
+  idol_id?: string;
 }
 
 export class UpdatePhotocardSetBody {
@@ -48,16 +49,16 @@ export class UpdatePhotocardSetBody {
   @IsString()
   description?: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'idol_id' })
   @IsOptional()
   @IsString()
-  @Matches(UUID_REGEX, { message: 'idolId must be a UUID' })
-  idolId?: string | null;
+  @Matches(UUID_REGEX, { message: 'idol_id must be a UUID' })
+  idol_id?: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'is_active' })
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  is_active?: boolean;
 }
 
 export class AddPhotocardTemplateBody {
@@ -67,19 +68,19 @@ export class AddPhotocardTemplateBody {
   @MaxLength(80)
   name!: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'image_url' })
   @IsOptional()
   @IsUrl({ require_tld: false, require_protocol: false })
-  imageUrl?: string;
+  image_url?: string;
 
   @ApiPropertyOptional({ enum: RARITIES })
   @IsOptional()
   @IsIn(RARITIES)
   rarity?: PhotocardRarity;
 
-  @ApiPropertyOptional({ minimum: 1 })
+  @ApiPropertyOptional({ minimum: 1, name: 'drop_weight' })
   @IsOptional()
   @IsInt()
   @Min(1)
-  dropWeight?: number;
+  drop_weight?: number;
 }
