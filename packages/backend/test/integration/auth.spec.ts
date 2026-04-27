@@ -61,7 +61,7 @@ describe('ITC-AUTH — signup → login → /me', () => {
     const { refreshToken, userId } = await signupUser(env.http);
     const refreshed = await env.http
       .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
+      .send({ refresh_token: refreshToken })
       .expect(200);
     expect(refreshed.body).toMatchObject({
       accessToken: expect.any(String),
@@ -80,7 +80,7 @@ describe('ITC-AUTH — signup → login → /me', () => {
     // 보다 hash mismatch 동작을 검증.
     const reuse = await env.http
       .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
+      .send({ refresh_token: refreshToken })
       .expect(401);
     expect(reuse.body).toMatchObject({ code: 'INVALID_REFRESH_TOKEN' });
   });
@@ -88,7 +88,7 @@ describe('ITC-AUTH — signup → login → /me', () => {
   it('TC-AUTH-006 — bogus refresh token → 401 INVALID_REFRESH_TOKEN', async () => {
     const res = await env.http
       .post('/api/v1/auth/refresh')
-      .send({ refreshToken: 'eyJhbGc.bogus.bogus' })
+      .send({ refresh_token: 'eyJhbGc.bogus.bogus' })
       .expect(401);
     expect(res.body).toMatchObject({ code: 'INVALID_REFRESH_TOKEN' });
   });
@@ -97,14 +97,14 @@ describe('ITC-AUTH — signup → login → /me', () => {
     const { refreshToken } = await signupUser(env.http);
     const logout = await env.http
       .post('/api/v1/auth/logout')
-      .send({ refreshToken })
+      .send({ refresh_token: refreshToken })
       .expect(200);
     expect(logout.body).toEqual({ revoked: true });
 
     // 같은 refresh token 재사용 시 session revoked → 401.
     const reuse = await env.http
       .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
+      .send({ refresh_token: refreshToken })
       .expect(401);
     expect(reuse.body).toMatchObject({ code: 'INVALID_REFRESH_TOKEN' });
   });
@@ -112,7 +112,7 @@ describe('ITC-AUTH — signup → login → /me', () => {
   it('TC-AUTH-008 — bogus refresh token으로 logout은 silent 200 (idempotent)', async () => {
     const res = await env.http
       .post('/api/v1/auth/logout')
-      .send({ refreshToken: 'eyJhbGc.bogus.bogus' })
+      .send({ refresh_token: 'eyJhbGc.bogus.bogus' })
       .expect(200);
     expect(res.body).toEqual({ revoked: false });
   });

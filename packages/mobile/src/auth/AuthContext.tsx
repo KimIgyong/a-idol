@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const r = await api.login({ email, password, deviceId: 'expo-app' });
+    const r = await api.login({ email, password, device_id: 'expo-app' });
     await persistTokens(r.accessToken, r.refreshToken);
     setUser(r.user);
   }, [persistTokens]);
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     nickname: string;
     birthdate: string;
   }) => {
-    const r = await api.signup({ ...payload, deviceId: 'expo-app' });
+    const r = await api.signup({ ...payload, device_id: 'expo-app' });
     await persistTokens(r.accessToken, r.refreshToken);
     setUser(r.user);
   }, [persistTokens]);
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 로컬 token은 무조건 비워 사용자 측에서 logged out 상태가 되도록.
     try {
       const rt = await AsyncStorage.getItem(RT_KEY);
-      if (rt) await api.logout({ refreshToken: rt });
+      if (rt) await api.logout({ refresh_token: rt });
     } catch {
       // 무시 — server-side revoke 실패해도 token expiry로 자연 만료.
     }

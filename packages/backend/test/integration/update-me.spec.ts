@@ -21,9 +21,9 @@ describe('ITC-ME-PATCH — self update via PATCH /me', () => {
         .patch('/api/v1/me')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
-          avatarUrl: 'https://cdn.a-idol.dev/u/abc.jpg',
-          marketingOptIn: true,
-          pushOptIn: false,
+          avatar_url: 'https://cdn.a-idol.dev/u/abc.jpg',
+          marketing_opt_in: true,
+          push_opt_in: false,
         })
         .expect(200);
 
@@ -52,7 +52,7 @@ describe('ITC-ME-PATCH — self update via PATCH /me', () => {
       const after = await env.http
         .patch('/api/v1/me')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ marketingOptIn: true })
+        .send({ marketing_opt_in: true })
         .expect(200);
       expect(after.body.marketingOptIn).toBe(true);
       expect(after.body.pushOptIn).toBe(true); // 그대로
@@ -68,14 +68,14 @@ describe('ITC-ME-PATCH — self update via PATCH /me', () => {
       await env.http
         .patch('/api/v1/me')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ avatarUrl: 'https://x.com/a.jpg' })
+        .send({ avatar_url: 'https://x.com/a.jpg' })
         .expect(200);
 
       // null로 제거
       const cleared = await env.http
         .patch('/api/v1/me')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ avatarUrl: null })
+        .send({ avatar_url: null })
         .expect(200);
       expect(cleared.body.avatarUrl).toBeNull();
     } finally {
@@ -86,7 +86,7 @@ describe('ITC-ME-PATCH — self update via PATCH /me', () => {
   it('TC-ME-004 — 미인증 시 401', async () => {
     await env.http
       .patch('/api/v1/me')
-      .send({ marketingOptIn: true })
+      .send({ marketing_opt_in: true })
       .expect(401);
   });
 
@@ -107,7 +107,7 @@ describe('ITC-ME-PATCH — self update via PATCH /me', () => {
       await env.http
         .patch('/api/v1/me')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ nickname: 'evilHacker', marketingOptIn: true })
+        .send({ nickname: 'evilHacker', marketing_opt_in: true })
         .expect((r) => {
           if (r.status < 400 || r.status >= 500) {
             throw new Error(`expected 4xx for forbidden field, got ${r.status}`);

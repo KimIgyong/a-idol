@@ -19,11 +19,13 @@ export interface UserDto {
  * `PATCH /api/v1/me` 본문. 사용자 자기 자신의 프로필/동의 필드만 업데이트.
  * 닉네임/생년월일/이메일은 회원가입 시 fix되며 본 endpoint로 변경 불가
  * (관리자 도구로만). SCR-004(가입 직후 추가 정보 수집) + 설정 화면에서 사용.
+ *
+ * ADR-023 — Request body 는 snake_case (amb-starter-kit v2.0 표준).
  */
 export interface UpdateUserMeDto {
-  avatarUrl?: string | null;
-  marketingOptIn?: boolean;
-  pushOptIn?: boolean;
+  avatar_url?: string | null;
+  marketing_opt_in?: boolean;
+  push_opt_in?: boolean;
 }
 
 export interface AuthTokensDto {

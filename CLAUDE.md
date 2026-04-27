@@ -246,6 +246,7 @@ See `.claude/commands/new-feature.md` for an opinionated template.
 - [`ADR-020`](docs/adr/ADR-020-orm-prisma-over-typeorm.md) — Adopt Prisma as the ORM (deviating from amb-starter-kit's TypeORM standard)
 - [`ADR-021`](docs/adr/ADR-021-phase-c-perf-levers.md) — Phase C performance levers (compression / select narrowing / Redis meta cache / ETag 304)
 - [`ADR-022`](docs/adr/ADR-022-api-versioning-policy.md) — Standardize API path on `/api/v1/...` (URI versioning)
+- [`ADR-023`](docs/adr/ADR-023-request-dto-snake-case-migration.md) — Request DTO snake_case migration (Phase D, 모듈 단위 hard-cutover, identity pilot 완료)
 
 ### amb-starter-kit (Amoeba platform v2.0) — applied with deviations
 

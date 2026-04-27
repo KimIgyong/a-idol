@@ -34,7 +34,7 @@ export class IdentityController {
       password: body.password,
       nickname: body.nickname,
       birthdate: new Date(body.birthdate),
-      deviceId: body.deviceId,
+      deviceId: body.device_id,
     });
     return toAuthResponse(result.user, result);
   }
@@ -46,7 +46,7 @@ export class IdentityController {
     const result = await this.login.execute({
       email: body.email,
       password: body.password,
-      deviceId: body.deviceId,
+      deviceId: body.device_id,
     });
     return toAuthResponse(result.user, result);
   }
@@ -55,7 +55,7 @@ export class IdentityController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Rotate refresh token → new access + refresh' })
   async postRefresh(@Body() body: RefreshDto): Promise<AuthTokensDto> {
-    return this.refresh.execute({ refreshToken: body.refreshToken });
+    return this.refresh.execute({ refreshToken: body.refresh_token });
   }
 
   @Post('auth/logout')
@@ -64,7 +64,7 @@ export class IdentityController {
     summary: '서버 측 session revoke. RPT-260426-D T-082 후속. Idempotent (invalid token도 silent OK).',
   })
   async postLogout(@Body() body: RefreshDto): Promise<{ revoked: boolean }> {
-    return this.logout.execute({ refreshToken: body.refreshToken });
+    return this.logout.execute({ refreshToken: body.refresh_token });
   }
 
   @Get('me')
@@ -84,7 +84,11 @@ export class IdentityController {
     @CurrentUser() user: CurrentUserContext,
     @Body() body: UpdateMeDto,
   ): Promise<UserDto> {
-    const u = await this.updateMe.execute(user.id, body);
+    const u = await this.updateMe.execute(user.id, {
+      avatarUrl: body.avatar_url,
+      marketingOptIn: body.marketing_opt_in,
+      pushOptIn: body.push_opt_in,
+    });
     return toUserDto(u);
   }
 }

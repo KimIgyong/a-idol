@@ -23,8 +23,9 @@ export class SignupDto {
   @IsDateString()
   birthdate!: string;
 
-  @ApiProperty({ required: false, example: 'iphone-XYZ' })
+  // ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0 표준).
+  @ApiProperty({ required: false, example: 'iphone-XYZ', name: 'device_id' })
   @IsOptional()
   @IsString()
-  deviceId?: string;
+  device_id?: string;
 }

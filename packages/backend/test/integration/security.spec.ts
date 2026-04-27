@@ -44,7 +44,7 @@ describe('ITC-SECURITY — helmet + throttle skip + validator', () => {
         email: 'bogus@x.com',
         password: 'Aaaaaa1!',
         nickname: 'sec',
-        deviceId: 'sec-1',
+        device_id: 'sec-1',
         birthdate: '2000-01-01',
         // unknown field — forbidNonWhitelisted=true 라 400.
         admin: true,

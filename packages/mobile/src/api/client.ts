@@ -209,18 +209,20 @@ export const api = {
   baseUrl: apiBaseUrl,
 
   // -- auth ---------------------------------------------------------------
+  // ADR-023 — Request body 는 snake_case (amb-starter-kit v2.0). Internal call
+  // sites 도 wire shape 그대로 사용.
   signup: (body: {
     email: string;
     password: string;
     nickname: string;
     birthdate: string;
-    deviceId?: string;
+    device_id?: string;
   }) => request<AuthResponseDto>('/auth/signup', { method: 'POST', body }),
-  login: (body: { email: string; password: string; deviceId?: string }) =>
+  login: (body: { email: string; password: string; device_id?: string }) =>
     request<AuthResponseDto>('/auth/login', { method: 'POST', body }),
-  refresh: (body: { refreshToken: string }) =>
+  refresh: (body: { refresh_token: string }) =>
     request<AuthTokensDto>('/auth/refresh', { method: 'POST', body }),
-  logout: (body: { refreshToken: string }) =>
+  logout: (body: { refresh_token: string }) =>
     request<{ revoked: boolean }>('/auth/logout', { method: 'POST', body }),
   me: (token: string) => request<UserDto>('/me', { token }),
   patchMe: (body: UpdateUserMeDto, token: string) =>

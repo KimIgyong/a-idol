@@ -42,9 +42,9 @@ export default function ExtraInfoScreen() {
     setLoading(true);
     try {
       await updateMe({
-        avatarUrl: avatarUrl.trim() || null,
-        marketingOptIn,
-        pushOptIn,
+        avatar_url: avatarUrl.trim() || null,
+        marketing_opt_in: marketingOptIn,
+        push_opt_in: pushOptIn,
       });
       router.replace('/(app)');
     } catch (e) {
