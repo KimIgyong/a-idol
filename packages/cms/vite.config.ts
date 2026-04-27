@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
@@ -12,6 +13,14 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    css: false,
+    // 자동 mock: 통합 테스트 영역 분리. ITC 같은 무거운 spec 은 backend 만 사용.
+    include: ['src/**/*.spec.{ts,tsx}'],
   },
   build: {
     // 단일 entry chunk 가 1MB 가까워지는 문제 — vendor 분리 + route 별 lazy.

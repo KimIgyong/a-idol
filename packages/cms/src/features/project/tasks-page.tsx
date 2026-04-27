@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 
 const WBS_SLUG = 'implementation-a-idol-wbs';
 
-interface TaskRow {
+export interface TaskRow {
   id: string;
   title: string;
   scope: string;
@@ -22,7 +22,7 @@ const PHASE_HEADER_RE = /^###\s+(Phase[^\n]+)/;
 const TASK_ROW_RE = /^\|\s+(T-\d{3})\s+\|\s+([^|]+?)\s+\|\s+([^|]+?)\s+\|\s+([^|]+?)\s+\|\s+([^|]+?)\s+\|\s+([^|]*?)\s+\|/;
 const PROGRESS_ROW_RE = /^\|\s+(T-\d{3})\s+\|\s+(🟢|🟡|🔴|⏸|🟢|🟡|🔴)\s*([0-9]+%?)?\s*\|\s+([^|]+?)\s+\|/;
 
-function parseTasks(md: string): TaskRow[] {
+export function parseTasks(md: string): TaskRow[] {
   const lines = md.split('\n');
   const tasks: Record<string, TaskRow> = {};
   let phase = '';
