@@ -13,4 +13,30 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  build: {
+    // 단일 entry chunk 가 1MB 가까워지는 문제 — vendor 분리 + route 별 lazy.
+    // gzipped 기준으로도 main 이 280KB 이상이라 staging 첫 로드 latency 가 큼.
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+          // 마크다운 렌더 — 프로젝트 관리 메뉴만 사용. lazy 페이지에서만 비용 발생.
+          'markdown-vendor': ['react-markdown', 'remark-gfm'],
+          'sentry-vendor': ['@sentry/react'],
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'ui-vendor': [
+            '@radix-ui/react-label',
+            '@radix-ui/react-slot',
+            'class-variance-authority',
+            'clsx',
+            'lucide-react',
+            'tailwind-merge',
+          ],
+          'store-vendor': ['zustand'],
+        },
+      },
+    },
+  },
 });

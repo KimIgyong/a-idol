@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import {
   BarChart3,
@@ -98,7 +99,15 @@ export function AppShell() {
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto">
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="flex h-full items-center justify-center text-sm text-slate-500">
+              불러오는 중...
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

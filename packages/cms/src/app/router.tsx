@@ -1,25 +1,36 @@
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/app-shell';
 import { LoginPage } from '@/features/auth/login-page';
 import { RequireRole } from '@/features/auth/require-role';
-import { AgenciesPage } from '@/features/agencies/agencies-page';
-import { IdolsPage } from '@/features/idols/idols-page';
-import { AutoMessagesPage } from '@/features/auto-messages/auto-messages-page';
-import { AuditionsPage } from '@/features/auditions/auditions-page';
-import { DashboardPage } from '@/features/dashboard/dashboard-page';
-import { PhotocardsPage } from '@/features/photocards/photocards-page';
-import { CommercePage } from '@/features/commerce/commerce-page';
-import { OperatorsPage } from '@/features/operators/operators-page';
-import { PreviewPage } from '@/features/preview/preview-page';
-import { DesignAssetsPage } from '@/features/design-assets/design-assets-page';
-import { ProjectLayout } from '@/features/project/project-layout';
-import { ProjectOverviewPage } from '@/features/project/project-overview-page';
-import { DocsListPage } from '@/features/project/docs-list-page';
-import { DocDetailPage } from '@/features/project/doc-detail-page';
-import { DocEditPage } from '@/features/project/doc-edit-page';
-import { DeliverablesPage } from '@/features/project/deliverables-page';
-import { WbsPage } from '@/features/project/wbs-page';
-import { TasksPage } from '@/features/project/tasks-page';
+
+// 라우트별 동적 import — bundler 가 chunk 분리 (vite production build).
+// 진입에 필요한 LoginPage / AppShell / RequireRole 만 즉시 로드.
+const lazyNamed = <T extends string>(path: () => Promise<Record<T, React.ComponentType>>, key: T) =>
+  lazy(async () => {
+    const mod = await path();
+    return { default: mod[key] };
+  });
+
+const DashboardPage = lazyNamed(() => import('@/features/dashboard/dashboard-page'), 'DashboardPage');
+const AgenciesPage = lazyNamed(() => import('@/features/agencies/agencies-page'), 'AgenciesPage');
+const IdolsPage = lazyNamed(() => import('@/features/idols/idols-page'), 'IdolsPage');
+const AutoMessagesPage = lazyNamed(() => import('@/features/auto-messages/auto-messages-page'), 'AutoMessagesPage');
+const AuditionsPage = lazyNamed(() => import('@/features/auditions/auditions-page'), 'AuditionsPage');
+const PhotocardsPage = lazyNamed(() => import('@/features/photocards/photocards-page'), 'PhotocardsPage');
+const CommercePage = lazyNamed(() => import('@/features/commerce/commerce-page'), 'CommercePage');
+const OperatorsPage = lazyNamed(() => import('@/features/operators/operators-page'), 'OperatorsPage');
+const PreviewPage = lazyNamed(() => import('@/features/preview/preview-page'), 'PreviewPage');
+const DesignAssetsPage = lazyNamed(() => import('@/features/design-assets/design-assets-page'), 'DesignAssetsPage');
+
+const ProjectLayout = lazyNamed(() => import('@/features/project/project-layout'), 'ProjectLayout');
+const ProjectOverviewPage = lazyNamed(() => import('@/features/project/project-overview-page'), 'ProjectOverviewPage');
+const DocsListPage = lazyNamed(() => import('@/features/project/docs-list-page'), 'DocsListPage');
+const DocDetailPage = lazyNamed(() => import('@/features/project/doc-detail-page'), 'DocDetailPage');
+const DocEditPage = lazyNamed(() => import('@/features/project/doc-edit-page'), 'DocEditPage');
+const DeliverablesPage = lazyNamed(() => import('@/features/project/deliverables-page'), 'DeliverablesPage');
+const WbsPage = lazyNamed(() => import('@/features/project/wbs-page'), 'WbsPage');
+const TasksPage = lazyNamed(() => import('@/features/project/tasks-page'), 'TasksPage');
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
