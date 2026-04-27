@@ -248,17 +248,79 @@ docker compose -f deploy/staging/docker-compose.staging.yml --env-file deploy/st
 
 ---
 
-## 6. 다음 단계
+## 6. Sentry 활성화 (T-080 마지막 5%)
 
-- **Sentry DSN 발급 + `.env.staging` 의 `SENTRY_DSN` 채우기** → 5xx burst 알림 활성화
+### 6.1 가입 + 프로젝트 생성
+
+[`staging-infra-checklist-ko.md`](./staging-infra-checklist-ko.md) §2.1 권장: Developer plan (free, 5k errors/month).
+
+[sentry.io](https://sentry.io) → 프로젝트 3개 생성:
+
+| 이름 | Platform | DSN 변수 |
+|---|---|---|
+| a-idol-backend | Node.js | `SENTRY_DSN` (backend env) |
+| a-idol-cms | React | `VITE_SENTRY_DSN` (CMS build env) |
+| a-idol-mobile | React Native | `EXPO_PUBLIC_SENTRY_DSN` (Expo build env) |
+
+### 6.2 .env.staging 채우기
+
+```bash
+# deploy/staging/.env.staging 의 SENTRY_DSN 항목
+SENTRY_DSN=https://abc123@oXXXXXX.ingest.sentry.io/1234567
+SENTRY_TRACES_SAMPLE_RATE=0.1
+```
+
+CMS 는 빌드 타임 inline 이라 별도 env 가 필요 — `.env.staging` 에 `VITE_SENTRY_DSN` 도 추가해서 deploy.sh 가 build 시 inject 하도록 하거나, 빌드 직전 export.
+
+### 6.3 release 태그 자동 주입
+
+`deploy/staging/deploy.sh` 가 `git rev-parse --short HEAD` 로 GIT_SHA 를 산출해:
+- backend: `GIT_SHA` env → `Sentry.init({ release: process.env.GIT_SHA })`
+- CMS: `VITE_GIT_SHA` build env → vite inline → `Sentry.init({ release: env.VITE_GIT_SHA })`
+
+deploy 마다 새 release 가 생성되어 issue 가 `5f36fcb`, `574703e` 같은 SHA 별로 grouping. regression 추적 용이.
+
+### 6.4 검증
+
+배포 후:
+
+```bash
+# backend 가 의도적으로 5xx 발생시키기 (dev only — staging admin 으로):
+curl -fsS https://a-idol-stg.amoeba.site/api/v1/admin/_internal/sentry-test \
+  -H "Authorization: Bearer $ADMIN" || true
+# 5초 내 Sentry issue stream 에 새 event 노출 확인
+```
+
+> 위 endpoint 는 미구현. 첫 burn-in 직후 `_internal/sentry-test` 라우트를 임시 추가
+> (dev-only `@AdminOnly` + `throw new InternalServerErrorException()`) 하거나
+> 자연 발생 5xx 가 없으면 `console.error('test')` + `Sentry.captureMessage` 로 검증.
+
+### 6.5 Source map upload (선택, post-DSN)
+
+Sentry CLI 로 unminify 된 stack trace:
+
+```bash
+pnpm dlx @sentry/cli releases new "${GIT_SHA}"
+pnpm dlx @sentry/cli releases files "${GIT_SHA}" upload-sourcemaps packages/cms/dist
+pnpm dlx @sentry/cli releases finalize "${GIT_SHA}"
+```
+
+`vite.config.ts` 의 `sourcemap: 'hidden'` 설정 덕에 .map 은 dist/ 에 생성되지만 client 응답에는 sourceMappingURL 미포함 — 보안 OK + Sentry 만 deminify 가능.
+
+---
+
+## 7. 다음 단계
+
+- **Sentry DSN 발급 + `.env.staging` 채우기** → 5xx burst 알림 활성화
 - **OAuth sandbox client id** (Kakao/Apple/Google) → mobile 시 sandbox 진입 가능
 - **k6 50k ramp** ([k6-staging-runbook-ko.md](./k6-staging-runbook-ko.md)) — 단일 VPS 한계 (5k VUs 권장) → 결과 보고 후 AWS 이전 결정
 - **백업 cron** 설치 + restore drill 1회
 
 ---
 
-## 7. 변경 이력
+## 8. 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-04-27 | 초안 — single-VPS 배포 (nginx + docker compose + Let's Encrypt + atomic release) 가이드. AWS plan 은 [`staging-infra-checklist-ko.md`](./staging-infra-checklist-ko.md) 에 별도 보존. |
+| 2026-04-27 | §6 Sentry 활성화 절차 추가 — DSN 발급 → .env 채움 → release 태그 (deploy.sh 가 GIT_SHA / VITE_GIT_SHA 자동 주입) → 검증 → source map upload (선택). vite `sourcemap: 'hidden'` + backend `release: process.env.GIT_SHA` 코드 wiring 동시 반영. |

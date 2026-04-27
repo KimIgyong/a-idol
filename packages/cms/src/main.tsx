@@ -24,6 +24,8 @@ async function loadSentryBoundary(): Promise<React.ComponentType<BoundaryProps>>
   Sentry.init({
     dsn: env.VITE_SENTRY_DSN,
     environment: env.VITE_APP_ENV,
+    // Release 태깅 — staging 배포 시 deploy.sh 가 VITE_GIT_SHA 주입.
+    release: env.VITE_GIT_SHA || undefined,
     tracesSampleRate: 0.1,
     integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
     replaysSessionSampleRate: 0.0,

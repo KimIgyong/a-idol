@@ -7,6 +7,9 @@ if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: process.env.NODE_ENV ?? 'development',
+    // Release 태깅 — 같은 issue 가 여러 배포에 걸쳐 발생해도 deploy 별로 grouping.
+    // staging deploy.sh 가 GIT_SHA 를 주입. 비어있으면 'unknown' 으로 fallback.
+    release: process.env.GIT_SHA || process.env.SENTRY_RELEASE || undefined,
     tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1'),
     // PII 자동 redact — pino redact 와 정합 (ADR-017).
     beforeSend(event) {

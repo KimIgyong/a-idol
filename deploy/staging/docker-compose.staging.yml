@@ -62,6 +62,8 @@ services:
       HIBP_CHECK_ENABLED: ${HIBP_CHECK_ENABLED:-1}
       SENTRY_DSN: ${SENTRY_DSN:-}
       SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      # T-080 Sentry release tagging — deploy.sh 가 git SHA 주입.
+      GIT_SHA: ${GIT_SHA:-}
       KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
       APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}

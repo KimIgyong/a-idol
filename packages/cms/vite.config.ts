@@ -17,6 +17,11 @@ export default defineConfig({
     // 단일 entry chunk 가 1MB 가까워지는 문제 — vendor 분리 + route 별 lazy.
     // gzipped 기준으로도 main 이 280KB 이상이라 staging 첫 로드 latency 가 큼.
     chunkSizeWarningLimit: 600,
+    // T-080 Sentry 연계용 — 'hidden' 은 .map 을 생성하지만 응답에 sourceMappingURL
+    // 주석을 넣지 않음. 클라이언트는 못 보지만 Sentry CLI 가 업로드 가능 (release
+    // tagging + 스택 트레이스 deminify). DSN 미설정 시에도 비용 거의 없음 (.map
+    // 파일은 dist 에만 존재, nginx 가 서빙 안 함 — 별도 보호 불필요).
+    sourcemap: 'hidden',
     rollupOptions: {
       output: {
         manualChunks: {

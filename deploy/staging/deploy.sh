@@ -41,10 +41,14 @@ echo "    target: ${SSH_USER}@${SSH_HOST}:${RELEASE_DIR}"
   exit 1
 }
 
+# -------- 0) Release 태그 (Sentry release grouping) ----------
+GIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo "${RELEASE_TS}")"
+echo "🏷  release tag: ${GIT_SHA}"
+
 # -------- 1) 로컬 빌드 ----------
 if [[ $DO_CMS_BUILD -eq 1 ]]; then
-  echo "📦  build CMS (vite production)"
-  pnpm --filter @a-idol/cms build
+  echo "📦  build CMS (vite production) — VITE_GIT_SHA=${GIT_SHA}"
+  VITE_GIT_SHA="${GIT_SHA}" pnpm --filter @a-idol/cms build
 fi
 
 echo "📦  build shared package"
@@ -86,8 +90,8 @@ cd "${RELEASE_DIR}"
 ENV_FILE="deploy/staging/.env.staging"
 COMPOSE="docker compose -f deploy/staging/docker-compose.staging.yml --env-file \$ENV_FILE -p a-idol-stg"
 
-# 새 release 빌드 + 부팅
-\$COMPOSE up -d --build
+# 새 release 빌드 + 부팅 (GIT_SHA 주입 — backend Sentry release 태그)
+GIT_SHA="${GIT_SHA}" \$COMPOSE up -d --build
 
 # Prisma migrate (idempotent)
 if [ "${DO_MIGRATE}" = "1" ]; then
