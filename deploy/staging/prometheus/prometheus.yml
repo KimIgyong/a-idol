@@ -1,0 +1,36 @@
+# A-idol staging — Prometheus scrape config
+# 외부 prometheus / grafana cloud agent 가 본 파일을 베이스로 staging backend 의
+# /metrics 를 스크래이프. 본 staging compose 자체에는 prometheus 컨테이너를 띄우지
+# 않음 (single-VPS 리소스 절약 — Grafana Cloud free / 별도 obs VM 권장).
+#
+# /metrics 는 nginx 에서 deny all (404) 처리 중. 운영에서 사용하려면:
+#  (1) nginx site-config 의 `location /metrics` 블록에 Prometheus 인스턴스 IP allow
+#      또는
+#  (2) 별도 internal LB / VPN / Tailscale 통해 접근
+
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: a-idol-stg
+    environment: staging
+
+scrape_configs:
+  - job_name: a-idol-backend
+    metrics_path: /metrics
+    scheme: https
+    static_configs:
+      - targets: ['a-idol-stg.amoeba.site']
+        labels:
+          service: a-idol-backend
+          tier: backend
+
+# alertmanager 는 별도 설정. rule_files 는 staging-rules.yml 동봉.
+rule_files:
+  - /etc/prometheus/rules/staging-rules.yml
+
+# 외부 alertmanager (e.g., grafana cloud, 또는 별도 VM)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager.example:9093']

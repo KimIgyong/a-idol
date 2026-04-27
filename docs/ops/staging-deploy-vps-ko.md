@@ -309,7 +309,57 @@ pnpm dlx @sentry/cli releases finalize "${GIT_SHA}"
 
 ---
 
-## 7. 다음 단계
+## 7. 모니터링 + 알람 (T-080 옵저버빌리티 마무리)
+
+### 7.1 메트릭 수집
+
+`/metrics` (Prometheus exposition) — backend 컨테이너의 3000 포트가 자체 노출.
+nginx 단에서 deny all 기본값. 외부 prometheus 가 스크래이프 하려면
+[`deploy/staging/nginx/conf.d/a-idol-stg.conf`](../../deploy/staging/nginx/conf.d/a-idol-stg.conf) 의
+`location /metrics` 블록의 `allow` 라인 주석 해제 + Prometheus IP / CIDR 입력.
+
+### 7.2 Prometheus 설정 (외부 인스턴스 가정)
+
+[`deploy/staging/prometheus/prometheus.yml`](../../deploy/staging/prometheus/prometheus.yml) +
+[`deploy/staging/prometheus/staging-rules.yml`](../../deploy/staging/prometheus/staging-rules.yml).
+
+8건 alert 정의 (3 그룹):
+
+| 그룹 | Alert | 임계 | Sev |
+|---|---|---|---|
+| availability | A-idol-Backend-5xx-Burst | 5xx >5/1min | 2 |
+| availability | A-idol-Backend-Down | scrape fail 2min | 1 |
+| perf | A-idol-Backend-p95-Latency | p95 >300ms 5min | 3 |
+| perf | A-idol-Backend-Event-Loop-Lag | p99 lag >100ms | 3 |
+| perf | A-idol-Backend-Memory-Growth | RSS >1.5GB 10min | 3 |
+| security | A-idol-Login-Failure-Burst | login fail >50/5min | 2 |
+| security | A-idol-Admin-Account-Locked | admin lockout >0/10min | 2 |
+| security | A-idol-User-Account-Locked-Burst | user lockout >20/15min | 3 |
+
+### 7.3 Sentry alerts
+
+[`deploy/staging/prometheus/sentry-alerts.md`](../../deploy/staging/prometheus/sentry-alerts.md) —
+issue rule (새 fingerprint, 5xx 빈도, release 24h regression) + metric rule
+(Apdex, crash-free rate). Slack 채널은 cs-workflow 와 정합.
+
+Prometheus = burst/saturation, Sentry = issue dedup + stack trace + release grouping. 보완관계.
+
+### 7.4 메트릭 wiring 검증 (이미 통과)
+
+다음 6개 메트릭이 /metrics 에 노출 확인:
+- `http_requests_total`
+- `http_request_duration_seconds_bucket`
+- `http_server_errors_total`
+- `auth_login_failures_total{kind="user|admin"}`
+- `auth_account_locked_total{kind="user|admin"}`
+- `nodejs_eventloop_lag_p99_seconds`
+
+count 0 인 카운터는 trigger 후 시리즈 생성 (Prometheus client 표준 동작).
+실제 발생 시 정상 증가 검증 완료 (`auth_login_failures_total{kind="admin"} 1` after 1 fail).
+
+---
+
+## 8. 다음 단계
 
 - **Sentry DSN 발급 + `.env.staging` 채우기** → 5xx burst 알림 활성화
 - **OAuth sandbox client id** (Kakao/Apple/Google) → mobile 시 sandbox 진입 가능
@@ -318,9 +368,10 @@ pnpm dlx @sentry/cli releases finalize "${GIT_SHA}"
 
 ---
 
-## 8. 변경 이력
+## 9. 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-04-27 | 초안 — single-VPS 배포 (nginx + docker compose + Let's Encrypt + atomic release) 가이드. AWS plan 은 [`staging-infra-checklist-ko.md`](./staging-infra-checklist-ko.md) 에 별도 보존. |
 | 2026-04-27 | §6 Sentry 활성화 절차 추가 — DSN 발급 → .env 채움 → release 태그 (deploy.sh 가 GIT_SHA / VITE_GIT_SHA 자동 주입) → 검증 → source map upload (선택). vite `sourcemap: 'hidden'` + backend `release: process.env.GIT_SHA` 코드 wiring 동시 반영. |
+| 2026-04-27 | §7 모니터링 + 알람 추가 — `deploy/staging/prometheus/{prometheus.yml,staging-rules.yml,sentry-alerts.md}` 신설. 8건 Prometheus alert (availability 2 + perf 3 + security 3) + Sentry issue/metric rule 매핑. 6개 메트릭 wiring 검증 완료 (auth_login_failures_total{kind="admin"} 1 after fail). nginx `/metrics` 블록은 IP allowlist 기반으로 변경 (deny all 기본, Prometheus IP 만 allow). |

@@ -1,0 +1,108 @@
+# A-idol staging — Prometheus alert rules
+# T-080 후속. runbook §1.4 의 알람 정의를 prometheus rule_files 형태로 materialize.
+# Sentry 가 issue 수집 / dedup 을 담당, Prometheus 는 burst / latency / saturation 을 담당.
+#
+# severity 정책 (runbook §2.1):
+#  - Sev-2: 30분 내 응답 (영업 시간), 야간 alert 전송
+#  - Sev-3: 다음 영업일
+
+groups:
+  - name: a-idol-backend-availability
+    interval: 30s
+    rules:
+      # ----- 가용성: 5xx burst -----
+      - alert: A-idol-Backend-5xx-Burst
+        expr: increase(http_server_errors_total{service="a-idol-backend"}[1m]) > 5
+        for: 0s
+        labels:
+          severity: sev-2
+          service: a-idol-backend
+        annotations:
+          summary: "Backend 5xx burst (>5 in 1 min)"
+          description: "1분 누적 5xx 가 5건 초과. Sentry 에서 동일 시점 issue 확인 + DB/Redis 헬스 체크."
+
+      # ----- 가용성: scrape 실패 (backend down) -----
+      - alert: A-idol-Backend-Down
+        expr: up{job="a-idol-backend"} == 0
+        for: 2m
+        labels:
+          severity: sev-1
+          service: a-idol-backend
+        annotations:
+          summary: "Backend /metrics 스크래이프 2분 실패 — backend down 가능"
+          description: "2회 연속 scrape 실패. /health 도 unreachable 이면 즉시 incident."
+
+  - name: a-idol-backend-perf
+    interval: 30s
+    rules:
+      # ----- p95 latency SLO -----
+      - alert: A-idol-Backend-p95-Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{service="a-idol-backend"}[5m]))
+          ) > 0.3
+        for: 5m
+        labels:
+          severity: sev-3
+          service: a-idol-backend
+        annotations:
+          summary: "p95 latency > 300ms 5분 지속"
+          description: "perf-baseline-ko.md 의 SLO 초과. DB slow query 가능. pg_stat_statements 확인."
+
+      # ----- event-loop saturation -----
+      - alert: A-idol-Backend-Event-Loop-Lag
+        expr: nodejs_eventloop_lag_p99_seconds{service="a-idol-backend"} > 0.1
+        for: 2m
+        labels:
+          severity: sev-3
+          service: a-idol-backend
+        annotations:
+          summary: "Node event-loop p99 lag > 100ms"
+          description: "CPU bound 작업 의심. 무거운 sync 처리 / 동시성 너무 많음."
+
+      # ----- 메모리 leak (1주일 burn-in 용) -----
+      - alert: A-idol-Backend-Memory-Growth
+        expr: process_resident_memory_bytes{service="a-idol-backend"} > 1.5e9
+        for: 10m
+        labels:
+          severity: sev-3
+          service: a-idol-backend
+        annotations:
+          summary: "RSS > 1.5GB"
+          description: "메모리 leak 의심. heapdump + restart 검토."
+
+  - name: a-idol-backend-security
+    interval: 30s
+    rules:
+      # ----- T-082 credential stuffing 패턴 -----
+      - alert: A-idol-Login-Failure-Burst
+        expr: increase(auth_login_failures_total{service="a-idol-backend"}[5m]) > 50
+        for: 0s
+        labels:
+          severity: sev-2
+          service: a-idol-backend
+        annotations:
+          summary: "5분 내 login fail 50건 초과 — credential stuffing 의심"
+          description: "IP / email 패턴 분석 후 임시 차단 검토 (cs-workflow §6.1)."
+
+      # ----- T-082 admin 계정 lockout (ATO 시도 강한 신호) -----
+      - alert: A-idol-Admin-Account-Locked
+        expr: increase(auth_account_locked_total{service="a-idol-backend",kind="admin"}[10m]) > 0
+        for: 0s
+        labels:
+          severity: sev-2
+          service: a-idol-backend
+        annotations:
+          summary: "Admin account lockout 발생"
+          description: "admin 대상 brute-force 가능. CMS unlock 절차 (cs-workflow §6.2) 또는 즉시 영향도 점검."
+
+      # ----- 일반 사용자 lockout 비정상 burst -----
+      - alert: A-idol-User-Account-Locked-Burst
+        expr: increase(auth_account_locked_total{service="a-idol-backend",kind="user"}[15m]) > 20
+        for: 0s
+        labels:
+          severity: sev-3
+          service: a-idol-backend
+        annotations:
+          summary: "15분 내 user lockout 20건 초과"
+          description: "정상 운영 대비 비정상. credential stuffing 캠페인 가능."
