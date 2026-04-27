@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": "./",
+    "paths": {
+      "@a-idol/shared": ["../shared/dist"],
+      "@a-idol/shared/*": ["../shared/dist/*"]
+    },
+    "incremental": true
+  },
+  "include": ["src/**/*"]
+}

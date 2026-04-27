@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "A-idol",
+    "slug": "a-idol-mobile",
+    "scheme": "aidol",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "group.amoeba.aidol"
+    },
+    "android": {
+      "package": "group.amoeba.aidol"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "apiBaseUrl": "http://localhost:3000/api/v1"
+    }
+  }
+}

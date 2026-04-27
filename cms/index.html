@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A-idol CMS · 관리자 콘솔</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8', 300: '#f9a8d4',
+                400: '#f472b6', 500: '#ec4899', 600: '#db2777', 700: '#be185d',
+              },
+              ink: { 900: '#0f172a', 800: '#1e293b', 700: '#334155', 600: '#475569' },
+            },
+            fontFamily: { sans: ['Pretendard', 'Inter', 'system-ui', 'sans-serif'] },
+          },
+        },
+      };
+    </script>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+    <style>
+      body { background: #f1f5f9; }
+      .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+      .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+      .bar { background: linear-gradient(180deg, rgba(236,72,153,0.9), rgba(168,85,247,0.9)); }
+    </style>
+  </head>
+  <body class="text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="env,react">
+      const { useState, useEffect, useMemo, useCallback, createContext, useContext } = React;
+
+      // =========================================================
+      // Mock data & domain helpers
+      // =========================================================
+      const API_BASE = 'http://localhost:3000/1';
+
+      const AGENCIES = [
+        { id: 'ag-1', name: 'Amoeba Entertainment', isActive: true },
+        { id: 'ag-2', name: 'Nova Records', isActive: true },
+        { id: 'ag-3', name: 'Luna Studios', isActive: true },
+      ];
+      const CONCEPTS = ['발랄', '시크', '청순', '몽환', '사이버펑크', '시티팝', 'K-발라드', '힙합', '일렉트로닉', '레트로', '판타지', '우주'];
+
+      const KO_SURNAMES = ['아', '하', '다', '노', '로', '리', '이', '준', '서', '율', '윤'];
+      const KO_GIVEN = ['리아', '비나', '채원', '다현', '이솔', '재민', '희원', '유나', '서연', '민지', '하린', '지아'];
+
+      function seededRandom(seed) {
+        let s = seed;
+        return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+      }
+
+      function buildMockIdols(realIdols = []) {
+        const rand = seededRandom(42);
+        const list = [];
+        for (let i = 0; i < 99; i++) {
+          const match = realIdols.find((r) => r.id.endsWith(`a${i + 1}`));
+          if (match) {
+            list.push({
+              id: match.id,
+              stageName: match.stageName ?? match.name,
+              realName: match.name,
+              agencyId: AGENCIES[i % AGENCIES.length].id,
+              birthday: `200${Math.floor(rand() * 5) + 2}-0${Math.floor(rand() * 9) + 1}-1${Math.floor(rand() * 9)}`,
+              debutDate: '2026-08-29',
+              conceptTags: [CONCEPTS[i % CONCEPTS.length], CONCEPTS[(i + 3) % CONCEPTS.length]],
+              bio: `백엔드 시드 데이터에서 불러온 ${match.stageName ?? match.name}의 프로필입니다.`,
+              displayOrder: i + 1,
+              isActive: true,
+              publishedAt: match.publishedAt,
+              heartCount: match.heartCount ?? 0,
+              followCount: match.followCount ?? 0,
+              source: 'db',
+              photos: 1,
+              photocardSets: Math.floor(rand() * 5),
+              scheduleCount: Math.floor(rand() * 8),
+            });
+          } else {
+            const surname = KO_SURNAMES[i % KO_SURNAMES.length];
+            const given = KO_GIVEN[Math.floor(rand() * KO_GIVEN.length)];
+            const realName = `${surname}${given}`;
+            const stageName = rand() > 0.3 ? given : realName;
+            list.push({
+              id: `mock-${String(i + 1).padStart(3, '0')}`,
+              stageName,
+              realName,
+              agencyId: AGENCIES[i % AGENCIES.length].id,
+              birthday: `200${Math.floor(rand() * 5) + 2}-${String(Math.floor(rand() * 12) + 1).padStart(2, '0')}-${String(Math.floor(rand() * 28) + 1).padStart(2, '0')}`,
+              debutDate: '2026-08-29',
+              conceptTags: [CONCEPTS[Math.floor(rand() * CONCEPTS.length)], CONCEPTS[Math.floor(rand() * CONCEPTS.length)]],
+              bio: `AI 아이돌 ${stageName}의 프로필. 시드 데이터(목업).`,
+              displayOrder: i + 1,
+              isActive: rand() > 0.08,
+              publishedAt: rand() > 0.5 ? '2026-04-10T00:00:00Z' : null,
+              heartCount: Math.floor(rand() * 12000),
+              followCount: Math.floor(rand() * 3000),
+              source: 'mock',
+              photos: Math.floor(rand() * 8) + 1,
+              photocardSets: Math.floor(rand() * 5),
+              scheduleCount: Math.floor(rand() * 8),
+            });
+          }
+        }
+        return list;
+      }
+
+      function buildMockAuditions(idols) {
+        const base = new Date('2026-04-20');
+        return [
+          {
+            id: 'au-1',
+            name: '데뷔 오디션 Season 1',
+            description: '8월 GA 데뷔조를 뽑는 첫 번째 공개 오디션',
+            startDate: '2026-05-01',
+            participatingIdolIds: idols.slice(0, 24).map((i) => i.id),
+            rounds: [
+              { roundNo: 1, type: 'PRELIMINARY', status: 'FINALIZED', startAt: '2026-05-01T00:00:00Z', endAt: '2026-05-07T15:00:00Z', advancement: { topN: 16 } },
+              { roundNo: 2, type: 'PRELIMINARY', status: 'FINALIZED', startAt: '2026-05-08T00:00:00Z', endAt: '2026-05-14T15:00:00Z', advancement: { topN: 8 } },
+              { roundNo: 3, type: 'PRELIMINARY', status: 'ACTIVE', startAt: '2026-05-15T00:00:00Z', endAt: '2026-05-21T15:00:00Z', advancement: { topN: 4 } },
+              { roundNo: 4, type: 'FINAL', status: 'PENDING', startAt: '2026-05-22T00:00:00Z', endAt: '2026-05-28T15:00:00Z', advancement: null },
+            ],
+            weights: { online: 0.5, sms: 0.2, popularity: 0.3 },
+            ticketLimitPerUser: 10,
+          },
+          {
+            id: 'au-2',
+            name: '신인상 투표 - 여름 특집',
+            description: '여름 컴백 활동 아이돌 중 신인상 선정',
+            startDate: '2026-06-15',
+            participatingIdolIds: idols.slice(24, 40).map((i) => i.id),
+            rounds: [
+              { roundNo: 1, type: 'PRELIMINARY', status: 'PENDING', startAt: '2026-06-15T00:00:00Z', endAt: '2026-06-21T15:00:00Z', advancement: { topN: 8 } },
+            ],
+            weights: { online: 0.6, sms: 0.0, popularity: 0.4 },
+            ticketLimitPerUser: 10,
+          },
+        ];
+      }
+
+      function buildLiveVotes(round, idolPool) {
+        const rand = seededRandom(round.roundNo * 131);
+        return idolPool.slice(0, 8).map((i) => {
+          const online = Math.floor(rand() * 20000);
+          const sms = Math.floor(rand() * 5000);
+          const popularity = Math.floor(rand() * 15000);
+          return {
+            idolId: i.id, stageName: i.stageName,
+            online, sms, popularity,
+            weightedScore: online * 0.5 + sms * 0.2 + popularity * 0.3,
+          };
+        }).sort((a, b) => b.weightedScore - a.weightedScore);
+      }
+
+      const ANNOUNCEMENTS = [
+        { id: 'an-1', target: 'global', title: '🎉 A-idol 정식 서비스 오픈 안내', body: '8월 29일 정식 서비스가 오픈됩니다. 사전 예약 이벤트를 확인하세요.', channel: 'essential', scheduledAt: '2026-04-19T09:00:00Z', status: 'scheduled' },
+        { id: 'an-2', target: 'idol:00000000-0000-0000-0000-0000000000a1', title: '아리아 생일 컴백', body: '아리아의 첫 디지털 싱글이 공개됩니다.', channel: 'marketing', scheduledAt: '2026-04-22T20:00:00Z', status: 'scheduled' },
+        { id: 'an-3', target: 'audition:au-1', title: '데뷔 오디션 Round 3 시작', body: 'Top4 진출을 가리는 라운드가 시작되었습니다.', channel: 'essential', scheduledAt: '2026-05-15T00:00:00Z', status: 'sent' },
+      ];
+
+      const SCHEDULES = [
+        { id: 's-1', idolId: '00000000-0000-0000-0000-0000000000a1', type: 'BROADCAST', title: 'M!Countdown 스페셜 MC', startAt: '2026-04-24T17:00:00Z', endAt: '2026-04-24T18:30:00Z', location: 'CJ ENM 스튜디오' },
+        { id: 's-2', idolId: '00000000-0000-0000-0000-0000000000a2', type: 'FANMEETING', title: '비나 팬미팅 Vol.1', startAt: '2026-05-05T14:00:00Z', endAt: '2026-05-05T17:00:00Z', location: '서울 올림픽홀' },
+        { id: 's-3', idolId: '00000000-0000-0000-0000-0000000000a3', type: 'CONCERT', title: '칼렙 단독 콘서트 《STARDUST》', startAt: '2026-06-12T19:30:00Z', endAt: '2026-06-12T22:00:00Z', location: '고척 스카이돔' },
+      ];
+
+      // =========================================================
+      // Formatters
+      // =========================================================
+      const fmtNum = (n) => (n ?? 0).toLocaleString();
+      const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('ko-KR') : '—';
+      const fmtDateTime = (iso) => iso ? new Date(iso).toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+      const statusColor = {
+        PENDING: 'bg-slate-200 text-slate-700',
+        ACTIVE: 'bg-emerald-100 text-emerald-700',
+        CLOSED: 'bg-amber-100 text-amber-700',
+        FINALIZED: 'bg-indigo-100 text-indigo-700',
+        scheduled: 'bg-sky-100 text-sky-700',
+        sent: 'bg-slate-200 text-slate-700',
+      };
+
+      // =========================================================
+      // Shared atoms
+      // =========================================================
+      const Card = ({ children, className = '' }) => (
+        <div className={`bg-white rounded-xl border border-slate-200 ${className}`}>{children}</div>
+      );
+      const Button = ({ variant = 'primary', className = '', ...p }) => {
+        const styles = {
+          primary: 'bg-brand-600 hover:bg-brand-500 text-white',
+          ghost: 'bg-transparent hover:bg-slate-100 text-slate-700 border border-slate-200',
+          soft: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
+          danger: 'bg-rose-600 hover:bg-rose-500 text-white',
+        }[variant];
+        return <button {...p} className={`${styles} px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-60 transition ${className}`} />;
+      };
+      const Badge = ({ children, tone = 'slate' }) => {
+        const tones = {
+          slate: 'bg-slate-100 text-slate-700',
+          brand: 'bg-brand-100 text-brand-700',
+          emerald: 'bg-emerald-100 text-emerald-700',
+          amber: 'bg-amber-100 text-amber-700',
+          indigo: 'bg-indigo-100 text-indigo-700',
+          sky: 'bg-sky-100 text-sky-700',
+          rose: 'bg-rose-100 text-rose-700',
+        };
+        return <span className={`${tones[tone]} inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium`}>{children}</span>;
+      };
+      const Field = ({ label, children, hint }) => (
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-slate-600">{label}</span>
+          {children}
+          {hint ? <span className="text-[11px] text-slate-400">{hint}</span> : null}
+        </label>
+      );
+      const Input = (p) => (
+        <input {...p} className={`w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none text-sm ${p.className ?? ''}`} />
+      );
+      const Select = ({ children, ...p }) => (
+        <select {...p} className={`w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none text-sm bg-white ${p.className ?? ''}`}>{children}</select>
+      );
+      const TextArea = (p) => (
+        <textarea {...p} className={`w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none text-sm ${p.className ?? ''}`} />
+      );
+
+      // =========================================================
+      // Drawer (slide-in for detail edits)
+      // =========================================================
+      const Drawer = ({ open, onClose, title, children, footer, width = 'max-w-xl' }) => (
+        <div className={`fixed inset-0 z-40 ${open ? '' : 'pointer-events-none'}`}>
+          <div onClick={onClose} className={`absolute inset-0 bg-slate-900/30 transition ${open ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`absolute right-0 top-0 h-full w-full ${width} bg-white shadow-xl transition-transform ${open ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+            <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+              <h3 className="text-lg font-semibold">{title}</h3>
+              <button onClick={onClose} className="text-slate-500 hover:text-slate-800">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">{children}</div>
+            {footer ? <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">{footer}</div> : null}
+          </div>
+        </div>
+      );
+
+      // =========================================================
+      // Layout: Sidebar + Topbar
+      // =========================================================
+      const NAV = [
+        { key: 'dashboard', label: '대시보드', icon: '📊' },
+        { key: 'idols', label: '아이돌 관리', icon: '🎤' },
+        { key: 'auditions', label: '오디션', icon: '🏆' },
+        { key: 'announcements', label: '공지/일정', icon: '📢' },
+        { key: 'analytics', label: '통계', icon: '📈' },
+      ];
+
+      function Sidebar({ view, setView, user, onLogout, stats }) {
+        return (
+          <aside className="w-60 bg-slate-900 text-slate-200 flex flex-col min-h-screen">
+            <div className="px-5 py-5 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bar" />
+                <div>
+                  <div className="font-bold leading-none">A-idol CMS</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">v0.1.0 · MVP</div>
+                </div>
+              </div>
+            </div>
+            <nav className="flex-1 py-4 space-y-0.5">
+              {NAV.map((n) => (
+                <button key={n.key} onClick={() => setView(n.key)}
+                  className={`w-full flex items-center gap-3 px-5 py-2.5 text-sm transition ${view === n.key ? 'bg-slate-800 text-white border-l-2 border-brand-400' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'}`}>
+                  <span className="w-4 text-center">{n.icon}</span>
+                  <span className="flex-1 text-left">{n.label}</span>
+                  {n.key === 'idols' && stats?.activeIdols != null ? (
+                    <span className="text-[10px] text-slate-500">{stats.activeIdols}/99</span>
+                  ) : null}
+                </button>
+              ))}
+            </nav>
+            <div className="p-4 border-t border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bar flex items-center justify-center font-bold text-sm">
+                  {user?.name?.[0] ?? 'A'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-medium truncate">{user?.name}</div>
+                  <div className="text-[10px] text-slate-500">{user?.role}</div>
+                </div>
+                <button onClick={onLogout} title="로그아웃" className="text-slate-500 hover:text-white text-xs">⎋</button>
+              </div>
+            </div>
+          </aside>
+        );
+      }
+
+      function Topbar({ title, subtitle, right, apiStatus }) {
+        return (
+          <header className="bg-white border-b border-slate-200">
+            <div className="px-6 py-4 flex items-center gap-4">
+              <div className="flex-1">
+                <h1 className="text-xl font-semibold">{title}</h1>
+                {subtitle ? <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p> : null}
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className={`w-1.5 h-1.5 rounded-full ${apiStatus ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                <span className="text-slate-500">
+                  API {apiStatus ? 'localhost:3000' : 'disconnected'}
+                </span>
+              </div>
+              {right}
+            </div>
+          </header>
+        );
+      }
+
+      // =========================================================
+      // Login
+      // =========================================================
+      function LoginScreen({ onLogin }) {
+        const [email, setEmail] = useState('admin@a-idol.dev');
+        const [password, setPassword] = useState('admin-pass');
+        const [otp, setOtp] = useState('123456');
+        const [err, setErr] = useState(null);
+        function submit(e) {
+          e.preventDefault();
+          if (!email.includes('@') || password.length < 6 || otp.length !== 6) {
+            setErr('이메일/비밀번호/OTP 6자리를 모두 입력해 주세요.');
+            return;
+          }
+          onLogin({ name: '운영자 A', email, role: 'super_admin' });
+        }
+        return (
+          <div className="min-h-screen grid place-items-center p-6">
+            <div className="w-full max-w-md">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-2xl bar" />
+                <div>
+                  <div className="text-2xl font-bold">A-idol CMS</div>
+                  <div className="text-xs text-slate-500">AI 아이돌 99 · 관리자 전용</div>
+                </div>
+              </div>
+              <Card className="p-6">
+                <h2 className="font-semibold mb-4">관리자 로그인</h2>
+                <form onSubmit={submit} className="space-y-3">
+                  <Field label="이메일"><Input value={email} onChange={e => setEmail(e.target.value)} type="email" /></Field>
+                  <Field label="비밀번호"><Input value={password} onChange={e => setPassword(e.target.value)} type="password" /></Field>
+                  <Field label="OTP (6자리)" hint="TOTP 앱에서 발급받은 6자리 코드">
+                    <Input value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" maxLength={6} />
+                  </Field>
+                  {err ? <div className="text-xs text-rose-600">⚠ {err}</div> : null}
+                  <Button className="w-full mt-2">로그인</Button>
+                  <p className="text-[11px] text-slate-400 text-center pt-1">
+                    POL-010: 관리자 MFA 필수 · 5회 실패 시 30분 잠금
+                  </p>
+                </form>
+              </Card>
+              <p className="text-[11px] text-slate-400 text-center mt-6">
+                * 프로토타입: 인증은 폼 검증만 수행합니다 (백엔드 Admin API는 Phase 2에서 구현).
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      // =========================================================
+      // Dashboard
+      // =========================================================
+      function Dashboard({ idols, auditions, announcements, schedules, setView }) {
+        const active = idols.filter(i => i.isActive).length;
+        const avgHearts = Math.round(idols.reduce((s, i) => s + (i.heartCount ?? 0), 0) / Math.max(idols.length, 1));
+        const activeRound = auditions.flatMap(a => a.rounds).find(r => r.status === 'ACTIVE');
+        const pendingAnnouncements = announcements.filter(a => a.status === 'scheduled').length;
+        const upcoming = [...schedules].sort((a,b) => a.startAt.localeCompare(b.startAt)).slice(0, 5);
+
+        return (
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-4 gap-4">
+              <Kpi label="활성 아이돌" value={`${active} / 99`} sub={`${idols.length - active}명 비활성`} tone="brand" />
+              <Kpi label="오디션 진행" value={`${activeRound ? 'R' + activeRound.roundNo : '없음'}`} sub={activeRound ? `~ ${fmtDate(activeRound.endAt)} 종료` : '활성 라운드 없음'} tone="emerald" />
+              <Kpi label="예약 공지" value={`${pendingAnnouncements}건`} sub="푸시 전송 대기" tone="sky" />
+              <Kpi label="평균 하트(회원당)" value={fmtNum(avgHearts)} sub="7일 이동평균" tone="amber" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-6">
+              <Card className="col-span-2 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold">오디션 진행 현황</h3>
+                  <Button variant="ghost" onClick={() => setView('auditions')}>전체 보기 →</Button>
+                </div>
+                <div className="space-y-3">
+                  {auditions.map(a => (
+                    <div key={a.id} className="border border-slate-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold">{a.name}</div>
+                          <div className="text-xs text-slate-500">참여 아이돌 {a.participatingIdolIds.length}명 · 시작 {fmtDate(a.startDate)}</div>
+                        </div>
+                        <Badge tone={a.rounds.some(r => r.status === 'ACTIVE') ? 'emerald' : 'slate'}>
+                          {a.rounds.some(r => r.status === 'ACTIVE') ? '진행 중' : '대기'}
+                        </Badge>
+                      </div>
+                      <div className="mt-3 flex gap-1">
+                        {a.rounds.map(r => (
+                          <div key={r.roundNo} className={`flex-1 h-1.5 rounded-full ${r.status === 'FINALIZED' ? 'bg-indigo-400' : r.status === 'ACTIVE' ? 'bg-emerald-400 animate-pulse' : r.status === 'CLOSED' ? 'bg-amber-300' : 'bg-slate-200'}`} />
+                        ))}
+                      </div>
+                      <div className="mt-1 grid grid-cols-4 text-[10px] text-slate-500">
+                        {a.rounds.map(r => (
+                          <div key={r.roundNo}>{r.type === 'FINAL' ? 'Final' : `R${r.roundNo}`} · {r.status}</div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold">다가오는 일정</h3>
+                  <Button variant="ghost" onClick={() => setView('announcements')}>→</Button>
+                </div>
+                <ul className="space-y-3">
+                  {upcoming.map(s => (
+                    <li key={s.id} className="flex gap-3 text-sm">
+                      <div className="w-12 flex-shrink-0 text-center">
+                        <div className="text-xs text-slate-400">{new Date(s.startAt).toLocaleString('ko-KR', { month: 'short' })}</div>
+                        <div className="font-bold">{new Date(s.startAt).getDate()}</div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{s.title}</div>
+                        <div className="text-xs text-slate-500 truncate">{s.type} · {s.location}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
+
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">인기 아이돌 Top 10 (하트 기준)</h3>
+              <TopIdols idols={idols} />
+            </Card>
+          </div>
+        );
+      }
+      const Kpi = ({ label, value, sub, tone }) => {
+        const tones = {
+          brand: 'bg-brand-50 text-brand-700',
+          emerald: 'bg-emerald-50 text-emerald-700',
+          sky: 'bg-sky-50 text-sky-700',
+          amber: 'bg-amber-50 text-amber-700',
+        };
+        return (
+          <Card className="p-5">
+            <div className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${tones[tone]}`}>{label}</div>
+            <div className="mt-2 text-2xl font-bold">{value}</div>
+            <div className="text-xs text-slate-500">{sub}</div>
+          </Card>
+        );
+      };
+      const TopIdols = ({ idols }) => {
+        const top = [...idols].sort((a,b) => b.heartCount - a.heartCount).slice(0, 10);
+        const max = top[0]?.heartCount || 1;
+        return (
+          <div className="space-y-2">
+            {top.map((i, idx) => (
+              <div key={i.id} className="flex items-center gap-3">
+                <div className="w-6 text-xs text-slate-400 text-right">{idx + 1}</div>
+                <div className="w-8 h-8 rounded-lg bar flex items-center justify-center text-white font-bold">{i.stageName[0]}</div>
+                <div className="w-32 truncate font-medium text-sm">{i.stageName}</div>
+                <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="h-full bar" style={{ width: `${(i.heartCount / max) * 100}%` }} />
+                </div>
+                <div className="w-20 text-right text-xs text-slate-500">❤ {fmtNum(i.heartCount)}</div>
+              </div>
+            ))}
+          </div>
+        );
+      };
+
+      // =========================================================
+      // Idol Manager
+      // =========================================================
+      function IdolManager({ idols, onUpdate }) {
+        const [query, setQuery] = useState('');
+        const [agencyFilter, setAgencyFilter] = useState('all');
+        const [statusFilter, setStatusFilter] = useState('all');
+        const [view, setView] = useState('grid');
+        const [selected, setSelected] = useState(null);
+        const [showNew, setShowNew] = useState(false);
+
+        const filtered = useMemo(() => {
+          return idols.filter(i => {
+            if (query && !(`${i.stageName}${i.realName}`.toLowerCase().includes(query.toLowerCase()))) return false;
+            if (agencyFilter !== 'all' && i.agencyId !== agencyFilter) return false;
+            if (statusFilter === 'active' && !i.isActive) return false;
+            if (statusFilter === 'inactive' && i.isActive) return false;
+            return true;
+          });
+        }, [idols, query, agencyFilter, statusFilter]);
+
+        const active = idols.filter(i => i.isActive).length;
+
+        return (
+          <div className="p-6 space-y-4">
+            <Card className="p-4 flex items-center gap-3">
+              <Input placeholder="활동명 / 본명 검색" value={query} onChange={e => setQuery(e.target.value)} className="max-w-xs" />
+              <Select value={agencyFilter} onChange={e => setAgencyFilter(e.target.value)} className="max-w-xs">
+                <option value="all">모든 소속사</option>
+                {AGENCIES.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </Select>
+              <Select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="max-w-[140px]">
+                <option value="all">전체</option>
+                <option value="active">활성</option>
+                <option value="inactive">비활성</option>
+              </Select>
+              <div className="flex-1" />
+              <div className="text-xs text-slate-500 px-2">활성 <b className="text-slate-800">{active}</b> / <b>99</b></div>
+              <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
+                {['grid', 'table'].map(v => (
+                  <button key={v} onClick={() => setView(v)}
+                    className={`px-3 py-1.5 rounded-md ${view === v ? 'bg-white shadow-sm font-medium' : 'text-slate-500'}`}>
+                    {v === 'grid' ? '그리드' : '테이블'}
+                  </button>
+                ))}
+              </div>
+              <Button onClick={() => setShowNew(true)} disabled={active >= 99}>+ 아이돌 등록</Button>
+            </Card>
+
+            {view === 'grid' ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                {filtered.map(i => (
+                  <button key={i.id} onClick={() => setSelected(i)} className="text-left">
+                    <Card className={`p-3 hover:shadow-md transition ${!i.isActive ? 'opacity-50' : ''}`}>
+                      <div className="aspect-square rounded-lg bar mb-2 flex items-end p-2 text-white relative overflow-hidden">
+                        <div className="absolute top-2 right-2">
+                          {i.source === 'db' ? <Badge tone="emerald">DB</Badge> : <Badge tone="slate">목업</Badge>}
+                        </div>
+                        <div className="text-2xl font-black drop-shadow">{i.stageName[0]}</div>
+                      </div>
+                      <div className="font-semibold text-sm truncate">{i.stageName}</div>
+                      <div className="text-[11px] text-slate-500 truncate">{AGENCIES.find(a => a.id === i.agencyId)?.name}</div>
+                      <div className="text-[10px] text-slate-400 mt-1">❤ {fmtNum(i.heartCount)} · 👥 {fmtNum(i.followCount)}</div>
+                    </Card>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <Card className="overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr className="text-left text-xs text-slate-500">
+                      <th className="px-4 py-3">#</th>
+                      <th className="px-4 py-3">활동명 / 본명</th>
+                      <th className="px-4 py-3">소속</th>
+                      <th className="px-4 py-3">컨셉</th>
+                      <th className="px-4 py-3 text-right">하트</th>
+                      <th className="px-4 py-3 text-right">팔로워</th>
+                      <th className="px-4 py-3">상태</th>
+                      <th className="px-4 py-3">데뷔</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map(i => (
+                      <tr key={i.id} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-4 py-3 text-xs text-slate-500">{i.displayOrder}</td>
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{i.stageName}</div>
+                          <div className="text-xs text-slate-500">{i.realName}</div>
+                        </td>
+                        <td className="px-4 py-3 text-xs">{AGENCIES.find(a => a.id === i.agencyId)?.name}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-1 flex-wrap">
+                            {i.conceptTags.slice(0, 2).map(t => <Badge key={t}>{t}</Badge>)}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs tabular-nums">{fmtNum(i.heartCount)}</td>
+                        <td className="px-4 py-3 text-right text-xs tabular-nums">{fmtNum(i.followCount)}</td>
+                        <td className="px-4 py-3">
+                          {i.isActive ? <Badge tone="emerald">활성</Badge> : <Badge tone="slate">비활성</Badge>}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-slate-500">{fmtDate(i.debutDate)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <Button variant="ghost" onClick={() => setSelected(i)}>편집</Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+            )}
+
+            <IdolDrawer idol={selected} onClose={() => setSelected(null)} onSave={(patch) => { onUpdate(patch); setSelected(null); }} />
+            <NewIdolDrawer open={showNew} onClose={() => setShowNew(false)} nextOrder={idols.length + 1} onCreate={(draft) => { onUpdate(draft); setShowNew(false); }} />
+          </div>
+        );
+      }
+
+      function IdolDrawer({ idol, onClose, onSave }) {
+        const [form, setForm] = useState(null);
+        useEffect(() => { setForm(idol ? { ...idol } : null); }, [idol]);
+        if (!idol || !form) return <Drawer open={false} onClose={onClose} title="" />;
+        const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target?.value ?? e }));
+        return (
+          <Drawer open={!!idol} onClose={onClose} title={`아이돌 편집 · ${idol.stageName}`}
+            footer={<>
+              <Button variant="ghost" onClick={onClose}>취소</Button>
+              <Button onClick={() => onSave(form)}>저장</Button>
+            </>}>
+            <div className="space-y-4">
+              <div className="h-32 rounded-xl bar flex items-end p-4 text-white text-3xl font-black">{form.stageName?.[0]}</div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="활동명"><Input value={form.stageName} onChange={set('stageName')} /></Field>
+                <Field label="본명"><Input value={form.realName} onChange={set('realName')} /></Field>
+                <Field label="소속사">
+                  <Select value={form.agencyId} onChange={set('agencyId')}>
+                    {AGENCIES.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="노출 순서"><Input type="number" value={form.displayOrder} onChange={set('displayOrder')} /></Field>
+                <Field label="생일"><Input type="date" value={form.birthday} onChange={set('birthday')} /></Field>
+                <Field label="데뷔일"><Input type="date" value={form.debutDate} onChange={set('debutDate')} /></Field>
+              </div>
+              <Field label={`컨셉 태그 (${form.conceptTags.length}/5)`} hint="클릭으로 토글 · 정책 FR-111">
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {CONCEPTS.map(c => {
+                    const on = form.conceptTags.includes(c);
+                    return (
+                      <button type="button" key={c}
+                        onClick={() => setForm(f => ({
+                          ...f,
+                          conceptTags: on ? f.conceptTags.filter(x => x !== c) : (f.conceptTags.length >= 5 ? f.conceptTags : [...f.conceptTags, c]),
+                        }))}
+                        className={`px-2 py-1 rounded-full text-xs border ${on ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200 hover:border-brand-300'}`}>
+                        {c}
+                      </button>
+                    );
+                  })}
+                </div>
+              </Field>
+              <Field label="소개" hint="최대 1000자">
+                <TextArea rows={4} value={form.bio} onChange={set('bio')} maxLength={1000} />
+              </Field>
+              <div className="grid grid-cols-3 gap-3">
+                <Card className="p-3 text-center">
+                  <div className="text-xs text-slate-500">프로필 사진</div>
+                  <div className="text-lg font-bold mt-1">{form.photos}장</div>
+                </Card>
+                <Card className="p-3 text-center">
+                  <div className="text-xs text-slate-500">포토카드 세트</div>
+                  <div className="text-lg font-bold mt-1">{form.photocardSets}개</div>
+                </Card>
+                <Card className="p-3 text-center">
+                  <div className="text-xs text-slate-500">일정</div>
+                  <div className="text-lg font-bold mt-1">{form.scheduleCount}개</div>
+                </Card>
+              </div>
+              <Field label="공개 상태">
+                <div className="flex gap-2">
+                  <button onClick={() => setForm(f => ({...f, isActive: true}))}
+                    className={`flex-1 px-3 py-2 rounded-lg border text-sm ${form.isActive ? 'bg-emerald-50 border-emerald-500 text-emerald-700 font-medium' : 'bg-white border-slate-200 text-slate-500'}`}>
+                    활성 (앱 노출)
+                  </button>
+                  <button onClick={() => setForm(f => ({...f, isActive: false}))}
+                    className={`flex-1 px-3 py-2 rounded-lg border text-sm ${!form.isActive ? 'bg-slate-50 border-slate-500 text-slate-700 font-medium' : 'bg-white border-slate-200 text-slate-500'}`}>
+                    비활성 (숨김)
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">FR-113: 비활성 즉시 앱 목록에서 제외 (데이터는 보존)</p>
+              </Field>
+              <Field label="ID · 출처">
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <code className="font-mono">{form.id}</code>
+                  {form.source === 'db' ? <Badge tone="emerald">백엔드 DB</Badge> : <Badge>목업 데이터</Badge>}
+                </div>
+              </Field>
+            </div>
+          </Drawer>
+        );
+      }
+
+      function NewIdolDrawer({ open, onClose, nextOrder, onCreate }) {
+        const [form, setForm] = useState({
+          id: `new-${Date.now()}`, stageName: '', realName: '', agencyId: AGENCIES[0].id,
+          birthday: '2002-01-01', debutDate: new Date().toISOString().slice(0,10),
+          conceptTags: [], bio: '', displayOrder: nextOrder, isActive: true,
+          source: 'mock', heartCount: 0, followCount: 0, photos: 0, photocardSets: 0, scheduleCount: 0,
+        });
+        const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target?.value ?? e }));
+        const canSave = form.stageName.length > 0 && form.conceptTags.length > 0;
+        return (
+          <Drawer open={open} onClose={onClose} title="신규 아이돌 등록"
+            footer={<>
+              <Button variant="ghost" onClick={onClose}>취소</Button>
+              <Button onClick={() => onCreate(form)} disabled={!canSave}>등록</Button>
+            </>}>
+            <div className="space-y-4">
+              <div className="p-4 bg-brand-50 rounded-lg border border-brand-100 text-xs text-brand-700">
+                <b>정책:</b> BR-001 활성 아이돌 최대 99명 · FR-111 필수 필드(활동명/소속/프로필사진 1장 이상)
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="활동명 *"><Input value={form.stageName} onChange={set('stageName')} placeholder="예: Aria" /></Field>
+                <Field label="본명"><Input value={form.realName} onChange={set('realName')} /></Field>
+                <Field label="소속사">
+                  <Select value={form.agencyId} onChange={set('agencyId')}>
+                    {AGENCIES.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="데뷔일"><Input type="date" value={form.debutDate} onChange={set('debutDate')} /></Field>
+              </div>
+              <Field label="컨셉 태그 * (최소 1, 최대 5)">
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {CONCEPTS.map(c => {
+                    const on = form.conceptTags.includes(c);
+                    return (
+                      <button type="button" key={c}
+                        onClick={() => setForm(f => ({ ...f, conceptTags: on ? f.conceptTags.filter(x => x !== c) : (f.conceptTags.length >= 5 ? f.conceptTags : [...f.conceptTags, c]) }))}
+                        className={`px-2 py-1 rounded-full text-xs border ${on ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'}`}>
+                        {c}
+                      </button>
+                    );
+                  })}
+                </div>
+              </Field>
+              <Field label="소개"><TextArea rows={3} value={form.bio} onChange={set('bio')} /></Field>
+              <Field label="프로필 사진">
+                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center text-sm text-slate-400">
+                  클릭 또는 드래그하여 업로드 <span className="block text-[11px] text-slate-400 mt-1">최대 10장 · 장당 5MB</span>
+                </div>
+              </Field>
+            </div>
+          </Drawer>
+        );
+      }
+
+      // =========================================================
+      // Audition Manager
+      // =========================================================
+      function AuditionManager({ auditions, idols, onUpdate }) {
+        const [selected, setSelected] = useState(auditions[0]?.id);
+        const audition = auditions.find(a => a.id === selected);
+        const pool = audition ? idols.filter(i => audition.participatingIdolIds.includes(i.id)) : [];
+        const activeRound = audition?.rounds.find(r => r.status === 'ACTIVE');
+        const [tab, setTab] = useState('monitor');
+
+        return (
+          <div className="p-6 space-y-4">
+            <Card className="p-4">
+              <div className="flex gap-2 overflow-x-auto">
+                {auditions.map(a => {
+                  const on = a.id === selected;
+                  const active = a.rounds.some(r => r.status === 'ACTIVE');
+                  return (
+                    <button key={a.id} onClick={() => setSelected(a.id)}
+                      className={`text-left px-4 py-3 rounded-lg border min-w-[280px] ${on ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{a.name}</span>
+                        {active ? <Badge tone="emerald">LIVE</Badge> : null}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">{a.description}</div>
+                      <div className="text-[11px] text-slate-400 mt-1">참여 {a.participatingIdolIds.length} · 라운드 {a.rounds.length}</div>
+                    </button>
+                  );
+                })}
+                <button className="px-4 py-3 rounded-lg border-2 border-dashed border-slate-300 text-slate-500 hover:text-slate-700 hover:border-slate-400 text-sm min-w-[140px]">
+                  + 오디션 생성
+                </button>
+              </div>
+            </Card>
+
+            {audition ? (
+              <>
+                <Card className="p-4">
+                  <div className="flex gap-6 border-b border-slate-200 -mx-4 px-4 -mt-4 pt-4">
+                    {[
+                      ['monitor', '라운드 모니터', activeRound ? `R${activeRound.roundNo} 진행 중` : null],
+                      ['rules', '투표 규칙', null],
+                      ['participants', '참여 아이돌', `${pool.length}`],
+                    ].map(([k, l, b]) => (
+                      <button key={k} onClick={() => setTab(k)}
+                        className={`pb-3 -mb-px flex items-center gap-2 text-sm border-b-2 ${tab === k ? 'border-brand-500 font-semibold text-brand-700' : 'border-transparent text-slate-500'}`}>
+                        {l}
+                        {b ? <Badge tone="brand">{b}</Badge> : null}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-4">
+                    {tab === 'monitor' && <RoundMonitor audition={audition} pool={pool} onUpdate={onUpdate} />}
+                    {tab === 'rules' && <VoteRuleEditor audition={audition} onUpdate={onUpdate} />}
+                    {tab === 'participants' && <ParticipantList pool={pool} />}
+                  </div>
+                </Card>
+              </>
+            ) : null}
+          </div>
+        );
+      }
+
+      function RoundMonitor({ audition, pool, onUpdate }) {
+        const [selectedRound, setSelectedRound] = useState(audition.rounds.find(r => r.status === 'ACTIVE')?.roundNo ?? audition.rounds[0].roundNo);
+        const round = audition.rounds.find(r => r.roundNo === selectedRound);
+        const [votes, setVotes] = useState(() => buildLiveVotes(round, pool));
+        const [autoRefresh, setAutoRefresh] = useState(round.status === 'ACTIVE');
+
+        useEffect(() => { setVotes(buildLiveVotes(round, pool)); }, [selectedRound]);
+        useEffect(() => {
+          if (!autoRefresh) return;
+          const t = setInterval(() => {
+            setVotes(prev => prev.map(v => ({
+              ...v,
+              online: v.online + Math.floor(Math.random() * 50),
+              sms: v.sms + Math.floor(Math.random() * 10),
+              popularity: v.popularity + Math.floor(Math.random() * 30),
+            })).map(v => ({
+              ...v,
+              weightedScore: v.online * audition.weights.online + v.sms * audition.weights.sms + v.popularity * audition.weights.popularity,
+            })).sort((a, b) => b.weightedScore - a.weightedScore));
+          }, 2000);
+          return () => clearInterval(t);
+        }, [autoRefresh, audition.weights]);
+
+        const totalVotes = votes.reduce((s, v) => s + v.online + v.sms + v.popularity, 0);
+        const maxScore = votes[0]?.weightedScore || 1;
+
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              {audition.rounds.map(r => (
+                <button key={r.roundNo} onClick={() => setSelectedRound(r.roundNo)}
+                  className={`px-3 py-1.5 rounded-lg text-sm border ${selectedRound === r.roundNo ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-slate-200 text-slate-600'}`}>
+                  {r.type === 'FINAL' ? '결승' : `R${r.roundNo}`}
+                  <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${statusColor[r.status]}`}>{r.status}</span>
+                </button>
+              ))}
+              <div className="flex-1" />
+              <label className="text-xs flex items-center gap-2">
+                <input type="checkbox" checked={autoRefresh} onChange={e => setAutoRefresh(e.target.checked)} />
+                실시간 갱신 (2s)
+              </label>
+              <Button variant="ghost">📥 CSV 내보내기</Button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-3">
+              <Kpi label="라운드 상태" value={round.status} sub={`${fmtDateTime(round.startAt)} ~`} tone="brand" />
+              <Kpi label="총 투표 수" value={fmtNum(totalVotes)} sub={`참여 아이돌 ${votes.length}명`} tone="emerald" />
+              <Kpi label="1위" value={votes[0]?.stageName ?? '—'} sub={`가중치 점수 ${fmtNum(Math.round(votes[0]?.weightedScore ?? 0))}`} tone="amber" />
+              <Kpi label="진출 기준" value={round.advancement?.topN ? `Top ${round.advancement.topN}` : '—'} sub="FR-143 자동 진출" tone="sky" />
+            </div>
+
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">실시간 가중치 랭킹</h4>
+                <div className="text-xs text-slate-500">
+                  공식: (온라인 × {audition.weights.online}) + (SMS × {audition.weights.sms}) + (인기도 × {audition.weights.popularity})
+                </div>
+              </div>
+              <div className="space-y-2">
+                {votes.map((v, i) => {
+                  const advancing = round.advancement?.topN && i < round.advancement.topN;
+                  return (
+                    <div key={v.idolId} className="flex items-center gap-3">
+                      <div className="w-8 text-center">
+                        <div className={`text-xs font-bold ${i < 3 ? 'text-brand-600' : 'text-slate-400'}`}>{i + 1}</div>
+                      </div>
+                      <div className="w-9 h-9 rounded-lg bar flex items-center justify-center text-white font-bold">{v.stageName[0]}</div>
+                      <div className="w-32 font-medium text-sm truncate">{v.stageName}</div>
+                      <div className="flex-1 h-6 rounded-lg bg-slate-100 relative overflow-hidden">
+                        <div className="h-full bar transition-all" style={{ width: `${(v.weightedScore / maxScore) * 100}%` }} />
+                      </div>
+                      <div className="w-56 grid grid-cols-3 gap-1 text-[11px] text-slate-500">
+                        <span title="온라인 투표">🌐 {fmtNum(v.online)}</span>
+                        <span title="SMS 투표">📱 {fmtNum(v.sms)}</span>
+                        <span title="인기도">❤ {fmtNum(v.popularity)}</span>
+                      </div>
+                      <div className="w-24 text-right tabular-nums text-sm font-semibold">{fmtNum(Math.round(v.weightedScore))}</div>
+                      <div className="w-16 text-right">
+                        {advancing ? <Badge tone="emerald">진출</Badge> : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {round.status === 'ACTIVE' ? (
+                <div className="mt-5 flex gap-2">
+                  <Button variant="danger">라운드 조기 종료</Button>
+                  <Button variant="soft">일시 정지 (긴급)</Button>
+                </div>
+              ) : round.status === 'CLOSED' ? (
+                <div className="mt-5 flex gap-2">
+                  <Button>확정(FINALIZE) 하고 진출자 확정</Button>
+                  <Button variant="ghost">결과 재검토</Button>
+                </div>
+              ) : null}
+            </Card>
+          </div>
+        );
+      }
+
+      function VoteRuleEditor({ audition, onUpdate }) {
+        const [w, setW] = useState({ ...audition.weights });
+        const sum = w.online + w.sms + w.popularity;
+        const valid = Math.abs(sum - 1) <= 0.001;
+        const activeExists = audition.rounds.some(r => r.status === 'ACTIVE');
+
+        function change(k, v) {
+          setW(prev => ({ ...prev, [k]: Number(v) }));
+        }
+        function normalize() {
+          if (sum === 0) return;
+          setW({
+            online: Number((w.online / sum).toFixed(3)),
+            sms: Number((w.sms / sum).toFixed(3)),
+            popularity: Number((w.popularity / sum).toFixed(3)),
+          });
+        }
+        return (
+          <div className="space-y-4 max-w-3xl">
+            <div className={`p-4 rounded-lg text-sm ${valid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>
+              FR-147: 가중치 합 = 1.0 ± 0.001 · 현재 합 <b className="tabular-nums">{sum.toFixed(3)}</b>
+              {activeExists ? (
+                <span className="ml-3 text-rose-600">⚠ 활성 라운드가 있어 가중치 잠금 상태 (FR-147)</span>
+              ) : null}
+            </div>
+
+            {['online', 'sms', 'popularity'].map(k => (
+              <Card key={k} className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-medium">{ { online: '🌐 온라인 투표', sms: '📱 SMS 투표', popularity: '❤ 인기도(하트)' }[k]}</div>
+                    <div className="text-xs text-slate-500">
+                      { { online: '앱 내 투표권 사용', sms: '외부 SMS 발송 (Phase 2에서 집계)', popularity: '하트/팔로우 수 기반 자동 집계' }[k]}
+                    </div>
+                  </div>
+                  <div className="text-xl font-bold tabular-nums w-16 text-right">{(w[k] * 100).toFixed(1)}%</div>
+                </div>
+                <input type="range" min="0" max="1" step="0.01" value={w[k]} disabled={activeExists}
+                  onChange={e => change(k, e.target.value)} className="w-full accent-brand-500" />
+              </Card>
+            ))}
+
+            <div className="flex gap-2">
+              <Button variant="ghost" onClick={normalize} disabled={activeExists}>자동 정규화 (합=1)</Button>
+              <Button disabled={!valid || activeExists}>저장</Button>
+            </div>
+
+            <Card className="p-4 bg-slate-50">
+              <div className="text-xs text-slate-500 mb-1">투표권 한도 (FR-150)</div>
+              <div className="flex items-center gap-3">
+                <Input type="number" defaultValue={audition.ticketLimitPerUser} className="max-w-[100px]" />
+                <span className="text-sm text-slate-600">장 / 라운드 / 사용자</span>
+              </div>
+            </Card>
+          </div>
+        );
+      }
+
+      function ParticipantList({ pool }) {
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {pool.map(i => (
+              <Card key={i.id} className="p-3">
+                <div className="aspect-square rounded-lg bar flex items-end p-2 text-white mb-2">
+                  <div className="text-xl font-black">{i.stageName[0]}</div>
+                </div>
+                <div className="text-sm font-semibold truncate">{i.stageName}</div>
+                <div className="text-[11px] text-slate-500">❤ {fmtNum(i.heartCount)}</div>
+              </Card>
+            ))}
+          </div>
+        );
+      }
+
+      // =========================================================
+      // Announcements & Schedules
+      // =========================================================
+      function AnnouncementsScreen({ announcements, schedules, idols, auditions }) {
+        const [tab, setTab] = useState('announcements');
+        return (
+          <div className="p-6 space-y-4">
+            <Card className="p-4">
+              <div className="flex gap-6 border-b border-slate-200 -mx-4 px-4 -mt-4 pt-4">
+                {[
+                  ['announcements', '공지 / 푸시'],
+                  ['schedules', '아이돌 일정'],
+                ].map(([k, l]) => (
+                  <button key={k} onClick={() => setTab(k)}
+                    className={`pb-3 -mb-px text-sm border-b-2 ${tab === k ? 'border-brand-500 font-semibold text-brand-700' : 'border-transparent text-slate-500'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <div className="pt-4">
+                {tab === 'announcements' ? <AnnouncementList announcements={announcements} idols={idols} auditions={auditions} /> : <ScheduleList schedules={schedules} idols={idols} />}
+              </div>
+            </Card>
+          </div>
+        );
+      }
+
+      function AnnouncementList({ announcements, idols, auditions }) {
+        const [showCompose, setShowCompose] = useState(false);
+        function targetLabel(t) {
+          if (t === 'global') return { icon: '🌐', label: '전체 사용자' };
+          if (t.startsWith('idol:')) { const id = t.slice(5); const i = idols.find(i => i.id === id); return { icon: '🎤', label: i ? `${i.stageName} 팬클럽` : id }; }
+          if (t.startsWith('audition:')) { const id = t.slice(9); const a = auditions.find(a => a.id === id); return { icon: '🏆', label: a ? a.name : id }; }
+          return { icon: '?', label: t };
+        }
+        return (
+          <>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm text-slate-600">공지 {announcements.length}건 · 예약 {announcements.filter(a => a.status === 'scheduled').length}건</div>
+              <Button onClick={() => setShowCompose(true)}>+ 공지 작성</Button>
+            </div>
+            <div className="space-y-2">
+              {announcements.map(a => {
+                const t = targetLabel(a.target);
+                return (
+                  <Card key={a.id} className="p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-xl">{t.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold">{a.title}</h4>
+                          <Badge tone={statusColor[a.status] ? 'slate' : 'slate'}>{a.status === 'scheduled' ? '예약' : '발송 완료'}</Badge>
+                          <Badge tone={a.channel === 'essential' ? 'indigo' : 'amber'}>{a.channel === 'essential' ? '필수' : '마케팅'}</Badge>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">{a.body}</p>
+                        <div className="text-[11px] text-slate-400 mt-2">
+                          대상: <b>{t.label}</b> · 예약 {fmtDateTime(a.scheduledAt)}
+                          {a.channel === 'marketing' ? ' · POL-007: 21:00~09:00 자동 침묵' : null}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost">편집</Button>
+                        {a.status === 'scheduled' ? <Button variant="soft">취소</Button> : null}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+            <AnnouncementCompose open={showCompose} onClose={() => setShowCompose(false)} idols={idols} auditions={auditions} />
+          </>
+        );
+      }
+
+      function AnnouncementCompose({ open, onClose, idols, auditions }) {
+        const [form, setForm] = useState({
+          target: 'global', idolId: idols[0]?.id ?? '', auditionId: auditions[0]?.id ?? '',
+          title: '', body: '', channel: 'essential', scheduledAt: new Date().toISOString().slice(0, 16),
+        });
+        const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target?.value ?? e }));
+        const target =
+          form.target === 'global' ? 'global' :
+          form.target === 'idol' ? `idol:${form.idolId}` :
+          `audition:${form.auditionId}`;
+
+        return (
+          <Drawer open={open} onClose={onClose} title="공지 작성"
+            footer={<>
+              <Button variant="ghost" onClick={onClose}>취소</Button>
+              <Button disabled={!form.title || !form.body}>예약 발송</Button>
+            </>}>
+            <div className="space-y-4">
+              <Field label="대상">
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    ['global', '🌐 전체 사용자'],
+                    ['idol', '🎤 아이돌 팬클럽'],
+                    ['audition', '🏆 오디션 참여자'],
+                  ].map(([k, l]) => (
+                    <button key={k} onClick={() => setForm(f => ({...f, target: k}))}
+                      className={`px-3 py-2 rounded-lg border text-sm ${form.target === k ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-slate-200'}`}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+              {form.target === 'idol' ? (
+                <Field label="아이돌 선택">
+                  <Select value={form.idolId} onChange={set('idolId')}>
+                    {idols.slice(0, 30).map(i => <option key={i.id} value={i.id}>{i.stageName}</option>)}
+                  </Select>
+                </Field>
+              ) : null}
+              {form.target === 'audition' ? (
+                <Field label="오디션 선택">
+                  <Select value={form.auditionId} onChange={set('auditionId')}>
+                    {auditions.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </Select>
+                </Field>
+              ) : null}
+              <Field label="제목 *"><Input value={form.title} onChange={set('title')} maxLength={50} /></Field>
+              <Field label={`내용 * (${form.body.length}/200)`} hint="FR-121: 자동 메시지 ≤200자">
+                <TextArea rows={4} value={form.body} onChange={set('body')} maxLength={200} />
+              </Field>
+              <Field label="채널">
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => setForm(f => ({...f, channel: 'essential'}))}
+                    className={`px-3 py-2 rounded-lg border text-sm ${form.channel === 'essential' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200'}`}>
+                    필수 알림 (24시간)
+                  </button>
+                  <button onClick={() => setForm(f => ({...f, channel: 'marketing'}))}
+                    className={`px-3 py-2 rounded-lg border text-sm ${form.channel === 'marketing' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-slate-200'}`}>
+                    마케팅 (09~21 KST)
+                  </button>
+                </div>
+              </Field>
+              <Field label="발송 시각"><Input type="datetime-local" value={form.scheduledAt} onChange={set('scheduledAt')} /></Field>
+              <Card className="p-3 bg-slate-50">
+                <div className="text-[11px] text-slate-500 mb-1">미리보기 (모바일 앱)</div>
+                <div className="bg-white rounded-lg p-3 border">
+                  <div className="text-xs text-slate-400">A-idol · 지금</div>
+                  <div className="font-semibold">{form.title || '제목 미입력'}</div>
+                  <div className="text-sm text-slate-700">{form.body || '내용 미입력'}</div>
+                </div>
+              </Card>
+            </div>
+          </Drawer>
+        );
+      }
+
+      function ScheduleList({ schedules, idols }) {
+        return (
+          <>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm text-slate-600">일정 {schedules.length}건</div>
+              <Button>+ 일정 등록</Button>
+            </div>
+            <Card className="overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 text-left">
+                  <tr><th className="px-4 py-3">구분</th><th className="px-4 py-3">아이돌</th><th className="px-4 py-3">제목</th><th className="px-4 py-3">시작</th><th className="px-4 py-3">장소</th><th /></tr>
+                </thead>
+                <tbody>
+                  {schedules.map(s => {
+                    const i = idols.find(i => i.id === s.idolId);
+                    return (
+                      <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-4 py-3"><Badge tone={
+                          s.type === 'CONCERT' ? 'brand' :
+                          s.type === 'BROADCAST' ? 'sky' :
+                          s.type === 'FANMEETING' ? 'emerald' : 'slate'
+                        }>{s.type}</Badge></td>
+                        <td className="px-4 py-3 font-medium">{i?.stageName ?? '—'}</td>
+                        <td className="px-4 py-3">{s.title}</td>
+                        <td className="px-4 py-3 text-xs">{fmtDateTime(s.startAt)}</td>
+                        <td className="px-4 py-3 text-xs text-slate-500">{s.location}</td>
+                        <td className="px-4 py-3 text-right"><Button variant="ghost">편집</Button></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </Card>
+          </>
+        );
+      }
+
+      // =========================================================
+      // Analytics
+      // =========================================================
+      function Analytics({ idols, auditions }) {
+        const days = 14;
+        const rand = seededRandom(777);
+        const dauSeries = Array.from({ length: days }, (_, i) => ({
+          day: i + 1, dau: 8000 + Math.floor(rand() * 4000), mau: 120000 + Math.floor(rand() * 20000),
+        }));
+        const maxDau = Math.max(...dauSeries.map(d => d.dau));
+        const round = auditions[0].rounds.find(r => r.status === 'ACTIVE') ?? auditions[0].rounds[0];
+        const pool = idols.filter(i => auditions[0].participatingIdolIds.includes(i.id));
+        const votes = buildLiveVotes(round, pool);
+
+        return (
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-4 gap-3">
+              <Kpi label="DAU (어제)" value={fmtNum(dauSeries[days - 1].dau)} sub="전일 대비 +3.2%" tone="brand" />
+              <Kpi label="MAU" value={fmtNum(dauSeries[days - 1].mau)} sub="30일 유니크" tone="emerald" />
+              <Kpi label="포토카드 매출(7d)" value="₩ 142,500,000" sub="목업 수치" tone="amber" />
+              <Kpi label="30일 리텐션" value="41.2%" sub="MVP 목표 40%+" tone="sky" />
+            </div>
+
+            <Card className="p-5">
+              <h3 className="font-semibold mb-3">DAU (최근 14일)</h3>
+              <div className="h-48 flex items-end gap-1.5">
+                {dauSeries.map(d => (
+                  <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full bar rounded-t" style={{ height: `${(d.dau / maxDau) * 100}%` }} />
+                    <div className="text-[10px] text-slate-400">D-{days - d.day}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-5">
+                <h3 className="font-semibold mb-3">오디션 투표 분포 (R{round.roundNo})</h3>
+                <VoteDistribution votes={votes} />
+              </Card>
+
+              <Card className="p-5">
+                <h3 className="font-semibold mb-3">소속사별 아이돌 분포</h3>
+                <AgencyDonut idols={idols} />
+              </Card>
+            </div>
+          </div>
+        );
+      }
+
+      function VoteDistribution({ votes }) {
+        const total = votes.reduce((s, v) => s + v.online + v.sms + v.popularity, 0) || 1;
+        const online = votes.reduce((s, v) => s + v.online, 0);
+        const sms = votes.reduce((s, v) => s + v.sms, 0);
+        const pop = votes.reduce((s, v) => s + v.popularity, 0);
+        return (
+          <div className="space-y-3">
+            {[['🌐 온라인', online, 'bg-brand-500'], ['📱 SMS', sms, 'bg-indigo-500'], ['❤ 인기도', pop, 'bg-amber-500']].map(([l, v, c]) => (
+              <div key={l}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span>{l}</span>
+                  <span className="text-slate-500 tabular-nums">{fmtNum(v)} ({((v/total)*100).toFixed(1)}%)</span>
+                </div>
+                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className={`h-full ${c}`} style={{ width: `${(v/total)*100}%` }} />
+                </div>
+              </div>
+            ))}
+            <div className="pt-2 border-t border-slate-200 text-xs text-slate-500">
+              총 투표수 <b className="text-slate-800">{fmtNum(total)}</b>
+            </div>
+          </div>
+        );
+      }
+
+      function AgencyDonut({ idols }) {
+        const counts = AGENCIES.map(a => ({
+          name: a.name, count: idols.filter(i => i.agencyId === a.id && i.isActive).length,
+        }));
+        const total = counts.reduce((s, c) => s + c.count, 0) || 1;
+        const palette = ['#ec4899', '#a855f7', '#f59e0b'];
+        let cum = 0;
+        return (
+          <div className="flex items-center gap-6">
+            <svg width="140" height="140" viewBox="0 0 42 42" className="-rotate-90">
+              <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#e2e8f0" strokeWidth="4" />
+              {counts.map((c, i) => {
+                const pct = (c.count / total) * 100;
+                const dash = `${pct} ${100 - pct}`;
+                const offset = 25 - cum;
+                cum += pct;
+                return <circle key={c.name} cx="21" cy="21" r="15.9" fill="transparent"
+                  stroke={palette[i]} strokeWidth="4" strokeDasharray={dash} strokeDashoffset={offset} />;
+              })}
+              <text x="21" y="22" textAnchor="middle" className="rotate-90" fontSize="6" fill="#334155" transform="rotate(90 21 21)">
+                {total}
+              </text>
+            </svg>
+            <div className="space-y-2 flex-1">
+              {counts.map((c, i) => (
+                <div key={c.name} className="flex items-center gap-2 text-sm">
+                  <span className="w-3 h-3 rounded" style={{ background: palette[i] }} />
+                  <span className="flex-1">{c.name}</span>
+                  <span className="text-slate-500 tabular-nums">{c.count}명</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // =========================================================
+      // Root App
+      // =========================================================
+      function App() {
+        const [user, setUser] = useState(null);
+        const [view, setView] = useState('dashboard');
+        const [idols, setIdols] = useState([]);
+        const [auditions, setAuditions] = useState([]);
+        const [announcements, setAnnouncements] = useState(ANNOUNCEMENTS);
+        const [schedules, setSchedules] = useState(SCHEDULES);
+        const [apiUp, setApiUp] = useState(false);
+
+        // Initial load — try backend /idols then fill mock
+        useEffect(() => {
+          (async () => {
+            try {
+              const res = await fetch(`${API_BASE}/idols`);
+              const body = res.ok ? await res.json() : { items: [] };
+              setApiUp(res.ok);
+              const mixed = buildMockIdols(body.items ?? []);
+              setIdols(mixed);
+              setAuditions(buildMockAuditions(mixed));
+            } catch {
+              setApiUp(false);
+              const mixed = buildMockIdols([]);
+              setIdols(mixed);
+              setAuditions(buildMockAuditions(mixed));
+            }
+          })();
+        }, []);
+
+        const stats = useMemo(() => ({ activeIdols: idols.filter(i => i.isActive).length }), [idols]);
+
+        const onIdolUpdate = useCallback((patch) => {
+          setIdols(prev => {
+            const idx = prev.findIndex(i => i.id === patch.id);
+            if (idx === -1) return [patch, ...prev];
+            const next = [...prev];
+            next[idx] = { ...next[idx], ...patch };
+            return next;
+          });
+        }, []);
+
+        if (!user) return <LoginScreen onLogin={setUser} />;
+
+        const pageMeta = {
+          dashboard: ['대시보드', '활성 아이돌 / 오디션 / 공지 현황'],
+          idols: ['아이돌 관리', `${stats.activeIdols}/99명 활성 · FR-111, FR-113 · BR-001`],
+          auditions: ['오디션', 'FR-140~149 · 라운드 진행, 가중치 규칙, 실시간 모니터'],
+          announcements: ['공지 · 일정', 'FR-112, FR-121 · 푸시 채널 분리(POL-007)'],
+          analytics: ['통계', 'FR-160~163 · DAU/MAU, 투표·매출 요약'],
+        };
+
+        return (
+          <div className="min-h-screen flex">
+            <Sidebar view={view} setView={setView} user={user} onLogout={() => setUser(null)} stats={stats} />
+            <main className="flex-1 flex flex-col min-w-0">
+              <Topbar
+                title={pageMeta[view][0]}
+                subtitle={pageMeta[view][1]}
+                apiStatus={apiUp}
+                right={
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost">🔔</Button>
+                    <Button variant="ghost">?</Button>
+                  </div>
+                }
+              />
+              <div className="flex-1 overflow-y-auto scrollbar-thin">
+                {view === 'dashboard' && <Dashboard idols={idols} auditions={auditions} announcements={announcements} schedules={schedules} setView={setView} />}
+                {view === 'idols' && <IdolManager idols={idols} onUpdate={onIdolUpdate} />}
+                {view === 'auditions' && <AuditionManager auditions={auditions} idols={idols} onUpdate={setAuditions} />}
+                {view === 'announcements' && <AnnouncementsScreen announcements={announcements} schedules={schedules} idols={idols} auditions={auditions} />}
+                {view === 'analytics' && <Analytics idols={idols} auditions={auditions} />}
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>

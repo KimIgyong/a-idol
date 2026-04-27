@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-idol Mobile Wireframes — Light Mode</title>
+<style>
+/* ── Design Tokens ─────────────────── */
+:root {
+  --bg:        #FFFFFF;
+  --surface:   #F7F6F3;
+  --elevated:  #EDECEA;
+  --accent:    #FF7A20;
+  --accent-lt: #FFF1E8;
+  --accent-dk: #D85A08;
+  --accent2:   #E03060;
+  --gold:      #C8880A;
+  --text1:     #18181E;
+  --text2:     #666674;
+  --text3:     #AAABB8;
+  --border:    rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.13);
+  --success:   #14996A;
+
+  /* Character theme colors */
+  --luna:   #5E2DA0;
+  --kira:   #1851A8;
+  --nova:   #1A7A50;
+  --aria:   #A82020;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:#EDECEA;
+  font-family:'Apple SD Gothic Neo','Noto Sans KR','Segoe UI',sans-serif;
+  min-height:100vh;
+  padding:32px 16px 60px;
+}
+
+/* ── Page header ── */
+.page-title{
+  text-align:center;font-size:17px;font-weight:800;
+  color:var(--accent);letter-spacing:-.5px;margin-bottom:4px;
+}
+.page-sub{text-align:center;font-size:11px;color:var(--text2);margin-bottom:24px;}
+
+/* ── Screen tabs ── */
+.tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:26px;}
+.tab-btn{
+  padding:7px 18px;border-radius:20px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border-md);cursor:pointer;
+  background:var(--bg);color:var(--text2);transition:all .15s;
+}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.tab-btn:hover:not(.active){background:var(--surface);}
+
+.screens{min-height:700px;}
+.screen{display:none;justify-content:center;gap:36px;flex-wrap:wrap;}
+.screen.active{display:flex;}
+
+/* ── Phone shell ── */
+.phone{
+  width:224px;background:var(--bg);
+  border-radius:40px;
+  border:1.5px solid rgba(0,0,0,.16);
+  overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 0 6px rgba(0,0,0,.04), 0 24px 52px rgba(0,0,0,.13);
+}
+.phone-notch{height:26px;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.notch-pill{width:68px;height:9px;background:#18181e;border-radius:5px;}
+.phone-label{text-align:center;font-size:10px;color:var(--text2);margin-top:12px;letter-spacing:.2px;}
+
+/* Status bar */
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:2px 16px 4px;font-size:9px;color:var(--text1);font-weight:600;
+}
+
+/* Nav bar */
+.nav-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;background:var(--bg);border-bottom:1px solid var(--border);
+}
+.nav-title{font-size:13px;font-weight:700;color:var(--text1);}
+
+/* ── Bottom Tab Bar ── */
+.btab{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:9px 4px 14px;background:var(--bg);
+  border-top:1px solid var(--border);
+}
+.ti{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ti-lbl{font-size:7px;color:var(--text3);}
+.ti.on .ti-lbl{color:var(--accent);font-weight:700;}
+
+/* ── Feed ── */
+.feed-header{padding:10px 14px 5px;display:flex;justify-content:space-between;align-items:center;}
+.logo-text{font-size:17px;font-weight:900;color:var(--accent);letter-spacing:-.6px;}
+
+.chips{display:flex;gap:5px;padding:4px 12px 9px;overflow:hidden;}
+.chip{padding:3px 10px;border-radius:12px;font-size:9px;font-weight:500;background:var(--elevated);color:var(--text2);white-space:nowrap;border:1px solid transparent;}
+.chip.active{background:var(--accent-lt);color:var(--accent);border-color:rgba(255,122,32,.22);}
+
+.idol-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 10px 10px;}
+
+/* Character Card */
+.idol-card{background:var(--bg);border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.07);}
+
+.char-card{
+  height:114px;position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.char-bg{
+  position:absolute;inset:0;
+}
+/* Subtle bottom fade for name readability */
+.char-fade{
+  position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(transparent, rgba(0,0,0,.32));
+}
+/* Character illustration — sits centered, bottom-anchored */
+.char-img{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:88px;height:96px;
+  object-fit:contain;object-position:bottom center;
+}
+.like-badge{
+  position:relative;z-index:3;
+  background:rgba(255,255,255,.92);
+  border-radius:10px;padding:2px 6px;font-size:8px;
+  color:var(--text1);display:flex;align-items:center;gap:2px;
+  margin:0 6px 6px 0;align-self:flex-end;margin-left:auto;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
+}
+.card-info{padding:7px 9px 9px;}
+.card-name{font-size:10.5px;font-weight:800;color:var(--text1);}
+.card-agency{font-size:8px;color:var(--text2);margin-top:1px;}
+.card-actions{display:flex;align-items:center;gap:7px;margin-top:6px;}
+
+/* ── Detail ── */
+/* Character hero — light bg with character centered */
+.char-hero{
+  height:172px;position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.char-hero-bg{position:absolute;inset:0;}
+.char-hero-fade{
+  position:absolute;bottom:0;left:0;right:0;height:70px;
+  background:linear-gradient(transparent, var(--bg));
+}
+.char-hero-img{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:140px;height:160px;
+  object-fit:contain;object-position:bottom center;
+}
+.hero-back-btn{
+  position:absolute;top:10px;left:12px;
+  background:rgba(255,255,255,.90);border-radius:14px;
+  padding:3px 9px;display:flex;align-items:center;gap:3px;
+  font-size:11px;color:var(--text1);z-index:5;
+}
+.hero-actions{position:absolute;top:10px;right:12px;display:flex;gap:6px;z-index:5;}
+.hero-action-btn{
+  background:rgba(255,255,255,.90);border-radius:14px;
+  padding:5px;display:flex;align-items:center;justify-content:center;
+}
+.photo-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;z-index:5;}
+.photo-dot{width:4px;height:4px;border-radius:2px;background:rgba(255,255,255,.45);}
+.photo-dot.active{background:#fff;width:10px;}
+
+.detail-card{background:var(--bg);padding:10px 13px;}
+.idol-name{font-size:15px;font-weight:800;color:var(--text1);}
+.agency-badge{
+  display:inline-block;background:var(--accent-lt);
+  border:1px solid rgba(255,122,32,.28);border-radius:8px;
+  padding:1px 7px;font-size:8px;color:var(--accent);margin-left:6px;font-weight:700;
+}
+.detail-tags{display:flex;gap:3px;margin:5px 0;flex-wrap:wrap;}
+.detail-tag{background:var(--elevated);border-radius:8px;padding:2px 7px;font-size:8px;color:var(--text2);}
+.stat-row{display:flex;gap:16px;padding:6px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:6px 0;}
+.stat-item{font-size:8px;color:var(--text2);display:flex;align-items:center;gap:3px;}
+.stat-item strong{color:var(--text1);font-size:9.5px;font-weight:700;}
+.action-row{display:flex;gap:5px;margin-bottom:9px;}
+.action-btn{flex:1;padding:8px;border-radius:10px;font-size:8px;font-weight:700;text-align:center;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;}
+.action-like{background:rgba(224,48,96,.09);color:var(--accent2);}
+.action-follow{background:var(--elevated);color:var(--text2);}
+.action-chat{background:var(--accent);color:#fff;}
+.section-label{font-size:9px;font-weight:700;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px;}
+.schedule-row{display:flex;gap:5px;align-items:center;padding:4px 0;}
+.sched-date{font-size:7.5px;color:var(--accent);font-weight:700;min-width:28px;}
+.sched-type{background:var(--accent-lt);border-radius:4px;padding:1px 6px;font-size:7.5px;color:var(--accent);font-weight:600;}
+.sched-title{font-size:8px;color:var(--text1);}
+
+/* ── Chat ── */
+.chat-header{background:var(--bg);padding:9px 14px;border-bottom:1px solid var(--border);}
+.chat-idol-name{font-size:12px;font-weight:700;color:var(--text1);text-align:center;}
+.chat-online{font-size:8px;color:var(--success);text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;margin-top:1px;}
+.quota-bar{display:flex;justify-content:space-between;align-items:center;padding:5px 13px;background:var(--surface);border-bottom:1px solid var(--border);}
+.quota-dots{display:flex;gap:3px;}
+.quota-dot{width:7px;height:7px;border-radius:3.5px;}
+.quota-dot.used{background:var(--elevated);border:1px solid var(--border-md);}
+.quota-dot.avail{background:var(--accent);}
+
+.chat-body{padding:10px;display:flex;flex-direction:column;gap:9px;min-height:236px;background:var(--surface);}
+.msg-auto-label{font-size:7px;color:var(--gold);margin-bottom:2px;font-weight:600;display:flex;align-items:center;gap:2px;}
+.bubble-idol{background:var(--bg);border-radius:12px 12px 12px 2px;padding:6px 10px;font-size:9px;color:var(--text1);max-width:140px;line-height:1.45;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.bubble-user{background:var(--accent);border-radius:12px 12px 2px 12px;padding:6px 10px;font-size:9px;color:#fff;max-width:140px;align-self:flex-end;line-height:1.45;}
+.bubble-time{font-size:7px;color:var(--text3);margin-top:2px;}
+.bubble-time.right{text-align:right;}
+.idol-bubble-row{display:flex;align-items:flex-end;gap:6px;}
+
+/* Chat avatar — character style */
+.chat-avatar{
+  width:28px;height:28px;border-radius:14px;
+  flex-shrink:0;overflow:hidden;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+}
+.chat-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+
+.chat-input-area{display:flex;align-items:center;gap:6px;padding:6px 10px;border-top:1px solid var(--border);background:var(--bg);}
+.chat-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:9px;color:var(--text2);}
+.send-btn{width:30px;height:30px;border-radius:15px;background:var(--accent);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;flex-shrink:0;}
+
+/* ── Audition ── */
+.audi-hero{background:linear-gradient(135deg,#FF7A20,#FF4060);padding:14px 13px 12px;}
+.audi-hero-title{font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;}
+.audi-hero-sub{font-size:8px;color:rgba(255,255,255,.82);margin-top:3px;}
+.countdown{font-size:17px;font-weight:800;color:#fff;margin:5px 0;font-variant-numeric:tabular-nums;letter-spacing:1px;}
+.audi-cta{background:#fff;border-radius:8px;padding:5px 13px;font-size:9px;color:var(--accent);font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-top:4px;}
+.round-track{display:flex;align-items:center;gap:2px;padding:8px 13px;}
+.round-circle{width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;flex-shrink:0;}
+.round-line{flex:1;height:1px;background:var(--border);}
+.rc-done{background:var(--accent);color:#fff;}
+.rc-cur{border:2px solid var(--accent);color:var(--accent);background:transparent;box-shadow:0 0 6px rgba(255,122,32,.3);}
+.rc-fut{background:var(--elevated);color:var(--text3);}
+
+.rank-list{padding:4px 13px;}
+.rank-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);}
+.rank-no{font-size:10px;font-weight:800;color:var(--gold);min-width:14px;}
+
+/* Rank avatar — character */
+.rank-avatar{
+  width:28px;height:28px;border-radius:14px;
+  flex-shrink:0;overflow:hidden;border:1.5px solid var(--border);
+  background:var(--surface);
+}
+.rank-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+
+.rank-name{font-size:9px;font-weight:600;color:var(--text1);flex:1;}
+.rank-bar{flex:2;height:4px;border-radius:2px;background:var(--elevated);overflow:hidden;}
+.rank-bar-fill{height:100%;border-radius:2px;}
+.rank-count{font-size:7.5px;color:var(--text2);min-width:34px;text-align:right;}
+.rank-delta{font-size:7.5px;min-width:12px;font-weight:600;}
+.dup{color:var(--success);}
+.ddn{color:var(--accent2);}
+
+/* ── Gacha ── */
+.gacha-body{padding:9px 14px;}
+.card-fan{display:flex;justify-content:center;position:relative;height:120px;margin:6px 0 14px;}
+.fan-card{
+  width:66px;height:100px;border-radius:10px;position:absolute;
+  border:1.5px solid rgba(0,0,0,.09);top:10px;left:50%;
+  transform-origin:bottom center;
+  box-shadow:0 4px 14px rgba(0,0,0,.10);overflow:hidden;background:var(--surface);
+}
+.fan-card img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.fc1{transform:translateX(-63px) rotate(-25deg);}
+.fc2{transform:translateX(-31px) rotate(-12deg);z-index:2;}
+.fc3{transform:translateX(0) rotate(0);z-index:3;}
+.fc4{transform:translateX(31px) rotate(12deg);z-index:2;}
+.fc5{transform:translateX(63px) rotate(25deg);}
+
+.gacha-set-name{font-size:12px;font-weight:800;color:var(--text1);text-align:center;}
+.gacha-set-sub{font-size:8px;color:var(--text2);text-align:center;margin-top:2px;}
+.coll-dots{display:flex;gap:3px;flex-wrap:wrap;margin:8px 0 4px;}
+.coll-dot{width:10px;height:10px;border-radius:3px;}
+.coll-dot.owned{background:var(--accent);}
+.coll-dot.empty{background:var(--elevated);border:1px solid var(--border);}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px;}
+.price-label{font-size:10px;color:var(--text2);}
+.price-value{font-size:15px;font-weight:800;color:var(--accent);}
+.gacha-btn{width:100%;padding:10px;border-radius:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;border:none;cursor:pointer;margin-top:10px;letter-spacing:.3px;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.gacha-btn:hover{opacity:.9;}
+.gacha-note{font-size:7.5px;color:var(--text3);text-align:center;margin-top:5px;}
+</style>
+</head>
+<body>
+
+<!-- ══ SVG Symbol Library — Monochrome Outline Icons ══ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4H4a1 1 0 00-1 1v3c0 2.76 1.79 5.12 4.33 5.77M17 4h3a1 1 0 011 1v3c0 2.76-1.79 5.12-4.33 5.77"/><path d="M7 4h10v7a5 5 0 01-10 0V4z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="14" rx="2"/><rect x="10" y="7" width="10" height="14" rx="2"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M3 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/><circle cx="17" cy="8" r="2.5"/><path d="M19.5 20c0-2.76-1.79-5-4-5.3"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0112 0c0 3.5.9 5.5 2 7H4c1.1-1.5 2-3.5 2-7z"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></symbol>
+  <symbol id="i-heart-f" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></symbol>
+  <symbol id="i-plus-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="7.5 12 10.5 15 16.5 9"/></symbol>
+  <symbol id="i-chevl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1a2 2 0 010 4v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1a2 2 0 010-4V9z"/><line x1="9" y1="7" x2="9" y2="17" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></symbol>
+  <symbol id="i-photo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19h20M4 19L2 8l5 4 5-7 5 7 5-4-2 11"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+</svg>
+
+<!-- ======================================================
+     DiceBear character URLs
+     Style: adventurer — cute illustrated character style
+     Each idol: unique seed + matching bg color
+====================================================== -->
+
+<p class="page-title">★ A-idol — Mobile Wireframes</p>
+<div class="page-sub">UI Specification v1.0.0 · Light Mode · Character Illustrations</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showScreen('feed',this)">홈 피드</button>
+  <button class="tab-btn" onclick="showScreen('detail',this)">아이돌 상세</button>
+  <button class="tab-btn" onclick="showScreen('chat',this)">채팅</button>
+  <button class="tab-btn" onclick="showScreen('audition',this)">오디션</button>
+  <button class="tab-btn" onclick="showScreen('gacha',this)">포토카드</button>
+</div>
+
+<div class="screens">
+
+<!-- ══════════ FEED ══════════ -->
+<div class="screen active" id="screen-feed">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="status-bar">
+        <span style="font-weight:700;">9:41</span>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <svg style="width:11px;height:11px;color:var(--text1)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5"/><path d="M5 12c2.2-2.2 12-2.2 14 0"/><path d="M8.5 15.5c1.2-1.2 6.8-1.2 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>
+          <svg style="width:11px;height:11px;color:var(--text1)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="feed-header">
+        <div class="logo-text">★ A-idol</div>
+        <div style="display:flex;gap:11px;align-items:center;">
+          <svg style="width:18px;height:18px;color:var(--text2)"><use href="#i-search"/></svg>
+          <svg style="width:18px;height:18px;color:var(--text2)"><use href="#i-bell"/></svg>
+        </div>
+      </div>
+
+      <div class="chips">
+        <div class="chip active">All</div>
+        <div class="chip">Nova Ent.</div>
+        <div class="chip">Stellar</div>
+        <div class="chip">Apex</div>
+      </div>
+
+      <div class="idol-grid">
+
+        <!-- Luna Veil -->
+        <div class="idol-card">
+          <div class="char-card">
+            <div class="char-bg" style="background:linear-gradient(160deg,#e8d8ff,#c4a0f0);"></div>
+            <div class="char-fade"></div>
+            <img class="char-img" src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeil&backgroundColor=transparent&hair=long16&hairColor=6c4675&eyes=variant06&eyebrows=variant04&mouth=variant04&skinColor=f2d3b1&clothing=blazer&clothingColor=7c3aed" alt="Luna Veil">
+            <div class="like-badge">
+              <svg style="width:8px;height:8px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>
+              12.4K
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Luna Veil</div>
+            <div class="card-agency">Nova Entertainment</div>
+            <div class="card-actions">
+              <svg style="width:14px;height:14px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>
+              <span style="font-size:8px;color:var(--accent);display:flex;align-items:center;gap:2px;font-weight:600;">
+                <svg style="width:10px;height:10px;color:var(--accent)"><use href="#i-check-c"/></svg>Following
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kira Sol -->
+        <div class="idol-card">
+          <div class="char-card">
+            <div class="char-bg" style="background:linear-gradient(160deg,#d0e8ff,#90c0f8);"></div>
+            <div class="char-fade"></div>
+            <img class="char-img" src="https://api.dicebear.com/8.x/adventurer/svg?seed=KiraSol&backgroundColor=transparent&hair=short19&hairColor=0e1e3c&eyes=variant14&eyebrows=variant10&mouth=variant10&skinColor=eac393&clothing=shirt&clothingColor=1d4ed8" alt="Kira Sol">
+            <div class="like-badge">
+              <svg style="width:8px;height:8px;color:var(--text3)" fill="none" viewBox="0 0 24 24"><use href="#i-heart"/></svg>
+              9.8K
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Kira Sol</div>
+            <div class="card-agency">Stellar Records</div>
+            <div class="card-actions">
+              <svg style="width:14px;height:14px;color:var(--text3)"><use href="#i-heart"/></svg>
+              <span style="font-size:8px;color:var(--text2);display:flex;align-items:center;gap:2px;">
+                <svg style="width:10px;height:10px;color:var(--text3)"><use href="#i-plus-c"/></svg>Follow
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nova Zen -->
+        <div class="idol-card">
+          <div class="char-card">
+            <div class="char-bg" style="background:linear-gradient(160deg,#c8f0d8,#80d4a8);"></div>
+            <div class="char-fade"></div>
+            <img class="char-img" src="https://api.dicebear.com/8.x/adventurer/svg?seed=NovaZen&backgroundColor=transparent&hair=long01&hairColor=27272a&eyes=variant22&eyebrows=variant15&mouth=variant08&skinColor=f5cba7&clothing=dress&clothingColor=15803d" alt="Nova Zen">
+            <div class="like-badge">
+              <svg style="width:8px;height:8px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>
+              7.2K
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Nova Zen</div>
+            <div class="card-agency">Apex Talent</div>
+            <div class="card-actions">
+              <svg style="width:14px;height:14px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>
+              <span style="font-size:8px;color:var(--text2);display:flex;align-items:center;gap:2px;">
+                <svg style="width:10px;height:10px;color:var(--text3)"><use href="#i-plus-c"/></svg>Follow
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aria Dawn -->
+        <div class="idol-card">
+          <div class="char-card">
+            <div class="char-bg" style="background:linear-gradient(160deg,#ffd8d8,#f4a0a0);"></div>
+            <div class="char-fade"></div>
+            <img class="char-img" src="https://api.dicebear.com/8.x/adventurer/svg?seed=AriaDawn&backgroundColor=transparent&hair=long02&hairColor=3b0f0f&eyes=variant26&eyebrows=variant02&mouth=variant12&skinColor=fad9c1&clothing=sweater&clothingColor=991b1b" alt="Aria Dawn">
+            <div class="like-badge">
+              <svg style="width:8px;height:8px;color:var(--text3)" fill="none" viewBox="0 0 24 24"><use href="#i-heart"/></svg>
+              6.1K
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">Aria Dawn</div>
+            <div class="card-agency">Nova Entertainment</div>
+            <div class="card-actions">
+              <svg style="width:14px;height:14px;color:var(--text3)"><use href="#i-heart"/></svg>
+              <span style="font-size:8px;color:var(--text2);display:flex;align-items:center;gap:2px;">
+                <svg style="width:10px;height:10px;color:var(--text3)"><use href="#i-plus-c"/></svg>Follow
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /idol-grid -->
+
+      <div class="btab">
+        <div class="ti on"><svg style="width:20px;height:20px;color:var(--accent)"><use href="#i-home"/></svg><span class="ti-lbl" style="color:var(--accent)">홈</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-trophy"/></svg><span class="ti-lbl">오디션</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-card"/></svg><span class="ti-lbl">포토카드</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-people"/></svg><span class="ti-lbl">팬클럽</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-person"/></svg><span class="ti-lbl">MY</span></div>
+      </div>
+    </div>
+    <div class="phone-label">SCR-005 홈 피드</div>
+  </div>
+</div>
+
+<!-- ══════════ DETAIL ══════════ -->
+<div class="screen" id="screen-detail">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="status-bar"><span>9:41</span><span style="font-size:8px">●●●</span></div>
+
+      <!-- Character Hero -->
+      <div class="char-hero">
+        <div class="char-hero-bg" style="background:linear-gradient(170deg,#e4ccff,#c090f0,#f0d0ff);"></div>
+        <div class="char-hero-fade"></div>
+        <img class="char-hero-img" src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeilDetail&backgroundColor=transparent&hair=long16&hairColor=6c4675&eyes=variant06&eyebrows=variant04&mouth=variant04&skinColor=f2d3b1&clothing=blazer&clothingColor=7c3aed" alt="Luna Veil">
+        <div class="hero-back-btn">
+          <svg style="width:12px;height:12px;color:var(--text1)"><use href="#i-chevl"/></svg>
+          Back
+        </div>
+        <div class="hero-actions">
+          <div class="hero-action-btn"><svg style="width:13px;height:13px;color:var(--text1)"><use href="#i-share"/></svg></div>
+          <div class="hero-action-btn"><svg style="width:13px;height:13px;color:var(--text1)"><use href="#i-more"/></svg></div>
+        </div>
+        <div class="photo-dots">
+          <div class="photo-dot active"></div><div class="photo-dot"></div><div class="photo-dot"></div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div style="display:flex;align-items:center;">
+          <span class="idol-name">Luna Veil</span>
+          <span class="agency-badge">Nova Ent.</span>
+        </div>
+        <div style="font-size:8px;color:var(--text2);margin-top:3px;">Born 2001.03.12 · Debut 2022.07.05</div>
+        <div class="detail-tags">
+          <span class="detail-tag">Pop</span>
+          <span class="detail-tag">Performance</span>
+          <span class="detail-tag">Charisma</span>
+        </div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <svg style="width:10px;height:10px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>
+            <strong>12.4K</strong> Likes
+          </div>
+          <div class="stat-item">
+            <svg style="width:10px;height:10px;color:var(--text2)"><use href="#i-people"/></svg>
+            <strong>3.2K</strong> Followers
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="action-btn action-like">
+            <svg style="width:10px;height:10px;color:var(--accent2)" fill="currentColor" viewBox="0 0 24 24"><use href="#i-heart-f"/></svg>Like
+          </button>
+          <button class="action-btn action-follow">
+            <svg style="width:10px;height:10px;color:var(--text2)"><use href="#i-plus-c"/></svg>Follow
+          </button>
+          <button class="action-btn action-chat">
+            <svg style="width:10px;height:10px;color:#fff"><use href="#i-chat"/></svg>Chat
+          </button>
+        </div>
+        <div class="section-label">
+          <svg style="width:10px;height:10px;color:var(--text2)"><use href="#i-cal"/></svg>Schedule
+        </div>
+        <div class="schedule-row">
+          <span class="sched-date">4/20</span>
+          <span class="sched-type">Broadcast</span>
+          <span class="sched-title">A-idol Showcase Live</span>
+        </div>
+        <div class="schedule-row">
+          <span class="sched-date">5/03</span>
+          <span class="sched-type" style="background:rgba(200,136,10,.12);color:var(--gold);">Concert</span>
+          <span class="sched-title">Luna Veil World Tour</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">SCR-006 아이돌 상세</div>
+  </div>
+</div>
+
+<!-- ══════════ CHAT ══════════ -->
+<div class="screen" id="screen-chat">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="status-bar"><span>9:41</span><span style="font-size:8px">●●●</span></div>
+
+      <div class="nav-bar">
+        <svg style="width:18px;height:18px;color:var(--accent)"><use href="#i-chevl"/></svg>
+        <div style="text-align:center;">
+          <div class="nav-title">Luna Veil</div>
+          <div style="font-size:7px;color:var(--text2);">Official Fan Club</div>
+        </div>
+        <svg style="width:18px;height:18px;color:var(--text2)"><use href="#i-more"/></svg>
+      </div>
+
+      <div class="quota-bar">
+        <div style="display:flex;align-items:center;gap:5px;">
+          <svg style="width:11px;height:11px;color:var(--text2)"><use href="#i-chat"/></svg>
+          <span style="font-size:8px;color:var(--text2);">남은 대화</span>
+          <div class="quota-dots">
+            <div class="quota-dot avail"></div><div class="quota-dot avail"></div>
+            <div class="quota-dot avail"></div><div class="quota-dot used"></div><div class="quota-dot used"></div>
+          </div>
+          <span style="font-size:8px;color:var(--text1);font-weight:700;">3/5</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:3px;font-size:8px;color:var(--gold);font-weight:600;">
+          <svg style="width:10px;height:10px;color:var(--gold)"><use href="#i-ticket"/></svg>Coupon 0
+        </div>
+      </div>
+
+      <div class="chat-body">
+        <!-- Auto message -->
+        <div>
+          <div class="msg-auto-label">
+            <svg style="width:8px;height:8px;color:var(--gold)"><use href="#i-spark"/></svg>Auto Message
+          </div>
+          <div class="idol-bubble-row">
+            <!-- Character avatar in chat -->
+            <div class="chat-avatar" style="background:linear-gradient(160deg,#e4ccff,#c090f0);">
+              <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeilChat&backgroundColor=transparent&hair=long16&hairColor=6c4675&eyes=variant06&skinColor=f2d3b1" alt="Luna Veil">
+            </div>
+            <div>
+              <div class="bubble-idol">Good morning! Have a great day ☀️</div>
+              <div class="bubble-time">08:00</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="bubble-user">Hi! How was today's performance?</div>
+          <div class="bubble-time right">10:32</div>
+        </div>
+        <div>
+          <div class="idol-bubble-row">
+            <div class="chat-avatar" style="background:linear-gradient(160deg,#e4ccff,#c090f0);">
+              <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeilChat&backgroundColor=transparent&hair=long16&hairColor=6c4675&eyes=variant06&skinColor=f2d3b1" alt="Luna Veil">
+            </div>
+            <div>
+              <div class="bubble-idol">It was amazing! You gave me so much energy 🧡</div>
+              <div class="bubble-time">10:33</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="bubble-user">I was there too!</div>
+          <div class="bubble-time right">10:34</div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="chat-input">Type a message...</div>
+        <button class="send-btn"><svg style="width:14px;height:14px;color:#fff"><use href="#i-send"/></svg></button>
+      </div>
+    </div>
+    <div class="phone-label">SCR-009 팬클럽 채팅</div>
+  </div>
+</div>
+
+<!-- ══════════ AUDITION ══════════ -->
+<div class="screen" id="screen-audition">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="status-bar"><span>9:41</span><span style="font-size:8px">●●●</span></div>
+
+      <div class="nav-bar">
+        <span style="width:18px;"></span>
+        <span class="nav-title">Audition</span>
+        <svg style="width:18px;height:18px;color:var(--text2)"><use href="#i-bell"/></svg>
+      </div>
+
+      <div class="audi-hero">
+        <div class="audi-hero-title">
+          <svg style="width:14px;height:14px;color:#fff"><use href="#i-trophy"/></svg>
+          A-idol Audition Season 1
+        </div>
+        <div class="audi-hero-sub">Round 3 · Voting in progress</div>
+        <div class="countdown" id="countdown-display">03 : 14 : 22 : 08</div>
+        <div class="audi-cta">
+          <svg style="width:10px;height:10px;color:var(--accent)"><use href="#i-star"/></svg>
+          Vote Now
+        </div>
+      </div>
+
+      <div class="round-track">
+        <div class="round-circle rc-done">1</div><div class="round-line"></div>
+        <div class="round-circle rc-done">2</div><div class="round-line"></div>
+        <div class="round-circle rc-cur">3</div><div class="round-line"></div>
+        <div class="round-circle rc-fut">4</div><div class="round-line"></div>
+        <div class="round-circle rc-fut">5</div>
+        <div class="round-line" style="flex:3;"></div>
+        <div class="round-circle rc-fut" style="background:rgba(200,136,10,.12);color:var(--gold);font-size:5px;border:1.5px solid var(--gold);">F</div>
+      </div>
+
+      <div style="padding:0 13px 4px;font-size:9px;color:var(--text2);display:flex;align-items:center;gap:4px;">
+        <svg style="width:11px;height:11px;color:var(--text2)"><use href="#i-crown"/></svg>Live Rankings
+      </div>
+
+      <div class="rank-list">
+        <div class="rank-row">
+          <span class="rank-no">1</span>
+          <div class="rank-avatar" style="background:linear-gradient(160deg,#e8d8ff,#c4a0f0);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeil&backgroundColor=transparent&hair=long16&hairColor=6c4675&skinColor=f2d3b1" alt="Luna Veil">
+          </div>
+          <span class="rank-name">Luna Veil</span>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:90%;background:var(--accent)"></div></div>
+          <span class="rank-count">42,183</span>
+          <span class="rank-delta dup">▲</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-no">2</span>
+          <div class="rank-avatar" style="background:linear-gradient(160deg,#d0e8ff,#90c0f8);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=KiraSol&backgroundColor=transparent&hair=short19&hairColor=0e1e3c&skinColor=eac393" alt="Kira Sol">
+          </div>
+          <span class="rank-name">Kira Sol</span>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:78%;background:var(--accent2)"></div></div>
+          <span class="rank-count">38,921</span>
+          <span class="rank-delta ddn">▼</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-no">3</span>
+          <div class="rank-avatar" style="background:linear-gradient(160deg,#c8f0d8,#80d4a8);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=NovaZen&backgroundColor=transparent&hair=long01&hairColor=27272a&skinColor=f5cba7" alt="Nova Zen">
+          </div>
+          <span class="rank-name">Nova Zen</span>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:65%;background:var(--success)"></div></div>
+          <span class="rank-count">31,042</span>
+          <span class="rank-delta dup">▲</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-no">4</span>
+          <div class="rank-avatar" style="background:linear-gradient(160deg,#ffd8d8,#f4a0a0);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=AriaDawn&backgroundColor=transparent&hair=long02&hairColor=3b0f0f&skinColor=fad9c1" alt="Aria Dawn">
+          </div>
+          <span class="rank-name">Aria Dawn</span>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:50%;background:var(--gold)"></div></div>
+          <span class="rank-count">24,400</span>
+          <span class="rank-delta" style="color:var(--text3)">—</span>
+        </div>
+      </div>
+
+      <div style="padding:7px 13px 4px;display:flex;gap:7px;">
+        <button style="flex:1;padding:8px;border-radius:10px;background:var(--elevated);color:var(--text1);font-size:9px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:600;">
+          <svg style="width:11px;height:11px;color:var(--text2)"><use href="#i-flag"/></svg>Full Ranking
+        </button>
+        <button style="flex:1;padding:8px;border-radius:10px;background:var(--accent);color:#fff;font-size:9px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:700;">
+          <svg style="width:11px;height:11px;color:#fff"><use href="#i-star"/></svg>Vote
+        </button>
+      </div>
+
+      <div class="btab">
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-home"/></svg><span class="ti-lbl">홈</span></div>
+        <div class="ti on"><svg style="width:20px;height:20px;color:var(--accent)"><use href="#i-trophy"/></svg><span class="ti-lbl" style="color:var(--accent)">오디션</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-card"/></svg><span class="ti-lbl">포토카드</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-people"/></svg><span class="ti-lbl">팬클럽</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-person"/></svg><span class="ti-lbl">MY</span></div>
+      </div>
+    </div>
+    <div class="phone-label">SCR-011 오디션</div>
+  </div>
+</div>
+
+<!-- ══════════ GACHA ══════════ -->
+<div class="screen" id="screen-gacha">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div></div>
+      <div class="status-bar"><span>9:41</span><span style="font-size:8px">●●●</span></div>
+
+      <div class="nav-bar">
+        <svg style="width:18px;height:18px;color:var(--accent)"><use href="#i-chevl"/></svg>
+        <span class="nav-title" style="font-size:12px;">Photocard Pull</span>
+        <svg style="width:18px;height:18px;color:var(--text2)"><use href="#i-more"/></svg>
+      </div>
+
+      <div class="gacha-body">
+        <!-- Character card fan — light bg per character -->
+        <div class="card-fan">
+          <div class="fan-card fc1" style="background:linear-gradient(160deg,#d0e8ff,#a0c8f8);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=KiraSol&backgroundColor=transparent&hair=short19&hairColor=0e1e3c&skinColor=eac393" alt="c">
+          </div>
+          <div class="fan-card fc2" style="background:linear-gradient(160deg,#ffd8d8,#f4a0a0);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=AriaDawn&backgroundColor=transparent&hair=long02&hairColor=3b0f0f&skinColor=fad9c1" alt="c">
+          </div>
+          <div class="fan-card fc3" style="background:linear-gradient(160deg,#e4ccff,#c090f0);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=LunaVeil&backgroundColor=transparent&hair=long16&hairColor=6c4675&skinColor=f2d3b1" alt="Luna Veil">
+          </div>
+          <div class="fan-card fc4" style="background:linear-gradient(160deg,#c8f0d8,#80d4a8);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=NovaZen&backgroundColor=transparent&hair=long01&hairColor=27272a&skinColor=f5cba7" alt="c">
+          </div>
+          <div class="fan-card fc5" style="background:linear-gradient(160deg,#ffe8c8,#f0c080);">
+            <img src="https://api.dicebear.com/8.x/adventurer/svg?seed=EllaRay&backgroundColor=transparent&hair=long06&hairColor=c97b2e&skinColor=f5cba7" alt="c">
+          </div>
+        </div>
+
+        <div class="gacha-set-name">Luna Veil Vol.1 Photocard Set</div>
+        <div class="gacha-set-sub">Random 1 card from 12 · Server-side draw</div>
+
+        <div style="font-size:8px;color:var(--text2);margin-top:10px;margin-bottom:3px;display:flex;align-items:center;gap:3px;">
+          <svg style="width:10px;height:10px;color:var(--text2)"><use href="#i-photo"/></svg>My Collection (5/12)
+        </div>
+        <div class="coll-dots">
+          <div class="coll-dot owned"></div><div class="coll-dot owned"></div><div class="coll-dot owned"></div>
+          <div class="coll-dot empty"></div><div class="coll-dot owned"></div><div class="coll-dot empty"></div>
+          <div class="coll-dot owned"></div><div class="coll-dot empty"></div><div class="coll-dot empty"></div>
+          <div class="coll-dot empty"></div><div class="coll-dot empty"></div><div class="coll-dot empty"></div>
+        </div>
+
+        <div style="background:var(--surface);border-radius:10px;padding:7px 10px;margin-top:9px;border:1px solid var(--border);">
+          <div style="font-size:8px;color:var(--text2);margin-bottom:4px;font-weight:700;">Card Set</div>
+          <div style="display:flex;gap:12px;">
+            <span style="font-size:8px;color:var(--text2);">⬜ Common ×6</span>
+            <span style="font-size:8px;color:var(--accent);font-weight:600;">★ Rare ×4</span>
+            <span style="font-size:8px;color:var(--gold);font-weight:600;">✦ Epic ×2</span>
+          </div>
+        </div>
+
+        <div class="price-row">
+          <span class="price-label">1 Pull</span>
+          <span class="price-value">₩1,500</span>
+        </div>
+
+        <button class="gacha-btn" id="gacha-btn" onclick="animateGacha()">
+          <svg style="width:13px;height:13px;color:#fff"><use href="#i-spark"/></svg>
+          Buy &amp; Pull
+        </button>
+        <div class="gacha-note">Random draw · Duplicates possible</div>
+      </div>
+
+      <div class="btab">
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-home"/></svg><span class="ti-lbl">홈</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-trophy"/></svg><span class="ti-lbl">오디션</span></div>
+        <div class="ti on"><svg style="width:20px;height:20px;color:var(--accent)"><use href="#i-card"/></svg><span class="ti-lbl" style="color:var(--accent)">포토카드</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-people"/></svg><span class="ti-lbl">팬클럽</span></div>
+        <div class="ti"><svg style="width:20px;height:20px;color:var(--text3)"><use href="#i-person"/></svg><span class="ti-lbl">MY</span></div>
+      </div>
+    </div>
+    <div class="phone-label">SCR-017 포토카드 뽑기</div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+
+<script>
+function showScreen(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function animateGacha(){
+  const btn=document.getElementById('gacha-btn');
+  btn.innerHTML='<svg style="width:13px;height:13px;color:#fff"><use href="#i-spark"/></svg> Drawing...';
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.innerHTML='★ Rare Card Obtained!';
+    btn.style.background='var(--gold)';btn.style.color='#18181E';
+    setTimeout(()=>{
+      btn.innerHTML='<svg style="width:13px;height:13px;color:#fff"><use href="#i-spark"/></svg> Buy & Pull';
+      btn.style.background='var(--accent)';btn.style.color='#fff';
+      btn.disabled=false;
+    },2000);
+  },1500);
+}
+function updateCountdown(){
+  const el=document.getElementById('countdown-display');
+  if(!el) return;
+  const p=el.textContent.split(' : ').map(Number);
+  let [d,h,m,s]=p;
+  if(--s<0){s=59;if(--m<0){m=59;if(--h<0){h=23;d--;}}}
+  el.textContent=[d,h,m,s].map(n=>String(n).padStart(2,'0')).join(' : ');
+}
+setInterval(updateCountdown,1000);
+</script>
+</body>
+</html>

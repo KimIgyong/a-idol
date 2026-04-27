@@ -1,0 +1,166 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.12.0'
+
+jobs:
+  # Fast feedback loop — lint/typecheck/unit tests for all packages + frontend
+  # build. Mobile hook tests (jest + jsdom) run here via `pnpm -r test`.
+  # Does NOT touch Postgres/Redis — see the `integration` job for that.
+  lint-test:
+    name: Lint · Typecheck · Unit · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @a-idol/backend prisma:generate
+
+      - name: Build @a-idol/shared (consumed by backend + mobile + cms)
+        run: pnpm --filter @a-idol/shared build
+
+      - name: Lint
+        run: pnpm -r lint
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Unit tests (backend + mobile)
+        run: pnpm -r test
+
+      - name: Build (backend + cms)
+        run: |
+          pnpm --filter @a-idol/backend build
+          pnpm --filter @a-idol/cms build
+
+  # Integration suite — spins up real Postgres 16 + Redis 7 matching
+  # docker-compose.yml, applies prisma migrations, seeds, then runs
+  # `jest --config jest.integration.config.js` (10 suites / 45 tests).
+  # Runs in parallel with `lint-test`.
+  integration:
+    name: Integration (Postgres + Redis)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aidol
+          POSTGRES_PASSWORD: aidol_dev
+          POSTGRES_DB: aidol
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd="pg_isready -U aidol -d aidol"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://aidol:aidol_dev@localhost:5433/aidol?schema=public
+      REDIS_URL: redis://localhost:6379/0
+      # Test-only secrets. Real prod secrets live in the deploy env, not here.
+      # Admin tokens share the user JWT secret and distinguish by payload
+      # `type` — see admin-jwt-token.service.ts.
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: ci-refresh-secret-0123456789abcdef0123456789abcdef
+      JWT_REFRESH_EXPIRES_IN: 14d
+      # 4 rounds = bcrypt minimum. Safe here since no real passwords touch CI.
+      BCRYPT_ROUNDS: '4'
+      CORS_ORIGINS: http://localhost:5173
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @a-idol/shared
+        run: pnpm --filter @a-idol/shared build
+
+      - name: Generate Prisma client
+        run: pnpm --filter @a-idol/backend prisma:generate
+
+      - name: Apply Prisma migrations
+        run: pnpm --filter @a-idol/backend prisma:deploy
+
+      - name: Seed database
+        run: pnpm --filter @a-idol/backend seed
+
+      - name: Integration tests
+        run: pnpm --filter @a-idol/backend test:integration
+
+  # Aggregator job — does NOT re-run gates (the upstream jobs already did).
+  # Reads `needs.<job>.result` and writes a markdown table to
+  # `$GITHUB_STEP_SUMMARY` so the GitHub Actions run page shows a 1-pager
+  # with Phase D backlog count + ADR roster + reference links. Same script
+  # as `make phase-c-status` (full mode) — just a different entry point.
+  phase-c-summary:
+    name: Phase C Status Summary
+    runs-on: ubuntu-latest
+    needs: [lint-test, integration]
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build summary
+        env:
+          LINT_TEST_RESULT: ${{ needs.lint-test.result }}
+          INTEGRATION_RESULT: ${{ needs.integration.result }}
+        run: bash scripts/phase-c-status.sh --summary >> "$GITHUB_STEP_SUMMARY"

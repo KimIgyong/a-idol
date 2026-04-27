@@ -1,0 +1,839 @@
+// A-idol — Prisma schema (MVP subset)
+// Full DDL reference: ../../sql/a-idol-schema.sql
+// This schema covers the tables touched by the skeleton: identity, catalog, fandom.
+// Commerce/Chat/Audition modules will be added in later tasks per the WBS.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  email
+  apple
+  google
+  kakao
+}
+
+enum UserStatus {
+  active
+  suspended
+  withdrawn
+}
+
+enum AdminRole {
+  admin
+  operator
+  viewer
+}
+
+enum AdminStatus {
+  active
+  suspended
+}
+
+model AdminUser {
+  id           String              @id @default(uuid()) @db.Uuid
+  email        String              @unique @db.VarChar(120)
+  passwordHash String              @map("password_hash")
+  displayName  String              @map("display_name") @db.VarChar(40)
+  role         AdminRole           @default(operator)
+  status       AdminStatus         @default(active)
+  lastLoginAt  DateTime?           @map("last_login_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  sessions     AdminAuthSession[]
+
+  @@map("admin_users")
+}
+
+/// T-082 (RPT-260426-D Phase D) — admin refresh token 의 server-side state.
+/// stateless JWT 만 사용하던 admin 인증에 revocation 능력 추가.
+/// 사용자측 `auth_sessions` 와 동일한 패턴.
+model AdminAuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  adminUserId      String    @map("admin_user_id") @db.Uuid
+  adminUser        AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  refreshTokenHash String    @map("refresh_token_hash")
+  ip               String?
+  userAgent        String?   @map("user_agent")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+
+  @@index([adminUserId])
+  @@map("admin_auth_sessions")
+}
+
+model User {
+  id              String       @id @default(uuid()) @db.Uuid
+  provider        AuthProvider
+  providerUserId  String       @map("provider_user_id")
+  email           String?      @unique
+  passwordHash    String?      @map("password_hash")
+  nickname        String       @db.VarChar(30)
+  avatarUrl       String?      @map("avatar_url")
+  instagramHandle String?      @map("instagram_handle") @db.VarChar(40)
+  birthdate       DateTime     @db.Date
+  status          UserStatus   @default(active)
+  marketingOptIn  Boolean      @default(false) @map("marketing_opt_in")
+  pushOptIn       Boolean      @default(true) @map("push_opt_in")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  deletedAt       DateTime?    @map("deleted_at")
+
+  authSessions AuthSession[]
+  hearts       Heart[]
+  follows      Follow[]
+  memberships  Membership[]
+  chatRooms    ChatRoom[]
+  chatQuota    ChatQuota?
+  chatWallet   ChatCouponWallet?
+  chatLedger   ChatCouponLedger[]
+  voteTicketBalance VoteTicketBalance?
+  voteTicketLedger  VoteTicketLedger[]
+  roundVoteTicketBalances RoundVoteTicketBalance[]
+  roundVoteTicketLedger   RoundVoteTicketLedger[]
+  photocards        UserPhotocard[]
+  cheers            Cheer[]
+
+  @@unique([provider, providerUserId])
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String    @map("refresh_token_hash")
+  deviceId         String?   @map("device_id") @db.VarChar(80)
+  ip               String?
+  userAgent        String?   @map("user_agent")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model Agency {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(80)
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  idols Idol[]
+
+  @@map("agencies")
+}
+
+model Idol {
+  id            String    @id @default(uuid()) @db.Uuid
+  agencyId      String    @map("agency_id") @db.Uuid
+  agency        Agency    @relation(fields: [agencyId], references: [id])
+  name          String    @db.VarChar(40)
+  stageName     String?   @map("stage_name") @db.VarChar(40)
+  birthdate     DateTime? @db.Date
+  mbti          String?   @db.VarChar(4)
+  bio           String?
+  heroImageUrl  String?   @map("hero_image_url")
+  heartCount    BigInt    @default(0) @map("heart_count")
+  followCount   BigInt    @default(0) @map("follow_count")
+  publishedAt   DateTime? @map("published_at")
+  // Full AI-generated idol persona (conceptSeed / coreIdentity / deepProfile /
+  // narrative / faceVector). Stored as JSONB so we can evolve the spec without
+  // schema churn; canonical source lives in packages/backend/prisma/seeds/.
+  profileJson   Json?     @map("profile_json") @db.JsonB
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  hearts    Heart[]
+  follows   Follow[]
+  fanClub   FanClub?
+  images    IdolImage[]
+  schedules IdolSchedule[]
+  chatRooms ChatRoom[]
+  autoMessages    AutoMessageTemplate[]
+  auditionEntries AuditionEntry[]
+  photocardSets   PhotocardSet[]
+  cheers          Cheer[]
+
+  @@index([publishedAt])
+  @@map("idols")
+}
+
+/// 응원댓글 (SCR-006 아이돌 상세). MVP는 단순 텍스트만 — 좋아요/대댓글은
+/// Phase E 이후. 모더레이션 정책은 별도 ADR에서 결정 (UGC 금칙어/스팸).
+/// RPT-260426-C P2.
+model Cheer {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idolId    String   @map("idol_id") @db.Uuid
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  message   String   @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([idolId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("cheers")
+}
+
+enum IdolScheduleType {
+  BROADCAST
+  CONCERT
+  FANMEETING
+  STREAMING
+  OTHER
+}
+
+model IdolSchedule {
+  id        String           @id @default(uuid()) @db.Uuid
+  idolId    String           @map("idol_id") @db.Uuid
+  idol      Idol             @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  type      IdolScheduleType @default(OTHER)
+  title     String           @db.VarChar(120)
+  location  String?          @db.VarChar(120)
+  startAt   DateTime         @map("start_at")
+  endAt     DateTime?        @map("end_at")
+  notes     String?
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  deletedAt DateTime?        @map("deleted_at")
+
+  @@index([idolId, startAt])
+  @@map("idol_schedules")
+}
+
+model IdolImage {
+  id         String   @id @default(uuid()) @db.Uuid
+  idolId     String   @map("idol_id") @db.Uuid
+  idol       Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  imageType  String   @map("image_type") @db.VarChar(32)
+  imageUrl   String   @map("image_url")
+  sortOrder  Int      @default(0) @map("sort_order")
+  isApproved Boolean  @default(false) @map("is_approved")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([idolId, sortOrder])
+  @@map("idol_images")
+}
+
+model Heart {
+  userId    String   @map("user_id") @db.Uuid
+  idolId    String   @map("idol_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, idolId])
+  @@map("hearts")
+}
+
+model Follow {
+  userId    String   @map("user_id") @db.Uuid
+  idolId    String   @map("idol_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, idolId])
+  @@map("follows")
+}
+
+model FanClub {
+  id        String   @id @default(uuid()) @db.Uuid
+  idolId    String   @unique @map("idol_id") @db.Uuid
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  tier      String   @default("official") @db.VarChar(20)
+  price     Decimal  @default(0) @db.Decimal(14, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  memberships Membership[]
+
+  @@map("fan_clubs")
+}
+
+model Membership {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  fanClubId  String    @map("fan_club_id") @db.Uuid
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fanClub    FanClub   @relation(fields: [fanClubId], references: [id], onDelete: Cascade)
+  joinedAt   DateTime  @default(now()) @map("joined_at")
+  leftAt     DateTime? @map("left_at")
+
+  @@unique([userId, fanClubId])
+  @@index([userId])
+  @@map("memberships")
+}
+
+// One 1:1 chat room per (user, idol). Created lazily when the fan first
+// opens the chat. Fan club membership gate-check happens in the usecase.
+model ChatRoom {
+  id        String         @id @default(uuid()) @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  idolId    String         @map("idol_id") @db.Uuid
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idol      Idol           @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now()) @map("created_at")
+  lastMessageAt DateTime?  @map("last_message_at")
+  messages  ChatMessage[]
+
+  @@unique([userId, idolId])
+  @@index([userId, lastMessageAt])
+  @@map("chat_rooms")
+}
+
+enum ChatSenderType {
+  user
+  idol
+}
+
+model ChatMessage {
+  id         String         @id @default(uuid()) @db.Uuid
+  roomId     String         @map("room_id") @db.Uuid
+  room       ChatRoom       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  senderType ChatSenderType @map("sender_type")
+  content    String         @db.VarChar(2000)
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  @@index([roomId, createdAt])
+  @@map("chat_messages")
+}
+
+// Per-user daily quota of free chat messages. Reset is "lazy": the next
+// read/consume after midnight KST zeroes `messagesToday` and stamps
+// `lastResetAt`. A BullMQ cron (T-042) is a safety net, not the primary path.
+model ChatQuota {
+  userId        String   @id @map("user_id") @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messagesToday Int      @default(0) @map("messages_today")
+  dailyLimit    Int      @default(5) @map("daily_limit")
+  lastResetAt   DateTime @default(now()) @map("last_reset_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("chat_quotas")
+}
+
+// Single-row wallet per user — running balance. Every change must also
+// insert a ChatCouponLedger row in the same transaction for audit.
+model ChatCouponWallet {
+  userId    String   @id @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("chat_coupon_wallets")
+}
+
+enum CouponReason {
+  ADMIN_GRANT
+  PURCHASE
+  MESSAGE_CONSUME
+  REFUND
+  DAILY_GIFT
+}
+
+model ChatCouponLedger {
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @map("user_id") @db.Uuid
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta        Int
+  reason       CouponReason
+  balanceAfter Int          @map("balance_after")
+  memo         String?
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("chat_coupon_ledger")
+}
+
+enum AutoMessageStatus {
+  SCHEDULED
+  DISPATCHED
+  CANCELED
+  FAILED
+}
+
+enum AuditionStatus {
+  DRAFT
+  ACTIVE
+  FINISHED
+  CANCELED
+}
+
+enum RoundStatus {
+  SCHEDULED
+  ACTIVE
+  CLOSED
+}
+
+model Audition {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String         @db.VarChar(120)
+  description String?
+  status      AuditionStatus @default(DRAFT)
+  startAt     DateTime       @map("start_at")
+  endAt       DateTime       @map("end_at")
+  createdBy   String         @map("created_by") @db.Uuid
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  deletedAt   DateTime?      @map("deleted_at")
+
+  rounds  Round[]
+  entries AuditionEntry[]
+
+  @@index([status, startAt])
+  @@map("auditions")
+}
+
+model Round {
+  id           String      @id @default(uuid()) @db.Uuid
+  auditionId   String      @map("audition_id") @db.Uuid
+  audition     Audition    @relation(fields: [auditionId], references: [id], onDelete: Cascade)
+  name         String      @db.VarChar(80)
+  orderIndex   Int         @map("order_index")
+  status       RoundStatus @default(SCHEDULED)
+  startAt      DateTime    @map("start_at")
+  endAt        DateTime    @map("end_at")
+  maxAdvancers Int?        @map("max_advancers")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  voteRule VoteRule?
+  roundVoteTicketBalances RoundVoteTicketBalance[]
+  roundVoteTicketLedger   RoundVoteTicketLedger[]
+
+  @@unique([auditionId, orderIndex])
+  @@index([auditionId, status])
+  @@map("rounds")
+}
+
+enum VoteMethod {
+  HEART
+  SMS
+  TICKET
+}
+
+// One vote rule per round. Weights are absolute multipliers (not ratios):
+// a final vote count = sum(per-method vote count × weight).
+// ADR-004 keeps `smsWeight` non-zero allowed but SMS votes are stubbed
+// (accumulated to zero) until the SMS gateway integration lands.
+model VoteRule {
+  id              String   @id @default(uuid()) @db.Uuid
+  roundId         String   @unique @map("round_id") @db.Uuid
+  round           Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  heartWeight     Decimal  @default(0) @map("heart_weight") @db.Decimal(8, 2)
+  smsWeight       Decimal  @default(0) @map("sms_weight") @db.Decimal(8, 2)
+  ticketWeight    Decimal  @default(0) @map("ticket_weight") @db.Decimal(8, 2)
+  dailyHeartLimit Int      @default(1) @map("daily_heart_limit")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("vote_rules")
+}
+
+// Audit log of every cast vote. Redis is the source of truth for live
+// leaderboards (T-063/T-064); this table is the durable record for
+// recomputing rankings on cache loss and for payment-linked vote audits
+// once Commerce (T-044) ships.
+model Vote {
+  id        String   @id @default(uuid()) @db.Uuid
+  roundId   String   @map("round_id") @db.Uuid
+  idolId    String   @map("idol_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  method    String   @db.VarChar(10)
+  weight    Decimal  @db.Decimal(8, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([roundId, idolId])
+  @@index([userId, roundId, createdAt])
+  @@map("votes")
+}
+
+// Per-user global vote ticket balance. Granted by the Commerce VoteTicketFulfiller
+// (kind=VOTE_TICKET), consumed atomically by CastTicketVoteUseCase.
+// Every balance change must insert a VoteTicketLedger row in the same $transaction.
+model VoteTicketBalance {
+  userId    String   @id @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("vote_ticket_balances")
+}
+
+enum VoteTicketReason {
+  PURCHASE
+  VOTE_CAST
+  ADMIN_GRANT
+  REFUND
+}
+
+model VoteTicketLedger {
+  id           String           @id @default(uuid()) @db.Uuid
+  userId       String           @map("user_id") @db.Uuid
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta        Int
+  reason       VoteTicketReason
+  balanceAfter Int              @map("balance_after")
+  memo         String?
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("vote_ticket_ledger")
+}
+
+// Round-scoped vote ticket balance (T-062b). Separate from VoteTicketBalance
+// because these tickets only apply to the specific round the product was
+// minted against — purchase a "Round-R1 ×2 promo pack", tickets land here.
+// Usage semantics (CastTicketVoteUseCase): try this bucket first, fall back
+// to the global VoteTicketBalance. When the round closes the tickets are
+// effectively expired — the vote flow rejects CLOSED rounds anyway, so no
+// explicit sweep is needed.
+model RoundVoteTicketBalance {
+  userId    String   @map("user_id") @db.Uuid
+  roundId   String   @map("round_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  round     Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([userId, roundId])
+  @@index([roundId])
+  @@map("round_vote_ticket_balances")
+}
+
+model RoundVoteTicketLedger {
+  id           String           @id @default(uuid()) @db.Uuid
+  userId       String           @map("user_id") @db.Uuid
+  roundId      String           @map("round_id") @db.Uuid
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  round        Round            @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  delta        Int
+  reason       VoteTicketReason
+  balanceAfter Int              @map("balance_after")
+  memo         String?
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  @@index([userId, roundId, createdAt])
+  @@map("round_vote_ticket_ledger")
+}
+
+// Periodic snapshot of the Redis leaderboard. Used to recompute rankings
+// if the Redis cache is lost, and to freeze the final result when a round
+// closes. Cron writes every 5 minutes (T-064); round-close hook writes one
+// final row with `isFinal: true` (not yet implemented — helper below).
+model RoundRankingSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  roundId    String   @map("round_id") @db.Uuid
+  snapshotAt DateTime @default(now()) @map("snapshot_at")
+  idolId     String   @map("idol_id") @db.Uuid
+  rank       Int
+  score      Decimal  @db.Decimal(12, 2)
+
+  @@index([roundId, snapshotAt])
+  @@index([roundId, rank])
+  @@map("round_ranking_snapshots")
+}
+
+// Join row: which idols participate in which audition.
+// `eliminatedAtRoundId` null → still advancing.
+model AuditionEntry {
+  id                  String    @id @default(uuid()) @db.Uuid
+  auditionId          String    @map("audition_id") @db.Uuid
+  idolId              String    @map("idol_id") @db.Uuid
+  audition            Audition  @relation(fields: [auditionId], references: [id], onDelete: Cascade)
+  idol                Idol      @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  eliminatedAt        DateTime? @map("eliminated_at")
+  eliminatedAtRoundId String?   @map("eliminated_at_round_id") @db.Uuid
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@unique([auditionId, idolId])
+  @@index([idolId])
+  @@map("audition_entries")
+}
+
+// Admin-authored idol broadcast to all active fan club members. Dispatched
+// via BullMQ at `scheduledAt`; one job ID = one template.
+model AutoMessageTemplate {
+  id           String            @id @default(uuid()) @db.Uuid
+  idolId       String            @map("idol_id") @db.Uuid
+  idol         Idol              @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  title        String            @db.VarChar(120)
+  content      String            @db.VarChar(2000)
+  scheduledAt  DateTime          @map("scheduled_at")
+  status       AutoMessageStatus @default(SCHEDULED)
+  createdBy    String            @map("created_by") @db.Uuid
+  dispatchedAt DateTime?         @map("dispatched_at")
+  recipients   Int               @default(0)
+  failedReason String?           @map("failed_reason")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  @@index([idolId, scheduledAt])
+  @@index([status, scheduledAt])
+  @@map("auto_message_templates")
+}
+
+// -- Commerce -----------------------------------------------------------
+
+enum ProductKind {
+  CHAT_COUPON
+  VOTE_TICKET
+  FAN_CLUB_SUBSCRIPTION
+  PHOTOCARD_PACK
+}
+
+enum PaymentProvider {
+  DEV_SANDBOX
+  APPLE_IAP
+  GOOGLE_IAP
+  STRIPE
+}
+
+enum TransactionStatus {
+  PENDING
+  FULFILLED
+  FAILED
+  REFUNDED
+}
+
+model PurchaseProduct {
+  id              String      @id @default(uuid()) @db.Uuid
+  sku             String      @unique @db.VarChar(60)
+  // Apple App Store Connect Product ID. Nullable: non-IAP products
+  // (operator-side Stripe, fan-club subscription, dev-only rows) may not
+  // have one. Unique when present so JWS → product lookup is 1:1.
+  // ADR-019 §4 + Apple Developer Program checklist §4. Populated in seed.
+  appleProductId  String?     @unique @map("apple_product_id") @db.VarChar(120)
+  kind            ProductKind
+  title           String      @db.VarChar(120)
+  description     String?
+  priceKrw        Int         @map("price_krw")
+  deliveryPayload Json        @map("delivery_payload")
+  isActive        Boolean     @default(true) @map("is_active")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  transactions    PurchaseTransaction[]
+
+  @@index([kind, isActive])
+  @@map("purchase_products")
+}
+
+model PurchaseTransaction {
+  id               String            @id @default(uuid()) @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  productId        String            @map("product_id") @db.Uuid
+  product          PurchaseProduct   @relation(fields: [productId], references: [id])
+  provider         PaymentProvider
+  providerTxId     String?           @map("provider_tx_id")
+  status           TransactionStatus @default(PENDING)
+  priceKrw         Int               @map("price_krw")
+  deliverySnapshot Json              @map("delivery_snapshot")
+  fulfilledAt      DateTime?         @map("fulfilled_at")
+  failedReason     String?           @map("failed_reason")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  @@unique([provider, providerTxId], name: "unique_provider_receipt")
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("purchase_transactions")
+}
+
+// -- Photocard -----------------------------------------------------------
+
+enum PhotocardRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+// A themed collection of photocards (e.g. "HYUN 1st Photocard Set"). Packs
+// reference a set via `deliveryPayload.setId`; the PhotocardPackFulfiller
+// rolls N templates weighted by each template's `dropWeight`.
+model PhotocardSet {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String              @db.VarChar(120)
+  description String?
+  idolId      String?             @map("idol_id") @db.Uuid
+  idol        Idol?               @relation(fields: [idolId], references: [id], onDelete: SetNull)
+  isActive    Boolean             @default(true) @map("is_active")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  templates   PhotocardTemplate[]
+
+  @@index([isActive, createdAt])
+  @@map("photocard_sets")
+}
+
+// Master definition of a single card. `dropWeight` governs pull frequency
+// (proportional, not percentage — fulfiller sums the weights of a set's
+// active templates and picks from the cumulative distribution).
+model PhotocardTemplate {
+  id         String          @id @default(uuid()) @db.Uuid
+  setId      String          @map("set_id") @db.Uuid
+  set        PhotocardSet    @relation(fields: [setId], references: [id], onDelete: Cascade)
+  name       String          @db.VarChar(80)
+  imageUrl   String?         @map("image_url")
+  rarity     PhotocardRarity @default(COMMON)
+  dropWeight Int             @default(10) @map("drop_weight")
+  isActive   Boolean         @default(true) @map("is_active")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  inventory  UserPhotocard[]
+
+  @@index([setId, isActive])
+  @@index([rarity])
+  @@map("photocard_templates")
+}
+
+enum PhotocardSource {
+  PURCHASE
+  ADMIN_GRANT
+}
+
+// Each obtained card is one row — duplicates are allowed and counted.
+model UserPhotocard {
+  id         String            @id @default(uuid()) @db.Uuid
+  userId     String            @map("user_id") @db.Uuid
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  templateId String            @map("template_id") @db.Uuid
+  template   PhotocardTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  source     PhotocardSource
+  sourceRef  String?           @map("source_ref") @db.VarChar(120)
+  obtainedAt DateTime          @default(now()) @map("obtained_at")
+
+  @@index([userId, obtainedAt])
+  @@index([templateId])
+  @@map("user_photocards")
+}
+
+/// T-085 (RPT-260426-D Phase D) — App Store / Play 제출용 디자인 자산 관리.
+/// 앱 아이콘, 스크린샷, feature graphic, splash, 아이돌 페르소나 이미지 등.
+/// 디자인팀 + PO + 법무 협업 중 status 트래킹 + url 보관용.
+enum DesignAssetType {
+  /// 앱 아이콘 (1024x1024)
+  APP_ICON
+  /// 스토어 스크린샷 (6장 시리즈)
+  SCREENSHOT
+  /// Play feature graphic (1024x500)
+  FEATURE_GRAPHIC
+  /// 앱 splash screen
+  SPLASH
+  /// App Preview Video (15~30s)
+  PREVIEW_VIDEO
+  /// 아이돌 hero / 갤러리 이미지
+  PERSONA_IMAGE
+  /// 포토카드 카드 이미지
+  PHOTOCARD_ART
+  /// 마케팅 배너 / 기타
+  OTHER
+}
+
+enum DesignAssetPlatform {
+  IOS
+  ANDROID
+  WEB
+  ALL
+}
+
+enum DesignAssetStatus {
+  /// placeholder — 자리만 잡고 자산 미수령
+  PLACEHOLDER
+  /// 디자이너 작업 중 (draft 시안)
+  DRAFT
+  /// PO 승인 완료
+  APPROVED
+  /// 법무 검수까지 통과
+  LEGAL_REVIEWED
+  /// 빌드/스토어에 ship됨
+  SHIPPED
+}
+
+model DesignAsset {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String              @db.VarChar(120)
+  type        DesignAssetType
+  platform    DesignAssetPlatform @default(ALL)
+  status      DesignAssetStatus   @default(PLACEHOLDER)
+  /// 자산 URL (S3 / CDN / 임시 google drive 등). PII 없음.
+  fileUrl     String?             @map("file_url") @db.VarChar(500)
+  /// 사양 (예: "1290x2796 PNG", "30s mp4")
+  spec        String?             @db.VarChar(200)
+  /// 정렬 순서 (스크린샷 1~6)
+  orderIndex  Int                 @default(0) @map("order_index")
+  /// 카피 (스크린샷에 들어가는 큰 텍스트)
+  caption     String?             @db.VarChar(200)
+  /// 비고 (디자이너 / PO / 법무 코멘트)
+  notes       String?             @db.VarChar(2000)
+  createdBy   String              @map("created_by") @db.Uuid
+  updatedBy   String              @map("updated_by") @db.Uuid
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  @@index([type, platform, orderIndex])
+  @@index([status])
+  @@map("design_assets")
+}
+
+/// ProjectDocument — CMS 프로젝트 관리 메뉴에서 ADR · 설계 · WBS · 산출물(수행계획/요구/기능/개발/중간보고)을
+/// 통합 관리. 외부 마크다운 파일을 등록하거나 (sourceType=FILE), CMS 에서 직접 작성 (sourceType=INLINE) 가능.
+enum ProjectDocCategory {
+  ADR
+  DESIGN
+  IMPLEMENTATION
+  DELIVERABLE
+  REPORT
+  OPS
+  OTHER
+}
+
+enum ProjectDocStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  ARCHIVED
+}
+
+enum ProjectDocSourceType {
+  FILE
+  INLINE
+}
+
+model ProjectDocument {
+  id          String               @id @default(uuid()) @db.Uuid
+  slug        String               @unique @db.VarChar(160)
+  title       String               @db.VarChar(200)
+  category    ProjectDocCategory
+  status      ProjectDocStatus     @default(DRAFT)
+  sourceType  ProjectDocSourceType @default(INLINE) @map("source_type")
+  /// FILE 일 때 repo 기준 상대 경로 (예: docs/adr/ADR-010-admin-user-separation.md). INLINE 이면 null.
+  sourcePath  String?              @map("source_path") @db.VarChar(500)
+  summary     String?              @db.VarChar(500)
+  content     String               @db.Text
+  /// 자유 태그 (콤마/스페이스 구분 자유, 검색용). 예: "phase-c,security,phase-d"
+  tags        String?              @db.VarChar(500)
+  /// 사람이 정한 정렬용 (예: ADR-010 → 10, ADR-011 → 11). null 이면 createdAt desc 보조 정렬.
+  orderIndex  Int                  @default(0) @map("order_index")
+  version     Int                  @default(1)
+  createdBy   String               @map("created_by") @db.Uuid
+  updatedBy   String               @map("updated_by") @db.Uuid
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  @@index([category, orderIndex])
+  @@index([status])
+  @@map("project_documents")
+}

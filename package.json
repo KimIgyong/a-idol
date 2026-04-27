@@ -1,0 +1,27 @@
+{
+  "name": "a-idol",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20.10"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @a-idol/backend dev",
+    "dev:cms": "pnpm --filter @a-idol/cms dev",
+    "dev:mobile": "pnpm --filter @a-idol/mobile dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d postgres redis",
+    "migrate": "pnpm --filter @a-idol/backend prisma:migrate",
+    "seed": "pnpm --filter @a-idol/backend seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "prettier": "^3.3.3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@a-idol/shared": ["../shared/dist"],
+      "@a-idol/shared/*": ["../shared/dist/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["prisma/seed.ts", "prisma/seeds/**/*.ts"]
+}

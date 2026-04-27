@@ -1,0 +1,41 @@
+# deps
+node_modules/
+.pnpm-store/
+.pnp.*
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# env
+.env
+.env.*.local
+!.env.example
+
+# editor
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# prisma
+packages/backend/prisma/migrations/**/migration.sql.bak
+
+# logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# coverage
+coverage/
+.nyc_output/
+
+# misc
+*.swp
+*.tmp

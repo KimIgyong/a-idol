@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@a-idol/shared": ["../shared/dist"],
+      "@a-idol/shared/*": ["../shared/dist/*"]
+    },
+    "types": ["node", "jest"],
+    "noEmit": true
+  },
+  "include": ["test/integration/**/*.ts", "src/**/*.ts"]
+}

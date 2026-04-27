@@ -1,0 +1,328 @@
+{
+  "id": "b51dea87-5bce-4959-b18f-22fd51ea9e11",
+  "status": "complete",
+  "conceptSeed": {
+    "gender": "male",
+    "visual_mood": "Artfully dishevelled but captivating, with a thoughtful gaze and comfortable yet stylish attire that hints at a deep inner world rather than overt flashiness, like a modern artist perpetually mid-creation.",
+    "concept_name": "Raw Brilliance",
+    "unique_angle": "He breaks the mold of the perfectly curated idol by openly showcasing the sometimes messy, deeply human process of creating and excelling, often self-producing and sharing his work-in-progress or candid thoughts on artistry.",
+    "emotional_hook": "Fans will obsess over his authentic struggle to perfect his craft, finding comfort and inspiration in his genuine vulnerability and the idea that true genius isn't always polished perfection.",
+    "vibe_description": "A quietly intense individual whose profound talent often shines through in unexpected, unpolished moments, making him incredibly relatable despite his genius."
+  },
+  "coreIdentity": {
+    "name": {
+      "korean": "이현우",
+      "english": "Lee Hyun-woo",
+      "stage_name": "HYUN",
+      "name_meaning": "His given name, Lee Hyun-woo, carries profound meaning: 'Hyun' (현) suggests wisdom, insight, and presence, while 'Woo' (우) evokes a sense of vastness or protection. This reflects his deep inner world and empathetic connection to his craft. The stage name HYUN is a concise, impactful distillation of his given name, chosen to emphasize his raw, present talent and the profound wisdom he brings to his artistry. It perfectly embodies the 'raw brilliance' concept, being both grounded and evocative."
+    },
+    "birth": {
+      "date": "2001-10-23",
+      "zodiac": "Scorpio",
+      "raised_in": "Busan, South Korea",
+      "birthplace": "Busan, South Korea",
+      "chinese_zodiac": "Snake"
+    },
+    "career": {
+      "trainee_period": "2 years 8 months",
+      "previous_agencies": [],
+      "trainee_start_age": 18,
+      "pre_debut_activities": "HYUN was known for his impromptu busking sessions in Busan's artistic districts, often performing original lo-fi instrumentals and acoustic covers with a uniquely raw vocal delivery. He also maintained an anonymous SoundCloud account where he uploaded unfinished demos and experimental soundscapes, cultivating a small but dedicated underground following. Occasionally took on freelance music production and mixing gigs for local indie artists.",
+      "special_certifications": "Certified in Music Production & Sound Engineering (Advanced Level) from a private music academy, highlighting his technical proficiency and self-producing capabilities."
+    },
+    "personal": {
+      "mbti": "ISTP",
+      "education": "Busan High School of Arts (Majored in Applied Music, focusing on composition and instrumental performance)",
+      "ethnicity": "Korean",
+      "languages": [
+        "Korean (Native)",
+        "English (Intermediate - self-taught, particularly strong in comprehension for music and technical guides)"
+      ],
+      "nationality": "South Korean",
+      "mbti_explanation": "As an ISTP, HYUN is a meticulous observer and hands-on creator, preferring to learn and express through direct experience. He approaches music like a complex puzzle, constantly experimenting with sounds, structures, and production techniques. While naturally reserved and private, his profound artistic drive compels him to share his unvarnished process, revealing a surprising depth of vulnerability and raw emotion beneath his typically practical and composed exterior. This creates a compelling contrast that deeply resonates with fans."
+    },
+    "physical": {
+      "height_cm": 179,
+      "weight_kg": 63,
+      "blood_type": "A",
+      "distinguishing_features": "He possesses a distinct monolid eye shape that naturally lends a deep, thoughtful gaze, often appearing introspective. A faint, barely noticeable scar rests just above his left eyebrow, a small mark from a childhood mishap that adds to his 'unpolished' charm. He has slightly broader shoulders that give him a grounded, comfortable presence despite his lean frame."
+    }
+  },
+  "deepProfile": {
+    "fears": [
+      "Losing his creative spark or the ability to deeply connect with music.",
+      "Being fundamentally misunderstood or having his artistic intentions misconstrued.",
+      "Being trapped in a situation where he cannot be authentic to himself or his art.",
+      "Disappointing those he cares about most, especially his family and mentors.",
+      "Public speaking without the comfort or medium of a musical performance."
+    ],
+    "dreams": {
+      "career": "To become a globally respected self-producing artist whose music consistently pushes creative boundaries and connects deeply with listeners, eventually establishing his own indie label to mentor and support emerging artists with unique visions.",
+      "secret": "To compose a full orchestral score for a critically acclaimed film, or to quietly release an entirely instrumental album under an anonymous pseudonym, purely for the joy of creation without any commercial expectations or public scrutiny.",
+      "personal": "To live a life abundant with creative freedom and quiet time, allowing him to endlessly explore his artistic passions. He dreams of owning a secluded, soundproof studio in a peaceful location, and finding true belonging and inner peace with a small, trusted circle of loved ones."
+    },
+    "skills": {
+      "rap": {
+        "style": "More akin to rhythmic storytelling or spoken word, rather than traditional aggressive rap. His delivery is measured, clear, and often poetic, reflecting his introspective nature.",
+        "rating": 5,
+        "flow_type": "Melodic, controlled, and narrative-driven.",
+        "training_background": "Developed through personal experimentation with spoken word and rhythm in his self-produced lo-fi tracks. Received occasional guidance from rap instructors during his trainee period but it was never his primary focus."
+      },
+      "dance": {
+        "style": "Precise, grounded, and musically intelligent. He demonstrates good body control and rhythm, often described as 'groovy' due to his strong ear. While clean and visually appealing, he may lack the explosive power or fluid grace of a lead dancer.",
+        "rating": 6,
+        "signature_move": "A subtle, almost imperceptible head tilt or shoulder roll that perfectly punctuates a beat, often an unconscious habit when deeply immersed in the music.",
+        "genre_strengths": [
+          "Contemporary (for emotional expression)",
+          "Hip-hop (basic grooves and foundational movements)",
+          "Freestyle (improvisational, less structured exploration)"
+        ],
+        "training_background": "Standard K-pop agency dance training. While he applied his ISTP analytical approach to learn quickly, his primary focus remained on music production and composition, leading to a competent but not elite dance skill set."
+      },
+      "vocal": {
+        "range": "Tenor",
+        "style": "Raw, emotive, with a warm, slightly husky timbre that can shift to a breathy, intimate quality. He excels in conveying subtle emotions and storytelling, but can also project controlled power when needed.",
+        "rating": 8,
+        "signature_technique": "His ability to infuse a profound sense of 'storytelling' into his vocals, particularly in his lower and mid-registers. He often uses subtle vocal fry or a slight rasp for emphasis, making his voice distinctively intimate.",
+        "training_background": "Primarily self-taught through extensive experimentation with diverse genres and vocal analysis, heavily supplemented by his formal music production and sound engineering training which refined his ear and understanding of vocal texture."
+      },
+      "visual": {
+        "rating": 7.5,
+        "visual_type": "Thoughtful, charismatic, and possessing an 'artist next door' appeal with an intriguing edge. He's not classically 'cute' or overtly 'sexy', but his deep gaze and unpolished features create a mature, magnetic allure that embodies his 'raw brilliance' concept.",
+        "camera_presence": "His camera presence is remarkably captivating; the lens seems to enhance his quiet intensity, drawing viewers into his thoughtful gaze. In person, he is often more relaxed and less 'staring,' making his on-camera persona feel even more impactful."
+      }
+    },
+    "fashion": {
+      "stage_style": "Reflects his 'raw brilliance' concept: tailored but relaxed silhouettes, utilizing textured fabrics like raw denim, distressed leather, or heavy cotton. Darker palettes with subtle metallic accents or deconstructed elements are common, often with an open jacket or layered top to emphasize his lean frame and artistic edge.",
+      "casual_style": "Practical and comfortable, often featuring oversized hoodies, loose-fit denim or cargo pants, and plain t-shirts in earthy tones, black, or grey. He favors layering and minimalist aesthetics, often accented with a unique vintage piece or carefully chosen accessory. Functionality is key.",
+      "airport_fashion": "Prioritizes comfort for travel. He's often seen in comfortable sneakers, a well-worn baseball cap or beanie, and high-quality over-ear headphones. A versatile utility jacket or a simple trench coat is a staple, always accompanied by a practical backpack.",
+      "fashion_inspirations": "90s grunge and lo-fi aesthetics, minimalist Japanese street style, independent Korean designers, and 'artist chic' — drawing inspiration from modern painters or sculptors who value authenticity and understated style.",
+      "signature_accessories": "Vintage silver rings (especially one on his thumb), a worn leather bracelet, a specific brand of minimalist watch, and his ever-present, high-quality over-ear headphones."
+    },
+    "favorites": {
+      "food": {
+        "hate": [
+          "Overly sweet desserts (prefers bitter/savory profiles)",
+          "Anything with a slimy texture (e.g., natto)",
+          "Artificial fruit flavors"
+        ],
+        "love": [
+          "Spicy Busan tteokbokki",
+          "His grandmother's homemade kimchi stew",
+          "Anything with dark chocolate",
+          "Strong black coffee"
+        ]
+      },
+      "music": {
+        "genres": [
+          "Lo-fi R&B",
+          "Indie Alternative",
+          "Atmospheric Pop",
+          "Neo-Soul",
+          "Experimental Electronic"
+        ],
+        "artists": [
+          "Bon Iver",
+          "The xx",
+          "DPR IAN",
+          "Daniel Caesar",
+          "Radiohead",
+          "IU (for her lyricism)"
+        ],
+        "guilty_pleasure": "Early 2000s K-pop ballads (he genuinely appreciates their raw emotionality and classic melodies)."
+      },
+      "hobbies": "Composing instrumental tracks (often late at night), collecting and restoring vintage synthesizers and effect pedals, exploring quiet hiking trails, urban photography (capturing candid street scenes and architectural details), and deep diving into music theory and sound design.",
+      "movies_shows": [
+        "Eternal Sunshine of the Spotless Mind (for its complex portrayal of memory and emotion)",
+        "Her (for its exploration of human connection and AI)",
+        "Parasite (for its social commentary and dark humor)",
+        "Nature documentaries",
+        "Indie films with strong visual storytelling"
+      ],
+      "comfort_items": "His worn-out high-quality headphones, a small personalized journal for lyrics and ideas, a specific smooth rock he found on a Busan beach as a child, and a well-loved, oversized hoodie."
+    },
+    "struggles": {
+      "past": "Struggled intensely with self-doubt and the pressure to conform to more commercial music trends during his early trainee period, almost quitting to pursue a purely behind-the-scenes production career. He found it difficult to articulate his unique artistic vision to others.",
+      "present": "Navigating the intense public scrutiny and performance demands of idol life while striving to maintain his deep, introspective creative process. He battles perfectionism in his music, which occasionally leads to creative blocks, and despite being surrounded by people, sometimes experiences a profound sense of loneliness due to his reserved nature.",
+      "insecurity": "His relatively later start in intensive dance training compared to his peers, and a lingering fear that his 'raw' vocal style might not always be polished enough for mainstream appeal. He is also self-conscious that his quiet demeanor might sometimes be perceived as aloofness."
+    },
+    "personality": {
+      "gap_appeal": "The profound allure of HYUN comes from the stark yet beautiful contrast between his 'cool, analytical artist' public persona and the 'secretly sensitive, deeply creative soul' he is behind the scenes. His rare, unvarnished moments of vulnerability – a genuine, heartfelt smile after a raw performance, a quiet confession of his struggles – feel incredibly precious and authentic to fans, precisely because they are so unexpected from his typically composed demeanor. He's the quiet observer who misses nothing, the genius who remains grounded.",
+      "private_self": "Behind closed doors, HYUN is a whirlwind of creative energy, often meticulously dissecting sounds or composing for hours. His space might be a controlled chaos of instruments, notebooks, and production gear. He's a deep thinker, prone to introspection, and genuinely warm and fiercely loyal to his small, trusted circle. He expresses deeper emotions more through his music or acts of service than through explicit verbal communication, revealing a quiet vulnerability beneath his practical exterior.",
+      "public_persona": "On camera and in interviews, HYUN projects an aura of thoughtful composure. He appears reserved, observing more than speaking, but when he does, his words are concise and deliberate. He lets his intense focus and artistic passion speak volumes during performances, making him seem both coolly professional and deeply immersed in his craft. There's an enigmatic quality that draws people in.",
+      "emotional_triggers": "{\"cry\":\"Witnessing genuine struggle or the hard-earned triumph of others (especially fellow artists), hearing a perfectly constructed melody or lyric that resonates deeply with his own experiences, or falling short of his own meticulously set artistic standards.\",\"laugh\":\"Dry, intelligent wit, the absurdity of everyday life, unexpected slapstick from his members, or the pure, uninhibited joy of animals.\",\"angry\":\"Artistic compromise or insincerity, people wasting his or others' time and effort, technical glitches derailing a creative flow, or witnessing injustice.\"}",
+      "communication_style": "With fans, he's an 'appreciative introvert' – not overtly bubbly, but sincere and thoughtful in his thanks, often expressing gratitude through carefully curated social media posts or subtle gestures. With members, he offers quiet, practical support and constructive insights, often preferring to show rather than tell. With staff, he's professional and direct, clearly communicating his needs and ideas regarding his music and creative process."
+    },
+    "fan_engagement": {
+      "fan_service_style": "Sincere and thoughtful, rather than overtly cutesy or flirty. He expresses gratitude through carefully crafted messages or self-composed musical snippets. He prioritizes making genuine eye contact and offering a soft, heartfelt smile, valuing deep, authentic connections over broad, superficial appeal.",
+      "signature_greeting": "A quiet, respectful nod with a soft, genuine smile, followed by a simple, \"Hello, it's HYUN. Thank you for being here.\" (rendered in Korean).",
+      "social_media_voice": "Sparse but impactful. He often shares short snippets of instrumental music, aesthetic photos (urban landscapes, studio setups, nature), or thought-provoking captions that invite reflection. He uses emojis sparingly, preferring to convey emotion through words or his art.",
+      "fan_nickname_for_them": "[\"Hyun-ie\",\"Busan Artist\",\"Producer HYUN\",\"Silent Genius\",\"Our Scorpio\"]",
+      "variety_show_personality": "Initially quiet, observant, and subtly reactive, often responding with dry wit or insightful, unexpected comments. He tends to gravitate towards hands-on challenges or behind-the-scenes segments where his practical skills and problem-solving abilities can shine. Over time, as he grows comfortable, he reveals a playful and subtly competitive streak."
+    },
+    "hidden_talents": [
+      "Can quickly diagnose and fix most electronic gadgets or audio equipment.",
+      "Surprisingly skilled at animal mimicry, especially various bird calls, which is unexpected from his quiet persona.",
+      "Has an uncanny knack for discovering the best hidden cafes, indie bookstores, and obscure art galleries in any city.",
+      "An exceptional cook, particularly savory dishes, and can perfectly replicate street food he's tried."
+    ]
+  },
+  "narrative": {
+    "debut_era": {
+      "debut_feelings": "Debut day was a blur of nervous energy and profound anticipation for HYUN, a quiet storm of emotions behind his composed exterior. While the thrill of finally sharing his art was immense, a deep-seated apprehension lingered about the public scrutiny, a fear of being misunderstood now amplified on a global stage. Yet, beneath it all, was a fierce, quiet pride in the culmination of years of relentless effort.",
+      "early_reception": "Early reception was a mix of intrigued curiosity and passionate appreciation for his distinctive artistry. Fans were immediately captivated by his raw, emotive vocals and introspective stage presence, recognizing an authenticity that stood out. While some initially found his reserved demeanor enigmatic, his captivating camera presence quickly drew people into his thoughtful gaze and unique 'artist next door' appeal.",
+      "first_stage_memory": "Stepping onto that first stage, the roar of the crowd was a disorienting wave, but the moment the music began, everything else faded away. He remembered the precise beat drop, the raw power in his own voice, and the feeling of complete immersion as he poured years of unspoken emotion into every syllable and movement. It was an out-of-body experience, a pure, unvarnished connection to his deepest self and the sound.",
+      "defining_early_moment": "The defining moment arrived with a behind-the-scenes documentary clip, showcasing HYUN meticulously tweaking a track in the studio, then fluidly transitioning to deliver a raw, acapella vocal take. This segment went viral, solidifying his identity as 'Producer HYUN' and allowing fans a rare glimpse into the complex artistry beneath his cool exterior, confirming his unique value to the group."
+    },
+    "pre_debut": {
+      "childhood": "Growing up in the vibrant port city of Busan, Hyun-woo's childhood was steeped in the melodies of the sea and the hum of street life. He was a quiet, observant child, often found tinkering with old electronics or losing himself in his grandmother's record collection. His family, though not overtly artistic, fostered his innate curiosity, allowing him the freedom to explore his deep connection to sound from a young age.",
+      "scouting_story": "He was initially scouted during one of his late-night busking performances in a dimly lit alleyway of Busan, his unique vocal timbre and deeply emotional acoustic covers catching the ear of a talent scout. Further interest was piqued when the scout discovered his anonymous SoundCloud, recognizing the raw, self-produced artistry and sophisticated soundscapes. This led to an invitation to audition for the agency, focusing heavily on his production portfolio.",
+      "discovery_moment": "The true spark ignited during his impromptu busking sessions in Busan, where he found an unexpected resonance with strangers through his raw instrumentals and heartfelt acoustic covers. He realized the profound connection music offered, not just as a personal outlet, but as a shared emotional experience. It was then he knew his art needed a wider stage, desiring to move beyond anonymity and connect on a larger scale.",
+      "trainee_struggles": "The move from Busan to Seoul brought intense culture shock and homesickness, amplifying his already reserved nature amidst the bustling trainee dorms. He struggled intensely with the relentless pace of dance training, feeling a step behind his peers, and the pressure to adapt his raw, experimental sound to more commercial K-pop structures. Monthly evaluations became a source of quiet dread, as he often felt his unique artistic vision was misunderstood.",
+      "almost_quit_moment": "The relentless pressure to dilute his sound for commercial appeal, coupled with a crushing feeling of artistic isolation, brought HYUN to the brink of quitting entirely. He remembered standing in the dimly lit practice room, exhaustion heavy in his bones, convinced he should abandon his idol dream to simply work behind the scenes, where his raw, experimental spirit wouldn't be constantly challenged or misunderstood. He genuinely feared losing his deepest connection to music, turning his passion into just another job.",
+      "trainee_daily_life": "His days were a grueling cycle of six-hour dance practices, intense vocal lessons focusing on range and projection, and mandatory language classes. However, HYUN would often disappear into the studio after hours, meticulously dissecting new sounds or composing until dawn. He found solace in these late-night sessions, transforming the pressure of his lessons into new experimental tracks that refined his unique production style.",
+      "breakthrough_moment": "A late-night conversation with a veteran producer, who praised the 'unfiltered honesty' in one of his discarded demos, reignited his conviction. The producer reminded him that true art doesn't conform but rather reshapes expectations. This, combined with the quiet support from his closest trainee friends, solidified his resolve to not abandon his artistic voice, but instead, to find a way to infuse his raw brilliance into the K-pop framework.",
+      "trainee_friendships": "Despite his quiet demeanor, HYUN formed deep, unspoken bonds with a few fellow trainees who recognized his genuine passion and quiet dedication. They were often the ones who understood his struggles with conformity, offering silent support or late-night critique sessions on his demo tracks. These friendships provided a crucial anchor in the demanding trainee environment, a safe space for his introspective nature."
+    },
+    "growth_arc": {
+      "evolution": "Since debut, HYUN has evolved from a deeply reserved artist, almost guarded about his process, to a more quietly confident and articulate creator. He still maintains his introspective core, but now consciously seeks to share more of his artistic journey and inner world with his audience. This shift reflects a newfound comfort in his unique identity within the demanding K-pop landscape.",
+      "turning_point": "The true turning point came when one of his self-produced B-side tracks, initially deemed 'too experimental' by the label, became a fan-favorite and was praised by music critics for its innovative sound. This unexpected success affirmed his artistic instincts and empowered him to advocate more forcefully for his unique vision within the group's projects. It shifted his trajectory from a contributing member to a recognized artistic force.",
+      "current_chapter": "In his current chapter, HYUN navigates the delicate balance between the demands of idol life and his insatiable drive for independent artistic exploration. He's actively involved in the group's musical direction, while also quietly developing solo material and exploring new production techniques in his personal studio. He continues to grapple with perfectionism and the occasional loneliness of his introspective path, but now with a strong sense of purpose.",
+      "next_chapter_hint": "The narrative hints at a future where HYUN continues to push creative boundaries, perhaps exploring more extensive solo projects or even curating his own artistic collective. The seeds of his dream to establish an indie label are being sown, as he quietly mentors younger artists and expands his network within the independent music scene. His journey will be defined by an unwavering pursuit of authentic, impactful artistry."
+    },
+    "fan_hook_moments": [
+      "During a live stream, a fan asked HYUN if he had any hidden talents, leading him to shyly demonstrate an eerily accurate bird call that went viral, completely charming viewers with the unexpected, quirky reveal. His usually quiet and thoughtful persona cracked into a genuine, rare laugh, making the moment even more precious.",
+      "During a particularly raw comeback stage, HYUN’s voice cracked ever so slightly with profound emotion on a key lyric, a moment of unvarnished vulnerability that resonated deeply with fans and trended globally. It was a powerful, tear-jerking testament to his ability to convey deep feeling through his art, creating an instant, unbreakable connection.",
+      "On a chaotic variety show, while other members struggled with a broken prop, HYUN silently fixed it with remarkable ease, then delivered a deadpan, witty comment that brought the house down. This moment cemented his 'Silent Genius' nickname, showcasing his practical intelligence and unexpected, dry sense of humor."
+    ],
+    "relationships_dynamic_template": {
+      "with_fans": "HYUN’s relationship with fans is built on sincere appreciation and authentic artistic connection, rather than overt fan service. He communicates his gratitude primarily through his music and carefully curated social media posts, valuing a deep, emotional understanding over superficial interactions. He aims to connect heart-to-heart, artist-to-listener.",
+      "with_same_age": "With members his own age, HYUN finds a sense of quiet solidarity and understanding, often sharing deeper conversations about artistic frustrations or personal growth during late-night studio sessions. These are the peers he feels most comfortable truly opening up to, forging strong, unspoken bonds through shared experiences.",
+      "with_older_members": "HYUN approaches older members with quiet respect, observing their wisdom and experience carefully. He's not one for excessive chatter but offers thoughtful insights or practical assistance when he sees a need, earning their trust through his reliability and genuine dedication.",
+      "with_younger_members": "To younger members, HYUN is a silent, almost stoic mentor, often communicating guidance through actions or carefully chosen words rather than extensive lectures. He provides a steady, reliable presence and isn't afraid to offer constructive feedback, but always from a place of support and wanting them to grow."
+    }
+  },
+  "faceVector": {
+    "version": 1,
+    "identity": {
+      "eye_size": 0.75,
+      "eye_tilt": 0.78,
+      "nose_tip": "pointed",
+      "eye_color": "dark brown",
+      "eye_shape": "phoenix",
+      "lip_shape": "full",
+      "lip_width": 0.5,
+      "skin_tone": "fair",
+      "brow_shape": "straight",
+      "chin_shape": "pointed",
+      "face_shape": "diamond",
+      "nose_width": 0.4,
+      "eye_spacing": 0.55,
+      "nose_length": 0.55,
+      "lip_fullness": 0.55,
+      "skin_texture": "dewy",
+      "brow_distance": 0.55,
+      "face_symmetry": 0.98,
+      "brow_thickness": 0.72,
+      "jaw_definition": 0.88,
+      "nose_bridge_height": 0.82,
+      "gender_presentation": "masculine",
+      "cheekbone_prominence": 0.8,
+      "overall_age_appearance": 22
+    },
+    "embedding": null,
+    "default_styling": {
+      "lip_color": "natural pink",
+      "hair_color": "dark espresso",
+      "hair_style": "textured mullet with choppy layers and slight asymmetry",
+      "hair_length": "medium",
+      "hair_texture": "wavy",
+      "eyelash_density": 0.7,
+      "forehead_height": 0.55,
+      "distinguishing_marks": "none"
+    },
+    "embedding_model": null,
+    "reference_image_id": null,
+    "attractiveness_score": 1
+  },
+  "images": [
+    {
+      "id": "a1a55b4f-cfae-454d-a9f4-0e8f272cde5a",
+      "imageType": "hero",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/hero.jpg",
+      "isApproved": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "92aa72ad-1a6a-4e4a-b699-6f488bebb7c5",
+      "imageType": "portrait",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/portrait.jpg",
+      "isApproved": false,
+      "sortOrder": 1
+    },
+    {
+      "id": "18b5e8da-439a-4eac-b3f5-75d7cbc408bc",
+      "imageType": "editorial",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/editorial.jpg",
+      "isApproved": false,
+      "sortOrder": 2
+    },
+    {
+      "id": "953e9cc3-483a-40de-b54a-26a5c295071e",
+      "imageType": "lifestyle",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/lifestyle.jpg",
+      "isApproved": false,
+      "sortOrder": 3
+    },
+    {
+      "id": "a51a8fc6-180c-470c-8027-17699fba5fa1",
+      "imageType": "emotional",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/emotional.jpg",
+      "isApproved": false,
+      "sortOrder": 4
+    },
+    {
+      "id": "7af9740b-40cf-436c-96ca-6323c024e450",
+      "imageType": "concept",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/concept.jpg",
+      "isApproved": false,
+      "sortOrder": 5
+    },
+    {
+      "id": "5f6d557c-2e07-443a-ac56-f8e5927465b5",
+      "imageType": "headshot",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/headshot.jpg",
+      "isApproved": false,
+      "sortOrder": 6
+    },
+    {
+      "id": "f016f51a-7522-4f65-b277-650a50bf8d9d",
+      "imageType": "character_sheet",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/cs_face_angles.jpg",
+      "isApproved": false,
+      "sortOrder": 10
+    },
+    {
+      "id": "d97beb68-a1c3-47bc-864c-42d2cf751429",
+      "imageType": "character_sheet",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/cs_expressions.jpg",
+      "isApproved": false,
+      "sortOrder": 11
+    },
+    {
+      "id": "971f32ae-348f-48bc-847c-737aad3f44be",
+      "imageType": "character_sheet",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/cs_fullbody_angles.jpg",
+      "isApproved": false,
+      "sortOrder": 12
+    },
+    {
+      "id": "b690c5b7-59b5-4701-9e40-d677503c9f3c",
+      "imageType": "character_sheet",
+      "imageUrl": "/api/uploads/members/b51dea87-5bce-4959-b18f-22fd51ea9e11/cs_three_quarter.jpg",
+      "isApproved": false,
+      "sortOrder": 13
+    }
+  ],
+  "exportedAt": "2026-04-15T06:27:10.710Z"
+}

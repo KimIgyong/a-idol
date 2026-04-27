@@ -1,0 +1,156 @@
+// A-idol — Prisma schema (MVP subset)
+// Full DDL reference: ../../sql/a-idol-schema.sql
+// This schema covers the tables touched by the skeleton: identity, catalog, fandom.
+// Commerce/Chat/Audition modules will be added in later tasks per the WBS.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  email
+  apple
+  google
+  kakao
+}
+
+enum UserStatus {
+  active
+  suspended
+  withdrawn
+}
+
+model User {
+  id              String       @id @default(uuid()) @db.Uuid
+  provider        AuthProvider
+  providerUserId  String       @map("provider_user_id")
+  email           String?      @unique
+  passwordHash    String?      @map("password_hash")
+  nickname        String       @db.VarChar(30)
+  avatarUrl       String?      @map("avatar_url")
+  instagramHandle String?      @map("instagram_handle") @db.VarChar(40)
+  birthdate       DateTime     @db.Date
+  status          UserStatus   @default(active)
+  marketingOptIn  Boolean      @default(false) @map("marketing_opt_in")
+  pushOptIn       Boolean      @default(true) @map("push_opt_in")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  deletedAt       DateTime?    @map("deleted_at")
+
+  authSessions AuthSession[]
+  hearts       Heart[]
+  follows      Follow[]
+  memberships  Membership[]
+
+  @@unique([provider, providerUserId])
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String    @map("refresh_token_hash")
+  deviceId         String?   @map("device_id") @db.VarChar(80)
+  ip               String?
+  userAgent        String?   @map("user_agent")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model Agency {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(80)
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  idols Idol[]
+
+  @@map("agencies")
+}
+
+model Idol {
+  id            String    @id @default(uuid()) @db.Uuid
+  agencyId      String    @map("agency_id") @db.Uuid
+  agency        Agency    @relation(fields: [agencyId], references: [id])
+  name          String    @db.VarChar(40)
+  stageName     String?   @map("stage_name") @db.VarChar(40)
+  birthdate     DateTime? @db.Date
+  mbti          String?   @db.VarChar(4)
+  bio           String?
+  heroImageUrl  String?   @map("hero_image_url")
+  heartCount    BigInt    @default(0) @map("heart_count")
+  followCount   BigInt    @default(0) @map("follow_count")
+  publishedAt   DateTime? @map("published_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  hearts    Heart[]
+  follows   Follow[]
+  fanClub   FanClub?
+
+  @@index([publishedAt])
+  @@map("idols")
+}
+
+model Heart {
+  userId    String   @map("user_id") @db.Uuid
+  idolId    String   @map("idol_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, idolId])
+  @@map("hearts")
+}
+
+model Follow {
+  userId    String   @map("user_id") @db.Uuid
+  idolId    String   @map("idol_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, idolId])
+  @@map("follows")
+}
+
+model FanClub {
+  id        String   @id @default(uuid()) @db.Uuid
+  idolId    String   @unique @map("idol_id") @db.Uuid
+  idol      Idol     @relation(fields: [idolId], references: [id], onDelete: Cascade)
+  tier      String   @default("official") @db.VarChar(20)
+  price     Decimal  @default(0) @db.Decimal(14, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  memberships Membership[]
+
+  @@map("fan_clubs")
+}
+
+model Membership {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  fanClubId  String    @map("fan_club_id") @db.Uuid
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fanClub    FanClub   @relation(fields: [fanClubId], references: [id], onDelete: Cascade)
+  joinedAt   DateTime  @default(now()) @map("joined_at")
+  leftAt     DateTime? @map("left_at")
+
+  @@unique([userId, fanClubId])
+  @@index([userId])
+  @@map("memberships")
+}

@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-idol · 모바일 목업 (Light)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+/* ── Design Tokens (from a-idol-mobile-wireframes.html) ─────────── */
+:root {
+  --bg:        #FFFFFF;
+  --surface:   #F7F6F3;
+  --elevated:  #EDECEA;
+  --accent:    #FF7A20;
+  --accent-lt: #FFF1E8;
+  --accent-dk: #D85A08;
+  --accent2:   #E03060;
+  --gold:      #C8880A;
+  --text1:     #18181E;
+  --text2:     #666674;
+  --text3:     #AAABB8;
+  --border:    rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.13);
+  --success:   #14996A;
+  --luna:      #5E2DA0;
+  --kira:      #1851A8;
+  --nova:      #1A7A50;
+  --aria:      #A82020;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  background:#EDECEA;
+  font-family:'Apple SD Gothic Neo','Noto Sans KR','Segoe UI',sans-serif;
+  color:var(--text1);
+  min-height:100vh;
+  padding:32px 16px 60px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Page header */
+.page-title{text-align:center;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.5px;margin-bottom:4px;}
+.page-sub{text-align:center;font-size:11px;color:var(--text2);margin-bottom:10px;}
+.api-pill{display:inline-flex;align-items:center;gap:5px;margin:0 auto 22px;padding:3px 10px;background:var(--bg);border:1px solid var(--border);border-radius:999px;font-size:10px;color:var(--text2);}
+.api-pill .dot{width:6px;height:6px;border-radius:3px;background:var(--text3);}
+.api-pill.ok .dot{background:var(--success);}
+.api-pill.down .dot{background:var(--accent2);}
+.page-wrap{max-width:840px;margin:0 auto;}
+.frame-wrap{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.phone-label{text-align:center;font-size:10px;color:var(--text2);letter-spacing:.2px;}
+
+/* ── Screen tabs (view switcher) ── */
+.tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:26px;}
+.tab-btn{
+  padding:7px 18px;border-radius:20px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border-md);cursor:pointer;
+  background:var(--bg);color:var(--text2);transition:all .15s;
+  font-family:inherit;
+}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.tab-btn:hover:not(.active){background:var(--surface);}
+
+/* ── Phone shell — iPhone 15 (393×852 pt; ratio 393/852 = 0.461) ── */
+/* Base coords = 224 wide to keep the reference density; `zoom: 1.75` lifts
+   the whole frame to iPhone 15 point scale (~392×852 CSS px) crisply. */
+.phone{
+  width:224px;height:486px;              /* 224 × (852/393) ≈ 486 → iPhone 15 ratio */
+  zoom:1.75;                              /* renders at ~392×852 (real iPhone 15) */
+  background:var(--bg);
+  border-radius:31px;                     /* × 1.75 ≈ 54px ≈ iPhone 15 corner */
+  border:1.5px solid rgba(0,0,0,.16);
+  overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 0 6px rgba(0,0,0,.04), 0 24px 52px rgba(0,0,0,.13);
+  display:flex;flex-direction:column;
+}
+.phone-notch{
+  height:34px;                            /* × 1.75 ≈ 60px = iPhone 15 top safe area */
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding-top:6px;                        /* × 1.75 ≈ 11px = island top margin */
+}
+/* Dynamic Island — iPhone 15 (126 × 37 pt, r 18.5 → scaled to 224-base) */
+.dynamic-island{
+  width:72px;height:21px;
+  background:#18181e;border-radius:11px;
+}
+/* Legacy alias kept so any stray .notch-pill still renders. */
+.notch-pill{width:72px;height:21px;background:#18181e;border-radius:11px;}
+
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:2px 16px 4px;font-size:9px;color:var(--text1);font-weight:600;
+}
+.status-icons{display:flex;gap:5px;align-items:center;}
+.status-icons svg{width:11px;height:11px;color:var(--text1);}
+
+.phone-body{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+
+/* Nav bar */
+.nav-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;background:var(--bg);border-bottom:1px solid var(--border);
+}
+.nav-title{font-size:13px;font-weight:700;color:var(--text1);}
+.nav-icon{width:18px;height:18px;color:var(--text2);cursor:pointer;}
+.nav-icon.accent{color:var(--accent);}
+.nav-stub{width:18px;}
+
+/* Bottom Tab Bar */
+.btab{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:9px 4px 14px;background:var(--bg);
+  border-top:1px solid var(--border);
+}
+.ti{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;background:transparent;border:none;font-family:inherit;}
+.ti svg{width:20px;height:20px;color:var(--text3);}
+.ti-lbl{font-size:7px;color:var(--text3);font-weight:500;}
+.ti.on svg{color:var(--accent);}
+.ti.on .ti-lbl{color:var(--accent);font-weight:700;}
+
+/* ── Feed ── */
+.feed-scroll{flex:1;overflow-y:auto;}
+.feed-header{padding:10px 14px 5px;display:flex;justify-content:space-between;align-items:center;}
+.logo-text{font-size:17px;font-weight:900;color:var(--accent);letter-spacing:-.6px;}
+.chips{display:flex;gap:5px;padding:4px 12px 9px;overflow-x:auto;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:3px 10px;border-radius:12px;font-size:9px;font-weight:500;background:var(--elevated);color:var(--text2);white-space:nowrap;border:1px solid transparent;cursor:pointer;font-family:inherit;}
+.chip.active{background:var(--accent-lt);color:var(--accent);border-color:rgba(255,122,32,.22);}
+.idol-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 10px 10px;}
+
+.idol-card{background:var(--bg);border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.07);cursor:pointer;padding:0;text-align:left;font-family:inherit;}
+.char-card{height:114px;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+.char-bg{position:absolute;inset:0;}
+.char-fade{position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent, rgba(0,0,0,.32));}
+.char-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:88px;height:96px;object-fit:contain;object-position:bottom center;}
+.like-badge{
+  position:relative;z-index:3;background:rgba(255,255,255,.92);
+  border-radius:10px;padding:2px 6px;font-size:8px;color:var(--text1);
+  display:flex;align-items:center;gap:2px;margin:0 6px 6px 0;align-self:flex-end;margin-left:auto;
+  box-shadow:0 1px 4px rgba(0,0,0,.10);
+}
+.card-info{padding:7px 9px 9px;}
+.card-name{font-size:10.5px;font-weight:800;color:var(--text1);}
+.card-agency{font-size:8px;color:var(--text2);margin-top:1px;}
+.card-actions{display:flex;align-items:center;gap:7px;margin-top:6px;}
+.card-actions .follow{font-size:8px;color:var(--text2);display:flex;align-items:center;gap:2px;}
+.card-actions .follow.on{color:var(--accent);font-weight:600;}
+
+/* ── Detail ── */
+.char-hero{height:172px;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+.char-hero-bg{position:absolute;inset:0;}
+.char-hero-fade{position:absolute;bottom:0;left:0;right:0;height:70px;background:linear-gradient(transparent, var(--bg));}
+.char-hero-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:140px;height:160px;object-fit:contain;object-position:bottom center;}
+.hero-back-btn{
+  position:absolute;top:10px;left:12px;background:rgba(255,255,255,.90);border-radius:14px;
+  padding:3px 9px;display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text1);z-index:5;cursor:pointer;border:none;font-family:inherit;
+}
+.hero-actions{position:absolute;top:10px;right:12px;display:flex;gap:6px;z-index:5;}
+.hero-action-btn{background:rgba(255,255,255,.90);border-radius:14px;padding:5px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+.photo-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:3px;z-index:5;}
+.photo-dot{width:4px;height:4px;border-radius:2px;background:rgba(255,255,255,.45);}
+.photo-dot.active{background:#fff;width:10px;}
+
+.detail-card{background:var(--bg);padding:10px 13px;}
+.idol-name{font-size:15px;font-weight:800;color:var(--text1);}
+.agency-badge{display:inline-block;background:var(--accent-lt);border:1px solid rgba(255,122,32,.28);border-radius:8px;padding:1px 7px;font-size:8px;color:var(--accent);margin-left:6px;font-weight:700;}
+.detail-tags{display:flex;gap:3px;margin:5px 0;flex-wrap:wrap;}
+.detail-tag{background:var(--elevated);border-radius:8px;padding:2px 7px;font-size:8px;color:var(--text2);}
+.stat-row{display:flex;gap:16px;padding:6px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:6px 0;}
+.stat-item{font-size:8px;color:var(--text2);display:flex;align-items:center;gap:3px;}
+.stat-item strong{color:var(--text1);font-size:9.5px;font-weight:700;}
+.action-row{display:flex;gap:5px;margin-bottom:9px;}
+.action-btn{flex:1;padding:8px;border-radius:10px;font-size:8px;font-weight:700;text-align:center;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;font-family:inherit;}
+.action-like{background:rgba(224,48,96,.09);color:var(--accent2);}
+.action-follow{background:var(--elevated);color:var(--text2);}
+.action-chat{background:var(--accent);color:#fff;}
+.section-label{font-size:9px;font-weight:700;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px;}
+.schedule-row{display:flex;gap:5px;align-items:center;padding:4px 0;}
+.sched-date{font-size:7.5px;color:var(--accent);font-weight:700;min-width:28px;}
+.sched-type{background:var(--accent-lt);border-radius:4px;padding:1px 6px;font-size:7.5px;color:var(--accent);font-weight:600;}
+.sched-title{font-size:8px;color:var(--text1);}
+
+/* ── Audition ── */
+.audi-scroll{flex:1;overflow-y:auto;}
+.audi-hero{background:linear-gradient(135deg,#FF7A20,#FF4060);padding:14px 13px 12px;}
+.audi-hero-title{font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;}
+.audi-hero-sub{font-size:8px;color:rgba(255,255,255,.82);margin-top:3px;}
+.countdown{font-size:17px;font-weight:800;color:#fff;margin:5px 0;font-variant-numeric:tabular-nums;letter-spacing:1px;}
+.audi-cta{background:#fff;border-radius:8px;padding:5px 13px;font-size:9px;color:var(--accent);font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-top:4px;}
+.round-track{display:flex;align-items:center;gap:2px;padding:8px 13px;}
+.round-circle{width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;flex-shrink:0;}
+.round-line{flex:1;height:1px;background:var(--border);}
+.rc-done{background:var(--accent);color:#fff;}
+.rc-cur{border:2px solid var(--accent);color:var(--accent);background:transparent;box-shadow:0 0 6px rgba(255,122,32,.3);}
+.rc-fut{background:var(--elevated);color:var(--text3);}
+.rank-list{padding:4px 13px;}
+.rank-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);}
+.rank-no{font-size:10px;font-weight:800;color:var(--gold);min-width:14px;}
+.rank-avatar{width:28px;height:28px;border-radius:14px;flex-shrink:0;overflow:hidden;border:1.5px solid var(--border);background:var(--surface);}
+.rank-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.rank-name{font-size:9px;font-weight:600;color:var(--text1);flex:1;}
+.rank-bar{flex:2;height:4px;border-radius:2px;background:var(--elevated);overflow:hidden;}
+.rank-bar-fill{height:100%;border-radius:2px;}
+.rank-count{font-size:7.5px;color:var(--text2);min-width:34px;text-align:right;}
+.rank-delta{font-size:7.5px;min-width:12px;font-weight:600;}
+.dup{color:var(--success);}
+.ddn{color:var(--accent2);}
+
+/* ── Gacha ── */
+.gacha-body{padding:9px 14px;flex:1;overflow-y:auto;}
+.card-fan{display:flex;justify-content:center;position:relative;height:120px;margin:6px 0 14px;}
+.fan-card{width:66px;height:100px;border-radius:10px;position:absolute;border:1.5px solid rgba(0,0,0,.09);top:10px;left:50%;transform-origin:bottom center;box-shadow:0 4px 14px rgba(0,0,0,.10);overflow:hidden;background:var(--surface);}
+.fan-card img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.fc1{transform:translateX(-63px) rotate(-25deg);}
+.fc2{transform:translateX(-31px) rotate(-12deg);z-index:2;}
+.fc3{transform:translateX(0) rotate(0);z-index:3;}
+.fc4{transform:translateX(31px) rotate(12deg);z-index:2;}
+.fc5{transform:translateX(63px) rotate(25deg);}
+.gacha-set-name{font-size:12px;font-weight:800;color:var(--text1);text-align:center;}
+.gacha-set-sub{font-size:8px;color:var(--text2);text-align:center;margin-top:2px;}
+.coll-dots{display:flex;gap:3px;flex-wrap:wrap;margin:8px 0 4px;}
+.coll-dot{width:10px;height:10px;border-radius:3px;}
+.coll-dot.owned{background:var(--accent);}
+.coll-dot.empty{background:var(--elevated);border:1px solid var(--border);}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px;}
+.price-label{font-size:10px;color:var(--text2);}
+.price-value{font-size:15px;font-weight:800;color:var(--accent);}
+.gacha-btn{width:100%;padding:10px;border-radius:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;border:none;cursor:pointer;margin-top:10px;letter-spacing:.3px;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;}
+.gacha-btn:hover{opacity:.9;}
+.gacha-note{font-size:7.5px;color:var(--text3);text-align:center;margin-top:5px;}
+
+/* ── Auth (Login / Signup) ── */
+.auth-body{flex:1;display:flex;flex-direction:column;padding:18px 18px 10px;overflow-y:auto;}
+.auth-logo{font-size:26px;font-weight:900;color:var(--accent);letter-spacing:-1px;text-align:center;margin-top:12px;}
+.auth-sub{font-size:10px;color:var(--text2);text-align:center;margin-top:2px;margin-bottom:18px;}
+.auth-form{display:flex;flex-direction:column;gap:10px;}
+.field-label{font-size:9px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;display:block;}
+.field-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:9px 11px;font-size:10.5px;color:var(--text1);
+  font-family:inherit;outline:none;
+}
+.field-input:focus{border-color:var(--accent);background:#fff;}
+.primary-btn{
+  width:100%;padding:11px;border-radius:12px;background:var(--accent);
+  color:#fff;font-size:11px;font-weight:800;border:none;cursor:pointer;
+  font-family:inherit;margin-top:4px;
+}
+.primary-btn:disabled{opacity:.6;cursor:wait;}
+.error-msg{font-size:9px;color:var(--accent2);padding:4px 0;display:flex;align-items:center;gap:3px;}
+.link-row{text-align:center;font-size:9px;color:var(--text2);margin-top:10px;background:none;border:none;cursor:pointer;font-family:inherit;padding:6px;}
+.link-row b{color:var(--accent);font-weight:700;}
+.fineprint{font-size:8px;color:var(--text3);text-align:center;margin-top:6px;line-height:1.5;}
+
+/* ── MY (profile) ── */
+.my-scroll{flex:1;overflow-y:auto;padding:10px 14px;}
+.my-hero{
+  background:linear-gradient(135deg,var(--accent-lt),#fff);
+  border:1px solid var(--border);border-radius:14px;padding:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.my-avatar{
+  width:44px;height:44px;border-radius:22px;flex-shrink:0;
+  border:1.5px solid var(--border);overflow:hidden;background:var(--surface);
+}
+.my-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.my-name{font-size:12px;font-weight:800;color:var(--text1);}
+.my-email{font-size:8px;color:var(--text2);margin-top:1px;}
+.my-badge{
+  margin-top:4px;display:inline-flex;align-items:center;gap:3px;
+  background:var(--accent);color:#fff;font-size:7px;font-weight:700;
+  padding:2px 6px;border-radius:8px;
+}
+
+.my-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;}
+.my-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;text-align:center;}
+.my-stat-label{font-size:7.5px;color:var(--text2);}
+.my-stat-value{font-size:12px;font-weight:800;color:var(--text1);margin-top:1px;}
+.my-stat-value.accent{color:var(--accent);}
+.my-stat-value.gold{color:var(--gold);}
+
+.my-list{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.my-row{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  background:transparent;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font-family:inherit;
+}
+.my-row:last-child{border-bottom:none;}
+.my-row svg{width:14px;height:14px;color:var(--text2);}
+.my-row-label{font-size:10px;color:var(--text1);flex:1;}
+.my-row-hint{font-size:8px;color:var(--text3);}
+.my-row.danger .my-row-label{color:var(--accent2);}
+.my-row.danger svg{color:var(--accent2);}
+
+/* Skeleton / empty */
+.center-pad{padding:30px 20px;text-align:center;color:var(--text3);font-size:9px;}
+
+/* scrollbar */
+.thin-scroll::-webkit-scrollbar{width:0;height:0;}
+</style>
+</head>
+<body>
+
+<!-- ══ SVG Symbol Library — Monochrome Outline Icons (from wireframes) ══ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4H4a1 1 0 00-1 1v3c0 2.76 1.79 5.12 4.33 5.77M17 4h3a1 1 0 011 1v3c0 2.76-1.79 5.12-4.33 5.77"/><path d="M7 4h10v7a5 5 0 01-10 0V4z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="10" height="14" rx="2"/><rect x="10" y="7" width="10" height="14" rx="2"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M3 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/><circle cx="17" cy="8" r="2.5"/><path d="M19.5 20c0-2.76-1.79-5-4-5.3"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 20c0-4.42 3.58-8 8-8s8 3.58 8 8"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0112 0c0 3.5.9 5.5 2 7H4c1.1-1.5 2-3.5 2-7z"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></symbol>
+  <symbol id="i-heart-f" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></symbol>
+  <symbol id="i-plus-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="7.5 12 10.5 15 16.5 9"/></symbol>
+  <symbol id="i-chevl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></symbol>
+  <symbol id="i-chevr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1a2 2 0 010 4v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1a2 2 0 010-4V9z"/><line x1="9" y1="7" x2="9" y2="17" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></symbol>
+  <symbol id="i-photo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19h20M4 19L2 8l5 4 5-7 5 7 5-4-2 11"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8.5C5.5 4.5 18.5 4.5 22.5 8.5"/><path d="M5 12c2.2-2.2 12-2.2 14 0"/><path d="M8.5 15.5c1.2-1.2 6.8-1.2 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></symbol>
+</svg>
+
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+
+<script type="text/babel" data-presets="env,react">
+  const { useState, useEffect, useCallback, useMemo } = React;
+
+  // ── API client (same as before) ────────────────────────────────
+  const API_BASE = "http://localhost:3000/1";
+  const AT_KEY = "a-idol.at";
+  const RT_KEY = "a-idol.rt";
+
+  async function api(path, { method = "GET", body, token } = {}) {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!res.ok) {
+      const msg = data?.message || data?.error || res.statusText;
+      throw new Error(Array.isArray(msg) ? msg.join(", ") : msg);
+    }
+    return data;
+  }
+
+  function useAuth() {
+    const [accessToken, setAccessToken] = useState(() => localStorage.getItem(AT_KEY));
+    const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem(RT_KEY));
+    const [user, setUser] = useState(null);
+
+    const persist = useCallback((at, rt) => {
+      setAccessToken(at); setRefreshToken(rt);
+      if (at) localStorage.setItem(AT_KEY, at); else localStorage.removeItem(AT_KEY);
+      if (rt) localStorage.setItem(RT_KEY, rt); else localStorage.removeItem(RT_KEY);
+    }, []);
+
+    const login = useCallback(async (email, password) => {
+      const r = await api("/auth/login", { method: "POST", body: { email, password, deviceId: "mockup-web" } });
+      persist(r.accessToken, r.refreshToken); setUser(r.user); return r.user;
+    }, [persist]);
+
+    const signup = useCallback(async (payload) => {
+      const r = await api("/auth/signup", { method: "POST", body: { ...payload, deviceId: "mockup-web" } });
+      persist(r.accessToken, r.refreshToken); setUser(r.user); return r.user;
+    }, [persist]);
+
+    const logout = useCallback(() => { persist(null, null); setUser(null); }, [persist]);
+
+    const fetchMe = useCallback(async () => {
+      if (!accessToken) return null;
+      try {
+        const u = await api("/me", { token: accessToken });
+        setUser(u);
+        return u;
+      } catch {
+        persist(null, null);
+      }
+    }, [accessToken, persist]);
+
+    useEffect(() => { if (accessToken && !user) fetchMe(); }, [accessToken]);
+
+    return { accessToken, refreshToken, user, login, signup, logout, fetchMe };
+  }
+
+  // ── Character / idol display helpers ─────────────────────────
+  // Reference DiceBear adventurer seeds + palette from wireframes.
+  const CHAR_PRESETS = {
+    // Male — "Raw Brilliance" concept, dark espresso mullet, fair skin, phoenix eyes. Maps to docs/reference/hyun-profile.json.
+    HYUN:      { bg: 'linear-gradient(160deg,#d8d4e8,#7a7594)', heroBg: 'linear-gradient(170deg,#e6e1f0,#8e88a8,#d0cadd)', seed: 'HYUN', hair: 'short18', hairColor: '3b2219', eyes: 'variant12', skinColor: 'f5d4ae', clothing: 'hoodie', clothingColor: '1f1f23' },
+    LunaVeil:  { bg: 'linear-gradient(160deg,#e8d8ff,#c4a0f0)', heroBg: 'linear-gradient(170deg,#e4ccff,#c090f0,#f0d0ff)', seed: 'LunaVeil', hair: 'long16', hairColor: '6c4675', eyes: 'variant06', skinColor: 'f2d3b1', clothing: 'blazer', clothingColor: '7c3aed' },
+    KiraSol:   { bg: 'linear-gradient(160deg,#d0e8ff,#90c0f8)', heroBg: 'linear-gradient(170deg,#d4e6ff,#88b4f8,#e0eaff)', seed: 'KiraSol', hair: 'short19', hairColor: '0e1e3c', eyes: 'variant14', skinColor: 'eac393', clothing: 'shirt', clothingColor: '1d4ed8' },
+    NovaZen:   { bg: 'linear-gradient(160deg,#c8f0d8,#80d4a8)', heroBg: 'linear-gradient(170deg,#d8f4e0,#80d4a8,#e8faee)', seed: 'NovaZen', hair: 'long01', hairColor: '27272a', eyes: 'variant22', skinColor: 'f5cba7', clothing: 'dress', clothingColor: '15803d' },
+    AriaDawn:  { bg: 'linear-gradient(160deg,#ffd8d8,#f4a0a0)', heroBg: 'linear-gradient(170deg,#ffd8d8,#f4a0a0,#ffe8e8)', seed: 'AriaDawn', hair: 'long02', hairColor: '3b0f0f', eyes: 'variant26', skinColor: 'fad9c1', clothing: 'sweater', clothingColor: '991b1b' },
+    EllaRay:   { bg: 'linear-gradient(160deg,#ffe8c8,#f0c080)', heroBg: 'linear-gradient(170deg,#fff0d8,#f0c080,#fff6e6)', seed: 'EllaRay', hair: 'long06', hairColor: 'c97b2e', eyes: 'variant18', skinColor: 'f5cba7', clothing: 'dress', clothingColor: 'b45309' },
+    MioKite:   { bg: 'linear-gradient(160deg,#ffe8f4,#f0a8d0)', heroBg: 'linear-gradient(170deg,#ffe8f4,#f0a8d0,#fff0f8)', seed: 'MioKite', hair: 'long15', hairColor: '111111', eyes: 'variant10', skinColor: 'fad9c1', clothing: 'shirt', clothingColor: 'be185d' },
+  };
+  const PRESET_ORDER = ['LunaVeil', 'KiraSol', 'NovaZen', 'AriaDawn', 'EllaRay', 'MioKite'];
+  // Direct stageName → preset map (takes precedence over index-based fallback).
+  const NAME_TO_PRESET = { HYUN: 'HYUN' };
+
+  function avatarUrl(preset, size = 'card') {
+    const c = CHAR_PRESETS[preset];
+    if (!c) return '';
+    const params = new URLSearchParams({
+      seed: c.seed, backgroundColor: 'transparent',
+      hair: c.hair, hairColor: c.hairColor, eyes: c.eyes, skinColor: c.skinColor,
+      ...(size === 'card' ? { clothing: c.clothing, clothingColor: c.clothingColor } : {}),
+    });
+    return `https://api.dicebear.com/8.x/adventurer/svg?${params}`;
+  }
+
+  // Merge DB idols (up to 3 seeded) with reference presets so the 2-col grid is populated even early in development.
+  const AGENCIES = ['Nova Entertainment', 'Stellar Records', 'Apex Talent', 'Luna Studios'];
+  const TAG_POOL = ['Pop','Performance','Charisma','Dance','Vocal','Visual','Rap','Producer'];
+
+  // Profile-specific overrides keyed by stageName.
+  const PROFILE_OVERRIDES = {
+    HYUN: {
+      agency: 'Nova Entertainment',
+      born: '2001.10.23',
+      debut: '2026.08.29',
+      tags: ['Raw Brilliance', 'Self-producing', 'Vocal', 'Lo-fi R&B'],
+    },
+  };
+
+  function enrichIdol(idol, i) {
+    const stageName = idol.stageName ?? idol.name ?? `Idol ${i+1}`;
+    const presetKey = NAME_TO_PRESET[stageName] ?? PRESET_ORDER[i % PRESET_ORDER.length];
+    const preset = CHAR_PRESETS[presetKey];
+    const override = PROFILE_OVERRIDES[stageName] ?? {};
+    return {
+      id: idol.id,
+      stageName,
+      agency: override.agency ?? AGENCIES[i % AGENCIES.length],
+      heartCount: idol.heartCount ?? Math.floor(3000 + i * 1200),
+      followCount: idol.followCount ?? Math.floor(800 + i * 300),
+      tags: override.tags ?? [TAG_POOL[i % TAG_POOL.length], TAG_POOL[(i+3) % TAG_POOL.length], TAG_POOL[(i+5) % TAG_POOL.length]],
+      born: override.born ?? '2001.03.12',
+      debut: override.debut ?? '2022.07.05',
+      preset,
+      presetKey,
+      isFollowing: i === 0 || i === 2,
+      isLiked: i === 0 || i === 2,
+      source: idol.source ?? (DB_PATTERN.test(idol.id ?? '') && !idol.id.startsWith('preset-') ? 'db' : 'preset'),
+      heroImageUrl: idol.heroImageUrl ?? null,
+      mbti: idol.mbti ?? null,
+    };
+  }
+
+  // Ensure the DB-backed HYUN record (not in the first 4 preset slots) is detected.
+  const DB_PATTERN = /^[0-9a-f-]{36}$/i;
+
+  function fillIdols(dbItems = []) {
+    const list = [];
+    for (let i = 0; i < 4; i++) {
+      if (dbItems[i]) list.push(enrichIdol({ ...dbItems[i], source: 'db' }, i));
+      else list.push(enrichIdol({
+        id: `preset-${PRESET_ORDER[i % PRESET_ORDER.length]}`,
+        stageName: PRESET_ORDER[i % PRESET_ORDER.length].replace(/([A-Z])/g, ' $1').trim(),
+      }, i));
+    }
+    return list;
+  }
+
+  // ── Shared UI atoms ───────────────────────────────────────────
+  const Icon = ({ id, style, className }) => (
+    <svg style={style} className={className}><use href={`#i-${id}`}/></svg>
+  );
+
+  const StatusBar = () => (
+    <div className="status-bar">
+      <span style={{fontWeight:700}}>9:41</span>
+      <div className="status-icons">
+        <Icon id="wifi" />
+        <Icon id="battery" />
+      </div>
+    </div>
+  );
+
+  const Notch = () => <div className="phone-notch"><div className="dynamic-island"></div></div>;
+
+  const BottomTabs = ({ tab, setTab }) => {
+    const tabs = [
+      ['home', '홈', 'home'],
+      ['audition', '오디션', 'trophy'],
+      ['gacha', '포토카드', 'card'],
+      ['fanclub', '팬클럽', 'people'],
+      ['my', 'MY', 'person'],
+    ];
+    return (
+      <div className="btab">
+        {tabs.map(([k, l, i]) => (
+          <button key={k} onClick={() => setTab(k)} className={`ti ${tab === k ? 'on' : ''}`}>
+            <Icon id={i} />
+            <span className="ti-lbl">{l}</span>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  // ── Login ─────────────────────────────────────────────────────
+  function LoginScreen({ auth, goSignup }) {
+    const [email, setEmail] = useState('demo@a-idol.dev');
+    const [password, setPassword] = useState('password123');
+    const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState(null);
+
+    async function submit(e) {
+      e.preventDefault();
+      setErr(null); setLoading(true);
+      try { await auth.login(email, password); }
+      catch (e) { setErr(e.message); }
+      finally { setLoading(false); }
+    }
+
+    return (
+      <div className="phone-body">
+        <div className="auth-body">
+          <div className="auth-logo">★ A-idol</div>
+          <div className="auth-sub">AI 아이돌 팬덤 플랫폼</div>
+
+          <form onSubmit={submit} className="auth-form">
+            <div>
+              <label className="field-label">이메일</label>
+              <input className="field-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" />
+            </div>
+            <div>
+              <label className="field-label">비밀번호</label>
+              <input className="field-input" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="8자 이상" />
+            </div>
+            {err ? <div className="error-msg">⚠ {err}</div> : null}
+            <button className="primary-btn" disabled={loading}>{loading ? '로그인 중…' : '로그인'}</button>
+            <button type="button" className="link-row" onClick={goSignup}>
+              계정이 없으신가요? <b>회원가입</b>
+            </button>
+            <p className="fineprint">만 14세 이상만 가입 가능합니다. (POL-006)</p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Signup ────────────────────────────────────────────────────
+  function SignupScreen({ auth, goBack }) {
+    const rnd = Math.floor(Math.random() * 10_000);
+    const [form, setForm] = useState({
+      email: `demo${rnd}@a-idol.dev`,
+      password: 'password123',
+      nickname: `fan${rnd}`,
+      birthdate: '2000-01-01',
+    });
+    const [err, setErr] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+    async function submit(e) {
+      e.preventDefault(); setErr(null); setLoading(true);
+      try { await auth.signup(form); }
+      catch (e) { setErr(e.message); }
+      finally { setLoading(false); }
+    }
+
+    return (
+      <div className="phone-body">
+        <div className="nav-bar">
+          <button className="hero-back-btn" style={{position:'static',background:'transparent',padding:0}} onClick={goBack}>
+            <Icon id="chevl" style={{width:12,height:12,color:'var(--text1)'}}/>
+          </button>
+          <div className="nav-title">회원가입</div>
+          <span className="nav-stub"></span>
+        </div>
+
+        <div className="auth-body">
+          <form onSubmit={submit} className="auth-form">
+            <div><label className="field-label">이메일</label>
+              <input className="field-input" type="email" value={form.email} onChange={set('email')} /></div>
+            <div><label className="field-label">비밀번호</label>
+              <input className="field-input" type="password" value={form.password} onChange={set('password')} /></div>
+            <div><label className="field-label">닉네임</label>
+              <input className="field-input" value={form.nickname} onChange={set('nickname')} /></div>
+            <div><label className="field-label">생년월일</label>
+              <input className="field-input" type="date" value={form.birthdate} onChange={set('birthdate')} /></div>
+            {err ? <div className="error-msg">⚠ {err}</div> : null}
+            <button className="primary-btn" disabled={loading}>{loading ? '가입 중…' : '가입하고 시작하기'}</button>
+            <p className="fineprint">
+              가입 시 서비스 약관 및 개인정보 처리방침에 동의한 것으로 간주됩니다.<br/>
+              만 14세 미만은 가입이 제한됩니다. (POL-006)
+            </p>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Home Feed ─────────────────────────────────────────────────
+  function FeedScreen({ idols, onOpenIdol }) {
+    const agencies = ['All', ...Array.from(new Set(idols.map(i => i.agency.split(' ')[0])))];
+    const [activeChip, setActiveChip] = useState('All');
+    const [list, setList] = useState(idols);
+
+    useEffect(() => {
+      if (activeChip === 'All') return setList(idols);
+      setList(idols.filter(i => i.agency.startsWith(activeChip)));
+    }, [activeChip, idols]);
+
+    return (
+      <div className="phone-body">
+        <div className="feed-scroll thin-scroll">
+          <div className="feed-header">
+            <div className="logo-text">★ A-idol</div>
+            <div style={{display:'flex',gap:11,alignItems:'center'}}>
+              <Icon id="search" style={{width:18,height:18,color:'var(--text2)'}}/>
+              <Icon id="bell" style={{width:18,height:18,color:'var(--text2)'}}/>
+            </div>
+          </div>
+
+          <div className="chips">
+            {agencies.map(a => (
+              <button key={a} className={`chip ${activeChip === a ? 'active' : ''}`} onClick={() => setActiveChip(a)}>{a}</button>
+            ))}
+          </div>
+
+          <div className="idol-grid">
+            {list.map(i => <IdolCard key={i.id} idol={i} onClick={() => onOpenIdol(i)} />)}
+            {list.length === 0 ? <div className="center-pad" style={{gridColumn:'1/3'}}>아직 공개된 아이돌이 없습니다</div> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function IdolCard({ idol, onClick }) {
+    return (
+      <button className="idol-card" onClick={onClick}>
+        <div className="char-card">
+          <div className="char-bg" style={{background: idol.preset.bg}}></div>
+          <div className="char-fade"></div>
+          <img
+            className="char-img"
+            style={idol.heroImageUrl ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' } : undefined}
+            src={idol.heroImageUrl
+              ? (idol.heroImageUrl.startsWith('http') ? idol.heroImageUrl : `http://localhost:3000${idol.heroImageUrl}`)
+              : avatarUrl(idol.presetKey, 'card')}
+            onError={(e) => { e.currentTarget.src = avatarUrl(idol.presetKey, 'card'); e.currentTarget.style = ''; }}
+            alt={idol.stageName}
+          />
+          <div className="like-badge">
+            <Icon id={idol.isLiked ? 'heart-f' : 'heart'} style={{width:8,height:8,color:idol.isLiked ? 'var(--accent2)' : 'var(--text3)'}}/>
+            {fmtK(idol.heartCount)}
+          </div>
+        </div>
+        <div className="card-info">
+          <div className="card-name">{idol.stageName}</div>
+          <div className="card-agency">{idol.agency}</div>
+          <div className="card-actions">
+            <Icon id={idol.isLiked ? 'heart-f' : 'heart'} style={{width:14,height:14,color: idol.isLiked ? 'var(--accent2)' : 'var(--text3)'}}/>
+            <span className={`follow ${idol.isFollowing ? 'on' : ''}`}>
+              <Icon id={idol.isFollowing ? 'check-c' : 'plus-c'} style={{width:10,height:10,color: idol.isFollowing ? 'var(--accent)' : 'var(--text3)'}}/>
+              {idol.isFollowing ? 'Following' : 'Follow'}
+            </span>
+          </div>
+        </div>
+      </button>
+    );
+  }
+
+  function fmtK(n) {
+    if (n == null) return '0';
+    if (n >= 10000) return `${(n/1000).toFixed(1).replace(/\.0$/,'')}K`;
+    if (n >= 1000) return `${(n/1000).toFixed(1).replace(/\.0$/,'')}K`;
+    return n.toLocaleString();
+  }
+
+  // ── Idol Detail ───────────────────────────────────────────────
+  function DetailScreen({ idol, auth, onClose }) {
+    const [detail, setDetail] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    // Only DB-backed idols have a detail endpoint; presets stay with static fallback.
+    const hasBackend = idol.source === 'db';
+
+    useEffect(() => {
+      if (!hasBackend) { setDetail(null); return; }
+      let cancelled = false;
+      setLoading(true);
+      api(`/idols/${idol.id}`, { token: auth.accessToken })
+        .then((d) => { if (!cancelled) setDetail(d); })
+        .catch((e) => { console.warn('idol detail failed', e); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+      return () => { cancelled = true; };
+    }, [idol.id, hasBackend, auth.accessToken]);
+
+    const profile = detail?.profile;
+    const images = detail?.images ?? [];
+    const photoDots = Math.max(3, Math.min(images.length || 3, 8));
+
+    return (
+      <div className="phone-body">
+        <div className="char-hero">
+          <div className="char-hero-bg" style={{background: idol.preset.heroBg}}></div>
+          <div className="char-hero-fade"></div>
+          <img
+            className="char-hero-img"
+            style={ (detail?.heroImageUrl || idol.heroImageUrl) ? { width: '100%', height: '100%', objectFit: 'cover' } : undefined }
+            src={
+              detail?.heroImageUrl
+                ? `http://localhost:3000${detail.heroImageUrl}`
+                : idol.heroImageUrl
+                  ? (idol.heroImageUrl.startsWith('http') ? idol.heroImageUrl : `http://localhost:3000${idol.heroImageUrl}`)
+                  : avatarUrl(idol.presetKey, 'hero')
+            }
+            onError={(e) => { e.currentTarget.src = avatarUrl(idol.presetKey, 'hero'); e.currentTarget.style = ''; }}
+            alt={idol.stageName}
+          />
+          <button className="hero-back-btn" onClick={onClose}>
+            <Icon id="chevl" style={{width:12,height:12,color:'var(--text1)'}}/>
+            Back
+          </button>
+          <div className="hero-actions">
+            <button className="hero-action-btn"><Icon id="share" style={{width:13,height:13,color:'var(--text1)'}}/></button>
+            <button className="hero-action-btn"><Icon id="more" style={{width:13,height:13,color:'var(--text1)'}}/></button>
+          </div>
+          <div className="photo-dots">
+            {Array.from({length: photoDots}).map((_, i) => (
+              <div key={i} className={`photo-dot ${i === 0 ? 'active' : ''}`}></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="detail-card" style={{flex:1,overflowY:'auto'}}>
+          <div style={{display:'flex',alignItems:'center',flexWrap:'wrap',gap:4}}>
+            <span className="idol-name">{idol.stageName}</span>
+            {profile?.coreIdentity?.name?.korean ? (
+              <span style={{fontSize:10,color:'var(--text2)',fontWeight:600}}>
+                {profile.coreIdentity.name.korean}
+              </span>
+            ) : null}
+            <span className="agency-badge">{idol.agency.split(' ')[0]} Ent.</span>
+          </div>
+          <div style={{fontSize:8,color:'var(--text2)',marginTop:3}}>
+            {detail?.birthdate ? `Born ${detail.birthdate.replace(/-/g,'.')}` : `Born ${idol.born}`}
+            {profile?.coreIdentity?.birth?.birthplace ? ` · ${profile.coreIdentity.birth.birthplace}` : ''}
+            {detail?.mbti ? ` · MBTI ${detail.mbti}` : idol.mbti ? ` · MBTI ${idol.mbti}` : ''}
+          </div>
+
+          {profile?.conceptSeed ? (
+            <div style={{margin:'6px 0 0',padding:'7px 9px',background:'var(--accent-lt)',border:'1px solid rgba(255,122,32,.22)',borderRadius:10}}>
+              <div style={{fontSize:7.5,color:'var(--accent)',fontWeight:700,letterSpacing:.4,textTransform:'uppercase'}}>Concept</div>
+              <div style={{fontSize:10,fontWeight:700,color:'var(--text1)',marginTop:1}}>《{profile.conceptSeed.concept_name}》</div>
+              <div style={{fontSize:8,color:'var(--text2)',marginTop:2,lineHeight:1.45}}>{profile.conceptSeed.vibe_description}</div>
+            </div>
+          ) : null}
+
+          <div className="detail-tags" style={{marginTop: profile ? 6 : 5}}>
+            {idol.tags.map(t => <span key={t} className="detail-tag">{t}</span>)}
+            {profile?.deepProfile?.favorites?.music?.genres?.slice(0,2).map(g => (
+              <span key={g} className="detail-tag" style={{background:'rgba(200,136,10,.12)',color:'var(--gold)'}}>{g}</span>
+            ))}
+          </div>
+
+          <div className="stat-row">
+            <div className="stat-item">
+              <Icon id="heart-f" style={{width:10,height:10,color:'var(--accent2)'}}/>
+              <strong>{fmtK(idol.heartCount)}</strong> Likes
+            </div>
+            <div className="stat-item">
+              <Icon id="people" style={{width:10,height:10,color:'var(--text2)'}}/>
+              <strong>{fmtK(idol.followCount)}</strong> Followers
+            </div>
+          </div>
+
+          <div className="action-row">
+            <button className="action-btn action-like">
+              <Icon id={idol.isLiked ? 'heart-f' : 'heart'} style={{width:10,height:10,color:'var(--accent2)'}}/>
+              Like
+            </button>
+            <button className="action-btn action-follow">
+              <Icon id={idol.isFollowing ? 'check-c' : 'plus-c'} style={{width:10,height:10,color:'var(--text2)'}}/>
+              {idol.isFollowing ? 'Following' : 'Follow'}
+            </button>
+            <button className="action-btn action-chat">
+              <Icon id="chat" style={{width:10,height:10,color:'#fff'}}/>
+              Chat
+            </button>
+          </div>
+
+          {profile?.deepProfile?.skills ? (
+            <>
+              <div className="section-label">
+                <Icon id="star" style={{width:10,height:10,color:'var(--text2)'}}/>
+                Skills
+              </div>
+              <SkillBars skills={profile.deepProfile.skills}/>
+            </>
+          ) : null}
+
+          {profile?.narrative?.fan_hook_moments?.[0] ? (
+            <>
+              <div className="section-label" style={{marginTop:8}}>
+                <Icon id="spark" style={{width:10,height:10,color:'var(--gold)'}}/>
+                Fan Moment
+              </div>
+              <div style={{fontSize:8,color:'var(--text1)',lineHeight:1.5,paddingBottom:4}}>
+                “{profile.narrative.fan_hook_moments[0]}”
+              </div>
+            </>
+          ) : null}
+
+          <div className="section-label" style={{marginTop:8}}>
+            <Icon id="cal" style={{width:10,height:10,color:'var(--text2)'}}/>
+            Schedule
+          </div>
+          <div className="schedule-row">
+            <span className="sched-date">4/20</span>
+            <span className="sched-type">Broadcast</span>
+            <span className="sched-title">A-idol Showcase Live</span>
+          </div>
+          <div className="schedule-row">
+            <span className="sched-date">5/03</span>
+            <span className="sched-type" style={{background:'rgba(200,136,10,.12)',color:'var(--gold)'}}>Concert</span>
+            <span className="sched-title">{idol.stageName} World Tour</span>
+          </div>
+          <div className="schedule-row">
+            <span className="sched-date">5/20</span>
+            <span className="sched-type">Fanmeet</span>
+            <span className="sched-title">Official Fan Meeting Vol.1</span>
+          </div>
+
+          {images.length > 0 ? (
+            <>
+              <div className="section-label" style={{marginTop:8}}>
+                <Icon id="photo" style={{width:10,height:10,color:'var(--text2)'}}/>
+                Image Set ({images.length})
+              </div>
+              <div style={{display:'flex',gap:3,flexWrap:'wrap',paddingBottom:8}}>
+                {images.map(img => (
+                  <span key={img.id} style={{fontSize:7,color: img.isApproved ? 'var(--success)' : 'var(--text3)',padding:'2px 6px',borderRadius:6,background:'var(--elevated)'}}>
+                    {img.imageType}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : null}
+
+          {hasBackend && loading ? (
+            <div style={{fontSize:8,color:'var(--text3)',textAlign:'center',padding:'4px 0 8px'}}>프로필 불러오는 중…</div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
+  function SkillBars({ skills }) {
+    const items = [
+      ['Vocal',  skills.vocal?.rating],
+      ['Dance',  skills.dance?.rating],
+      ['Rap',    skills.rap?.rating],
+      ['Visual', skills.visual?.rating],
+    ].filter(([,v]) => typeof v === 'number');
+    const max = 10;
+    return (
+      <div style={{display:'flex',flexDirection:'column',gap:3,paddingBottom:4}}>
+        {items.map(([label, v]) => (
+          <div key={label} style={{display:'flex',alignItems:'center',gap:6}}>
+            <span style={{fontSize:8,color:'var(--text2)',width:34}}>{label}</span>
+            <div style={{flex:1,height:4,borderRadius:2,background:'var(--elevated)',overflow:'hidden'}}>
+              <div style={{height:'100%',width:`${(v/max)*100}%`,background:'var(--accent)'}}></div>
+            </div>
+            <span style={{fontSize:8,color:'var(--text1)',fontWeight:700,width:22,textAlign:'right'}}>{v}/{max}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // ── Audition ──────────────────────────────────────────────────
+  function AuditionScreen({ idols }) {
+    const [t, setT] = useState({ d: 3, h: 14, m: 22, s: 8 });
+    useEffect(() => {
+      const id = setInterval(() => {
+        setT(({ d, h, m, s }) => {
+          s -= 1;
+          if (s < 0) { s = 59; m -= 1; }
+          if (m < 0) { m = 59; h -= 1; }
+          if (h < 0) { h = 23; d -= 1; }
+          if (d < 0) { d = 0; h = 0; m = 0; s = 0; }
+          return { d, h, m, s };
+        });
+      }, 1000);
+      return () => clearInterval(id);
+    }, []);
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const ranked = [...idols]
+      .sort((a, b) => b.heartCount - a.heartCount)
+      .slice(0, 4)
+      .map((idol, i) => ({
+        idol,
+        percent: [90, 78, 65, 50][i],
+        count: [42183, 38921, 31042, 24400][i],
+        color: ['var(--accent)', 'var(--accent2)', 'var(--success)', 'var(--gold)'][i],
+        delta: ['up', 'down', 'up', '-'][i],
+      }));
+
+    return (
+      <div className="phone-body">
+        <div className="nav-bar">
+          <span className="nav-stub"></span>
+          <span className="nav-title">Audition</span>
+          <Icon id="bell" className="nav-icon"/>
+        </div>
+
+        <div className="audi-scroll thin-scroll">
+          <div className="audi-hero">
+            <div className="audi-hero-title">
+              <Icon id="trophy" style={{width:14,height:14,color:'#fff'}}/>
+              A-idol Audition Season 1
+            </div>
+            <div className="audi-hero-sub">Round 3 · Voting in progress</div>
+            <div className="countdown">{pad(t.d)} : {pad(t.h)} : {pad(t.m)} : {pad(t.s)}</div>
+            <div className="audi-cta">
+              <Icon id="star" style={{width:10,height:10,color:'var(--accent)'}}/>
+              Vote Now
+            </div>
+          </div>
+
+          <div className="round-track">
+            <div className="round-circle rc-done">1</div><div className="round-line"></div>
+            <div className="round-circle rc-done">2</div><div className="round-line"></div>
+            <div className="round-circle rc-cur">3</div><div className="round-line"></div>
+            <div className="round-circle rc-fut">4</div><div className="round-line"></div>
+            <div className="round-circle rc-fut">5</div>
+            <div className="round-line" style={{flex:3}}></div>
+            <div className="round-circle rc-fut" style={{background:'rgba(200,136,10,.12)',color:'var(--gold)',fontSize:5,border:'1.5px solid var(--gold)'}}>F</div>
+          </div>
+
+          <div style={{padding:'0 13px 4px',fontSize:9,color:'var(--text2)',display:'flex',alignItems:'center',gap:4}}>
+            <Icon id="crown" style={{width:11,height:11,color:'var(--text2)'}}/>Live Rankings
+          </div>
+
+          <div className="rank-list">
+            {ranked.map((r, i) => (
+              <div key={r.idol.id} className="rank-row">
+                <span className="rank-no">{i+1}</span>
+                <div className="rank-avatar" style={{background:r.idol.preset.bg}}>
+                  <img src={avatarUrl(r.idol.presetKey, 'card')} alt={r.idol.stageName}/>
+                </div>
+                <span className="rank-name">{r.idol.stageName}</span>
+                <div className="rank-bar"><div className="rank-bar-fill" style={{width:`${r.percent}%`,background:r.color}}></div></div>
+                <span className="rank-count">{r.count.toLocaleString()}</span>
+                <span className={`rank-delta ${r.delta === 'up' ? 'dup' : r.delta === 'down' ? 'ddn' : ''}`} style={r.delta === '-' ? {color:'var(--text3)'} : undefined}>
+                  {r.delta === 'up' ? '▲' : r.delta === 'down' ? '▼' : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{padding:'7px 13px 14px',display:'flex',gap:7}}>
+            <button style={{flex:1,padding:8,borderRadius:10,background:'var(--elevated)',color:'var(--text1)',fontSize:9,border:'1px solid var(--border)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:4,fontWeight:600,fontFamily:'inherit'}}>
+              <Icon id="flag" style={{width:11,height:11,color:'var(--text2)'}}/>Full Ranking
+            </button>
+            <button style={{flex:1,padding:8,borderRadius:10,background:'var(--accent)',color:'#fff',fontSize:9,border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:4,fontWeight:700,fontFamily:'inherit'}}>
+              <Icon id="star" style={{width:11,height:11,color:'#fff'}}/>Vote
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Gacha (Photocard) ─────────────────────────────────────────
+  function GachaScreen({ idols }) {
+    const owned = [true,true,true,false,true,false,true,false,false,false,false,false];
+    const pool = idols.slice(0, 5);
+    return (
+      <div className="phone-body">
+        <div className="nav-bar">
+          <Icon id="chevl" className="nav-icon accent"/>
+          <span className="nav-title" style={{fontSize:12}}>Photocard Pull</span>
+          <Icon id="more" className="nav-icon"/>
+        </div>
+
+        <div className="gacha-body thin-scroll">
+          <div className="card-fan">
+            {pool.map((i, idx) => (
+              <div key={i.id} className={`fan-card fc${idx+1}`} style={{background: i.preset.bg}}>
+                <img src={avatarUrl(i.presetKey, 'card')} alt={i.stageName}/>
+              </div>
+            ))}
+          </div>
+
+          <div className="gacha-set-name">{pool[0]?.stageName ?? 'Luna Veil'} Vol.1 Photocard Set</div>
+          <div className="gacha-set-sub">Random 1 card from 12 · Server-side draw</div>
+
+          <div style={{fontSize:8,color:'var(--text2)',marginTop:10,marginBottom:3,display:'flex',alignItems:'center',gap:3}}>
+            <Icon id="photo" style={{width:10,height:10,color:'var(--text2)'}}/>My Collection (5/12)
+          </div>
+          <div className="coll-dots">
+            {owned.map((o, i) => <div key={i} className={`coll-dot ${o ? 'owned' : 'empty'}`}></div>)}
+          </div>
+
+          <div style={{background:'var(--surface)',borderRadius:10,padding:'7px 10px',marginTop:9,border:'1px solid var(--border)'}}>
+            <div style={{fontSize:8,color:'var(--text2)',marginBottom:4,fontWeight:700}}>Card Set</div>
+            <div style={{display:'flex',gap:12}}>
+              <span style={{fontSize:8,color:'var(--text2)'}}>⬜ Common ×6</span>
+              <span style={{fontSize:8,color:'var(--accent)',fontWeight:600}}>★ Rare ×4</span>
+              <span style={{fontSize:8,color:'var(--gold)',fontWeight:600}}>✦ Epic ×2</span>
+            </div>
+          </div>
+
+          <div className="price-row">
+            <span className="price-label">1 Pull</span>
+            <span className="price-value">₩1,500</span>
+          </div>
+
+          <button className="gacha-btn">
+            <Icon id="spark" style={{width:13,height:13,color:'#fff'}}/>
+            Buy &amp; Pull
+          </button>
+          <div className="gacha-note">Random draw · Duplicates possible</div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Fanclub (placeholder — shows joined idols) ────────────────
+  function FanclubScreen({ idols, onOpenIdol }) {
+    const joined = idols.filter(i => i.isFollowing);
+    return (
+      <div className="phone-body">
+        <div className="nav-bar">
+          <span className="nav-stub"></span>
+          <span className="nav-title">Fan Clubs</span>
+          <Icon id="search" className="nav-icon"/>
+        </div>
+        <div className="my-scroll thin-scroll">
+          <div className="section-label" style={{marginTop:4}}>
+            <Icon id="people" style={{width:10,height:10,color:'var(--text2)'}}/>
+            Joined · {joined.length}
+          </div>
+          <div className="my-list" style={{marginTop:4}}>
+            {joined.length === 0 ? (
+              <div className="center-pad">아직 가입한 팬클럽이 없습니다</div>
+            ) : joined.map(i => (
+              <button key={i.id} className="my-row" onClick={() => onOpenIdol(i)}>
+                <div className="rank-avatar" style={{background:i.preset.bg,width:32,height:32,borderRadius:16}}>
+                  <img src={avatarUrl(i.presetKey, 'card')} alt={i.stageName}/>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:10.5,fontWeight:700,color:'var(--text1)'}}>{i.stageName}</div>
+                  <div style={{fontSize:8,color:'var(--text2)'}}>Official Fan Club</div>
+                </div>
+                <span style={{fontSize:8,color:'var(--accent)',fontWeight:600,display:'flex',alignItems:'center',gap:3}}>
+                  <Icon id="chat" style={{width:10,height:10,color:'var(--accent)'}}/>
+                  Chat
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="fineprint" style={{marginTop:10}}>
+            채팅/쿠폰 기능은 백엔드 fandom · chat 모듈 구현 이후 연결됩니다. (FR-120~)
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── MY ────────────────────────────────────────────────────────
+  function MyScreen({ user, onLogout, onRefresh, idols }) {
+    const nickname = user?.nickname ?? '—';
+    const email = user?.email ?? '—';
+    const since = user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '—';
+    return (
+      <div className="phone-body">
+        <div className="nav-bar">
+          <span className="nav-stub"></span>
+          <span className="nav-title">MY</span>
+          <button className="hero-action-btn" style={{background:'transparent',padding:0}} onClick={onRefresh}>
+            <Icon id="settings" className="nav-icon"/>
+          </button>
+        </div>
+
+        <div className="my-scroll thin-scroll">
+          <div className="my-hero">
+            <div className="my-avatar" style={{background: CHAR_PRESETS.LunaVeil.bg}}>
+              <img src={avatarUrl('LunaVeil', 'card')} alt={nickname}/>
+            </div>
+            <div style={{flex:1,minWidth:0}}>
+              <div className="my-name">{nickname}</div>
+              <div className="my-email">{email}</div>
+              <span className="my-badge">
+                <Icon id="shield" style={{width:7,height:7,color:'#fff'}}/>
+                Lv.3 Bronze Fan
+              </span>
+            </div>
+          </div>
+
+          <div className="my-stats">
+            <div className="my-stat">
+              <div className="my-stat-label">Likes</div>
+              <div className="my-stat-value accent">42</div>
+            </div>
+            <div className="my-stat">
+              <div className="my-stat-label">Follows</div>
+              <div className="my-stat-value">{idols.filter(i=>i.isFollowing).length}</div>
+            </div>
+            <div className="my-stat">
+              <div className="my-stat-label">Coupons</div>
+              <div className="my-stat-value gold">3</div>
+            </div>
+          </div>
+
+          <div className="section-label" style={{marginTop:12}}>Account</div>
+          <div className="my-list">
+            <button className="my-row">
+              <Icon id="bell"/>
+              <span className="my-row-label">알림 설정</span>
+              <span className="my-row-hint">마케팅 ON</span>
+              <Icon id="chevr" style={{width:10,height:10,color:'var(--text3)'}}/>
+            </button>
+            <button className="my-row">
+              <Icon id="ticket"/>
+              <span className="my-row-label">결제/쿠폰 내역</span>
+              <Icon id="chevr" style={{width:10,height:10,color:'var(--text3)'}}/>
+            </button>
+            <button className="my-row">
+              <Icon id="shield"/>
+              <span className="my-row-label">보안 · 기기</span>
+              <span className="my-row-hint">1대</span>
+              <Icon id="chevr" style={{width:10,height:10,color:'var(--text3)'}}/>
+            </button>
+          </div>
+
+          <div className="section-label" style={{marginTop:12}}>Info</div>
+          <div className="my-list">
+            <div className="my-row" style={{cursor:'default'}}>
+              <Icon id="cal"/>
+              <span className="my-row-label">가입일</span>
+              <span className="my-row-hint">{since}</span>
+            </div>
+            <div className="my-row" style={{cursor:'default'}}>
+              <Icon id="person"/>
+              <span className="my-row-label">Provider</span>
+              <span className="my-row-hint">{user?.provider ?? '—'}</span>
+            </div>
+            <button className="my-row danger" onClick={onLogout}>
+              <Icon id="logout"/>
+              <span className="my-row-label">로그아웃</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── App shell ─────────────────────────────────────────────────
+  function App() {
+    const auth = useAuth();
+    const [route, setRoute] = useState('login'); // login | signup | app
+    const [tab, setTab] = useState('home');
+    const [detailIdol, setDetailIdol] = useState(null);
+    const [idols, setIdols] = useState(() => fillIdols([]));
+    const [apiUp, setApiUp] = useState(null);
+
+    useEffect(() => {
+      fetch(`${API_BASE}/idols`)
+        .then(async r => {
+          setApiUp(r.ok);
+          if (r.ok) {
+            const body = await r.json();
+            setIdols(fillIdols(body.items ?? []));
+          }
+        })
+        .catch(() => setApiUp(false));
+    }, []);
+
+    useEffect(() => {
+      if (auth.accessToken && auth.user) setRoute('app');
+      else if (!auth.accessToken) setRoute(r => r === 'signup' ? r : 'login');
+    }, [auth.accessToken, auth.user]);
+
+    function renderPhoneContent() {
+      if (route === 'login') return <LoginScreen auth={auth} goSignup={() => setRoute('signup')} />;
+      if (route === 'signup') return <SignupScreen auth={auth} goBack={() => setRoute('login')} />;
+
+      // app routes
+      if (detailIdol) return <DetailScreen idol={detailIdol} auth={auth} onClose={() => setDetailIdol(null)} />;
+      if (tab === 'home')     return <FeedScreen idols={idols} onOpenIdol={setDetailIdol} />;
+      if (tab === 'audition') return <AuditionScreen idols={idols} />;
+      if (tab === 'gacha')    return <GachaScreen idols={idols} />;
+      if (tab === 'fanclub')  return <FanclubScreen idols={idols} onOpenIdol={setDetailIdol} />;
+      if (tab === 'my')       return <MyScreen user={auth.user} idols={idols} onLogout={auth.logout} onRefresh={auth.fetchMe} />;
+      return null;
+    }
+
+    const currentLabel = route === 'login' ? 'SCR-001 로그인'
+      : route === 'signup' ? 'SCR-002 회원가입'
+      : detailIdol ? 'SCR-006 아이돌 상세'
+      : tab === 'home' ? 'SCR-005 홈 피드'
+      : tab === 'audition' ? 'SCR-011 오디션'
+      : tab === 'gacha' ? 'SCR-017 포토카드 뽑기'
+      : tab === 'fanclub' ? 'SCR-009 팬클럽'
+      : 'SCR-050 MY';
+
+    return (
+      <div className="page-wrap">
+        <p className="page-title">★ A-idol — 모바일 프로토타입</p>
+        <div className="page-sub">UI v1.0.0 · Light Mode · localhost:3000 연동</div>
+        <div style={{textAlign:'center'}}>
+          <span className={`api-pill ${apiUp === true ? 'ok' : apiUp === false ? 'down' : ''}`}>
+            <span className="dot"></span>
+            {apiUp === null ? '백엔드 연결 확인 중…' : apiUp ? '백엔드 연결됨 · localhost:3000' : '백엔드 연결 실패'}
+          </span>
+        </div>
+
+        <div className="frame-wrap">
+          <div className="phone-wrap">
+            <div className="phone">
+              <Notch />
+              <StatusBar />
+              {renderPhoneContent()}
+              {route === 'app' && !detailIdol ? <BottomTabs tab={tab} setTab={setTab} /> : null}
+            </div>
+            <div className="phone-label">{currentLabel}</div>
+          </div>
+        </div>
+
+        <p className="fineprint" style={{maxWidth:520,margin:'28px auto 0',lineHeight:1.7}}>
+          백엔드 <code>/1/auth/*</code>, <code>/1/idols</code>, <code>/1/me</code> 는 실제 API 호출이며,
+          캐릭터 일러스트·하트·채팅 등 팬덤 모듈(FR-120~)은 목업 데이터입니다.<br/>
+          실제 React Native 앱은 <code>packages/mobile</code>에 구현되어 있습니다.
+        </p>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
