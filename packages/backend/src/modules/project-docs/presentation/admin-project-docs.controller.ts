@@ -83,7 +83,19 @@ export class AdminProjectDocsController {
     @CurrentAdmin() admin: CurrentAdminContext,
     @Body() body: CreateProjectDocBody,
   ): Promise<ProjectDocDto> {
-    const r = await this.createUC.execute({ ...body, createdBy: admin.id });
+    const r = await this.createUC.execute({
+      slug: body.slug,
+      title: body.title,
+      category: body.category,
+      status: body.status,
+      sourceType: body.source_type,
+      sourcePath: body.source_path,
+      summary: body.summary,
+      content: body.content,
+      tags: body.tags,
+      orderIndex: body.order_index,
+      createdBy: admin.id,
+    });
     return toProjectDocDto(r);
   }
 
@@ -95,7 +107,19 @@ export class AdminProjectDocsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateProjectDocBody,
   ): Promise<ProjectDocDto> {
-    const r = await this.updateUC.execute(id, { ...body, updatedBy: admin.id });
+    const r = await this.updateUC.execute(id, {
+      slug: body.slug,
+      title: body.title,
+      category: body.category,
+      status: body.status,
+      sourceType: body.source_type,
+      sourcePath: body.source_path,
+      summary: body.summary,
+      content: body.content,
+      tags: body.tags,
+      orderIndex: body.order_index,
+      updatedBy: admin.id,
+    });
     return toProjectDocDto(r);
   }
 

@@ -37,6 +37,7 @@ const STATUS_VALUES: DesignAssetStatus[] = [
   'SHIPPED',
 ];
 
+// ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0).
 export class CreateDesignAssetBody {
   @IsString() @MinLength(1) @MaxLength(120)
   name!: string;
@@ -51,13 +52,13 @@ export class CreateDesignAssetBody {
   status?: DesignAssetStatus;
 
   @IsOptional() @IsUrl() @MaxLength(500)
-  fileUrl?: string | null;
+  file_url?: string | null;
 
   @IsOptional() @IsString() @MaxLength(200)
   spec?: string | null;
 
   @IsOptional() @IsInt() @Min(0)
-  orderIndex?: number;
+  order_index?: number;
 
   @IsOptional() @IsString() @MaxLength(200)
   caption?: string | null;
@@ -80,13 +81,13 @@ export class UpdateDesignAssetBody {
   status?: DesignAssetStatus;
 
   @IsOptional() @IsUrl() @MaxLength(500)
-  fileUrl?: string | null;
+  file_url?: string | null;
 
   @IsOptional() @IsString() @MaxLength(200)
   spec?: string | null;
 
   @IsOptional() @IsInt() @Min(0)
-  orderIndex?: number;
+  order_index?: number;
 
   @IsOptional() @IsString() @MaxLength(200)
   caption?: string | null;

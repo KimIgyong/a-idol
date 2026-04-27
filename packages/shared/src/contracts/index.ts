@@ -572,14 +572,15 @@ export interface DesignAssetDto {
   updatedAt: string;
 }
 
+// ADR-023 — Request body 는 snake_case (amb-starter-kit v2.0).
 export interface CreateDesignAssetDto {
   name: string;
   type: DesignAssetType;
   platform?: DesignAssetPlatform;
   status?: DesignAssetStatus;
-  fileUrl?: string | null;
+  file_url?: string | null;
   spec?: string | null;
-  orderIndex?: number;
+  order_index?: number;
   caption?: string | null;
   notes?: string | null;
 }
@@ -589,9 +590,9 @@ export interface UpdateDesignAssetDto {
   type?: DesignAssetType;
   platform?: DesignAssetPlatform;
   status?: DesignAssetStatus;
-  fileUrl?: string | null;
+  file_url?: string | null;
   spec?: string | null;
-  orderIndex?: number;
+  order_index?: number;
   caption?: string | null;
   notes?: string | null;
 }
@@ -631,17 +632,18 @@ export interface ProjectDocDto extends ProjectDocSummaryDto {
   createdAt: string;
 }
 
+// ADR-023 — Request body 는 snake_case. Response (ProjectDocDto/ProjectDocSummaryDto) 는 camelCase 표준 유지.
 export interface CreateProjectDocDto {
   slug: string;
   title: string;
   category: ProjectDocCategory;
   status?: ProjectDocStatus;
-  sourceType?: ProjectDocSourceType;
-  sourcePath?: string | null;
+  source_type?: ProjectDocSourceType;
+  source_path?: string | null;
   summary?: string | null;
   content: string;
   tags?: string | null;
-  orderIndex?: number;
+  order_index?: number;
 }
 
 export interface UpdateProjectDocDto {
@@ -649,12 +651,12 @@ export interface UpdateProjectDocDto {
   title?: string;
   category?: ProjectDocCategory;
   status?: ProjectDocStatus;
-  sourceType?: ProjectDocSourceType;
-  sourcePath?: string | null;
+  source_type?: ProjectDocSourceType;
+  source_path?: string | null;
   summary?: string | null;
   content?: string;
   tags?: string | null;
-  orderIndex?: number;
+  order_index?: number;
 }
 
 // -- Admin analytics (dashboard) -----------------------------------------

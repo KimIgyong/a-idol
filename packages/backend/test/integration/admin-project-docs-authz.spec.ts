@@ -56,7 +56,7 @@ describe('ITC-ADMIN-PROJECT-DOCS-AUTHZ — admin project-docs endpoints', () => 
         slug,
         title: 'ITC test',
         category: 'DELIVERABLE',
-        sourceType: 'INLINE',
+        source_type: 'INLINE',
         content: '# v1',
       })
       .expect(201);
@@ -71,7 +71,7 @@ describe('ITC-ADMIN-PROJECT-DOCS-AUTHZ — admin project-docs endpoints', () => 
         slug,
         title: 'dup',
         category: 'DELIVERABLE',
-        sourceType: 'INLINE',
+        source_type: 'INLINE',
         content: '# dup',
       })
       .expect(409);
@@ -156,7 +156,7 @@ describe('ITC-ADMIN-PROJECT-DOCS-AUTHZ — admin project-docs endpoints', () => 
         slug: `op-blocked-${Date.now()}`,
         title: 'op',
         category: 'DELIVERABLE',
-        sourceType: 'INLINE',
+        source_type: 'INLINE',
         content: 'x',
       })
       .expect(403);

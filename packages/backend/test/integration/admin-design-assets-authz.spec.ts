@@ -62,7 +62,7 @@ describe('ITC-ADMIN-DESIGN-ASSETS-AUTHZ — admin design-assets endpoints', () =
         type: 'OTHER',
         platform: 'ALL',
         status: 'PLACEHOLDER',
-        orderIndex: 999,
+        order_index: 999,
       })
       .expect(201);
     const id = created.body.id as string;

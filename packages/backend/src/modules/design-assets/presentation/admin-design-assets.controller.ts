@@ -66,7 +66,15 @@ export class AdminDesignAssetsController {
     @Body() body: CreateDesignAssetBody,
   ): Promise<DesignAssetDto> {
     const r = await this.createUC.execute({
-      ...body,
+      name: body.name,
+      type: body.type,
+      platform: body.platform,
+      status: body.status,
+      fileUrl: body.file_url,
+      spec: body.spec,
+      orderIndex: body.order_index,
+      caption: body.caption,
+      notes: body.notes,
       createdBy: admin.id,
     });
     return toDesignAssetDto(r);
@@ -81,7 +89,15 @@ export class AdminDesignAssetsController {
     @Body() body: UpdateDesignAssetBody,
   ): Promise<DesignAssetDto> {
     const r = await this.updateUC.execute(id, {
-      ...body,
+      name: body.name,
+      type: body.type,
+      platform: body.platform,
+      status: body.status,
+      fileUrl: body.file_url,
+      spec: body.spec,
+      orderIndex: body.order_index,
+      caption: body.caption,
+      notes: body.notes,
       updatedBy: admin.id,
     });
     return toDesignAssetDto(r);

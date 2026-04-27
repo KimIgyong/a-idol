@@ -49,11 +49,12 @@ export class CreateProjectDocBody {
   @IsOptional() @IsEnum(STATUS_VALUES)
   status?: ProjectDocStatus;
 
+  // ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0).
   @IsOptional() @IsEnum(SOURCE_TYPE_VALUES)
-  sourceType?: ProjectDocSourceType;
+  source_type?: ProjectDocSourceType;
 
   @IsOptional() @IsString() @MaxLength(500)
-  sourcePath?: string | null;
+  source_path?: string | null;
 
   @IsOptional() @IsString() @MaxLength(500)
   summary?: string | null;
@@ -65,7 +66,7 @@ export class CreateProjectDocBody {
   tags?: string | null;
 
   @IsOptional() @IsInt() @Min(0)
-  orderIndex?: number;
+  order_index?: number;
 }
 
 export class UpdateProjectDocBody {
@@ -83,10 +84,10 @@ export class UpdateProjectDocBody {
   status?: ProjectDocStatus;
 
   @IsOptional() @IsEnum(SOURCE_TYPE_VALUES)
-  sourceType?: ProjectDocSourceType;
+  source_type?: ProjectDocSourceType;
 
   @IsOptional() @IsString() @MaxLength(500)
-  sourcePath?: string | null;
+  source_path?: string | null;
 
   @IsOptional() @IsString() @MaxLength(500)
   summary?: string | null;
@@ -98,7 +99,7 @@ export class UpdateProjectDocBody {
   tags?: string | null;
 
   @IsOptional() @IsInt() @Min(0)
-  orderIndex?: number;
+  order_index?: number;
 }
 
 export function toProjectDocSummaryDto(r: ProjectDocRecord): ProjectDocSummaryDto {

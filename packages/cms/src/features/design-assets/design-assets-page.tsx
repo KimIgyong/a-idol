@@ -215,14 +215,15 @@ function AssetRow({
 
 function CreateAssetPanel({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false);
+  // ADR-023 — wire shape (snake_case) 을 form state 그대로 사용.
   const [form, setForm] = useState<CreateDesignAssetDto>({
     name: '',
     type: 'SCREENSHOT',
     platform: 'ALL',
     status: 'PLACEHOLDER',
-    fileUrl: '',
+    file_url: '',
     spec: '',
-    orderIndex: 0,
+    order_index: 0,
     caption: '',
     notes: '',
   });
@@ -234,7 +235,7 @@ function CreateAssetPanel({ onCreated }: { onCreated: () => void }) {
       setOpen(false);
       setForm({
         name: '', type: 'SCREENSHOT', platform: 'ALL', status: 'PLACEHOLDER',
-        fileUrl: '', spec: '', orderIndex: 0, caption: '', notes: '',
+        file_url: '', spec: '', order_index: 0, caption: '', notes: '',
       });
     },
   });
@@ -245,7 +246,7 @@ function CreateAssetPanel({ onCreated }: { onCreated: () => void }) {
     // 빈 string → null
     const sanitized: CreateDesignAssetDto = {
       ...form,
-      fileUrl: form.fileUrl?.trim() ? form.fileUrl : null,
+      file_url: form.file_url?.trim() ? form.file_url : null,
       spec: form.spec?.trim() ? form.spec : null,
       caption: form.caption?.trim() ? form.caption : null,
       notes: form.notes?.trim() ? form.notes : null,
@@ -314,8 +315,8 @@ function CreateAssetPanel({ onCreated }: { onCreated: () => void }) {
             <Input
               id="da-url"
               type="url"
-              value={form.fileUrl ?? ''}
-              onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
+              value={form.file_url ?? ''}
+              onChange={(e) => setForm({ ...form, file_url: e.target.value })}
               placeholder="https://drive.google.com/... or https://s3..."
             />
           </div>
@@ -336,8 +337,8 @@ function CreateAssetPanel({ onCreated }: { onCreated: () => void }) {
               id="da-order"
               type="number"
               min={0}
-              value={form.orderIndex ?? 0}
-              onChange={(e) => setForm({ ...form, orderIndex: Number(e.target.value) })}
+              value={form.order_index ?? 0}
+              onChange={(e) => setForm({ ...form, order_index: Number(e.target.value) })}
             />
           </div>
 
