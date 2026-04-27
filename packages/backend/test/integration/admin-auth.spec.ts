@@ -47,7 +47,7 @@ describe('ITC-ADMIN-AUTH — admin login + refresh + throttle', () => {
       .expect(200);
     const refreshed = await env.http
       .post('/api/v1/admin/auth/refresh')
-      .send({ refreshToken: login.body.refreshToken })
+      .send({ refresh_token: login.body.refreshToken })
       .expect(200);
     expect(refreshed.body.accessToken).not.toBe(login.body.accessToken);
     expect(refreshed.body.refreshToken).not.toBe(login.body.refreshToken);
@@ -60,12 +60,12 @@ describe('ITC-ADMIN-AUTH — admin login + refresh + throttle', () => {
       .expect(200);
     const logout = await env.http
       .post('/api/v1/admin/auth/logout')
-      .send({ refreshToken: login.body.refreshToken })
+      .send({ refresh_token: login.body.refreshToken })
       .expect(200);
     expect(logout.body).toEqual({ revoked: true });
     const reuse = await env.http
       .post('/api/v1/admin/auth/refresh')
-      .send({ refreshToken: login.body.refreshToken })
+      .send({ refresh_token: login.body.refreshToken })
       .expect(401);
     expect(reuse.body).toMatchObject({ code: 'INVALID_REFRESH_TOKEN' });
   });
@@ -73,7 +73,7 @@ describe('ITC-ADMIN-AUTH — admin login + refresh + throttle', () => {
   it('TC-ADMIN-AUTH-006 — bogus refresh token으로 logout은 silent 200 (idempotent)', async () => {
     const res = await env.http
       .post('/api/v1/admin/auth/logout')
-      .send({ refreshToken: 'eyJhbGc.bogus.bogus' })
+      .send({ refresh_token: 'eyJhbGc.bogus.bogus' })
       .expect(200);
     expect(res.body).toEqual({ revoked: false });
   });
@@ -85,12 +85,12 @@ describe('ITC-ADMIN-AUTH — admin login + refresh + throttle', () => {
       .expect(200);
     await env.http
       .post('/api/v1/admin/auth/refresh')
-      .send({ refreshToken: login.body.refreshToken })
+      .send({ refresh_token: login.body.refreshToken })
       .expect(200);
     // 옛 token 재사용은 hash mismatch 라 401.
     const reuse = await env.http
       .post('/api/v1/admin/auth/refresh')
-      .send({ refreshToken: login.body.refreshToken })
+      .send({ refresh_token: login.body.refreshToken })
       .expect(401);
     expect(reuse.body).toMatchObject({ code: 'INVALID_REFRESH_TOKEN' });
   });

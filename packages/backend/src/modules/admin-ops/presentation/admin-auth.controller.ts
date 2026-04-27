@@ -39,7 +39,7 @@ export class AdminAuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Rotate admin refresh token → new access + refresh' })
   async postRefresh(@Body() body: AdminRefreshDto): Promise<AuthTokensDto> {
-    return this.refresh.execute({ refreshToken: body.refreshToken });
+    return this.refresh.execute({ refreshToken: body.refresh_token });
   }
 
   @Post('logout')
@@ -48,7 +48,7 @@ export class AdminAuthController {
     summary: 'Server-side admin session revoke. Idempotent (invalid token도 silent OK).',
   })
   async postLogout(@Body() body: AdminRefreshDto): Promise<{ revoked: boolean }> {
-    return this.logout.execute({ refreshToken: body.refreshToken });
+    return this.logout.execute({ refreshToken: body.refresh_token });
   }
 }
 

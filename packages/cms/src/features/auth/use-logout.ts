@@ -22,7 +22,7 @@ export function useLogout(): { logout: () => Promise<void>; pending: boolean } {
         try {
           await apiFetch<{ revoked: boolean }>('/api/v1/admin/auth/logout', {
             method: 'POST',
-            body: { refreshToken: rt },
+            body: { refresh_token: rt },
           });
         } catch {
           // 무시 — server-side revoke 실패해도 token expiry로 자연 만료.

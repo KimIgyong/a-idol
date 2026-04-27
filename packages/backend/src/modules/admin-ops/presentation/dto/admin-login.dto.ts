@@ -12,8 +12,9 @@ export class AdminLoginDto {
   password!: string;
 }
 
+// ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0 표준).
 export class AdminRefreshDto {
-  @ApiProperty()
+  @ApiProperty({ name: 'refresh_token' })
   @IsString()
-  refreshToken!: string;
+  refresh_token!: string;
 }
