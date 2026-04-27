@@ -12,6 +12,14 @@ import { CommercePage } from '@/features/commerce/commerce-page';
 import { OperatorsPage } from '@/features/operators/operators-page';
 import { PreviewPage } from '@/features/preview/preview-page';
 import { DesignAssetsPage } from '@/features/design-assets/design-assets-page';
+import { ProjectLayout } from '@/features/project/project-layout';
+import { ProjectOverviewPage } from '@/features/project/project-overview-page';
+import { DocsListPage } from '@/features/project/docs-list-page';
+import { DocDetailPage } from '@/features/project/doc-detail-page';
+import { DocEditPage } from '@/features/project/doc-edit-page';
+import { DeliverablesPage } from '@/features/project/deliverables-page';
+import { WbsPage } from '@/features/project/wbs-page';
+import { TasksPage } from '@/features/project/tasks-page';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -102,6 +110,30 @@ export const router = createBrowserRouter([
             <DesignAssetsPage />
           </RequireRole>
         ),
+      },
+      {
+        path: '/project',
+        element: (
+          <RequireRole allow={['admin', 'operator']}>
+            <ProjectLayout />
+          </RequireRole>
+        ),
+        children: [
+          { index: true, element: <ProjectOverviewPage /> },
+          { path: 'docs', element: <DocsListPage /> },
+          { path: 'docs/:slug', element: <DocDetailPage /> },
+          {
+            path: 'docs/:slug/edit',
+            element: (
+              <RequireRole allow={['admin']}>
+                <DocEditPage />
+              </RequireRole>
+            ),
+          },
+          { path: 'deliverables', element: <DeliverablesPage /> },
+          { path: 'wbs', element: <WbsPage /> },
+          { path: 'tasks', element: <TasksPage /> },
+        ],
       },
     ],
   },

@@ -244,6 +244,8 @@ See `.claude/commands/new-feature.md` for an opinionated template.
 - [`ADR-018`](docs/adr/ADR-018-photocard-trade-deferred.md) — Photocard P2P trade deferred
 - [`ADR-019`](docs/adr/ADR-019-apple-iap-adapter.md) — Apple IAP adapter
 - [`ADR-020`](docs/adr/ADR-020-orm-prisma-over-typeorm.md) — Adopt Prisma as the ORM (deviating from amb-starter-kit's TypeORM standard)
+- [`ADR-021`](docs/adr/ADR-021-phase-c-perf-levers.md) — Phase C performance levers (compression / select narrowing / Redis meta cache / ETag 304)
+- [`ADR-022`](docs/adr/ADR-022-api-versioning-policy.md) — Standardize API path on `/api/v1/...` (URI versioning)
 
 ### amb-starter-kit (Amoeba platform v2.0) — applied with deviations
 

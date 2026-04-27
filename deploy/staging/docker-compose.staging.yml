@@ -1,0 +1,130 @@
+# A-idol staging compose — a-idol-stg.amoeba.site (single VPS)
+# 배포 후 server side 에서 실행:
+#   cd /srv/a-idol/release && docker compose -f deploy/staging/docker-compose.staging.yml --env-file .env.staging up -d --build
+#
+# 모든 자격증명은 .env.staging (gitignore) 에서 주입.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: a-idol-stg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # 외부 노출 안 함 — backend 만 internal network 으로 접근
+    expose:
+      - "5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: a-idol-stg-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "6379"
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: packages/backend/Dockerfile
+    container_name: a-idol-stg-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-14d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      THROTTLE_LIMIT_PER_MINUTE: ${THROTTLE_LIMIT_PER_MINUTE:-200}
+      HIBP_CHECK_ENABLED: ${HIBP_CHECK_ENABLED:-1}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      # 업로드 자산 영속화 (SVG placeholder + 향후 idol 이미지)
+      - backend_uploads:/app/packages/backend/uploads
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Vite 빌드 결과 (dist/) 를 nginx 컨테이너로 그대로 마운트해 정적 서빙.
+  # CMS 빌드는 deploy.sh 가 build 단계에서 packages/cms/dist/ 로 미리 만들어둠.
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: a-idol-stg-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      - ../../packages/cms/dist:/var/www/cms:ro
+      # certbot webroot challenge + 발급된 인증서
+      - certbot_webroot:/var/www/certbot
+      - certbot_etc:/etc/letsencrypt:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: a-idol-stg-certbot
+    restart: unless-stopped
+    volumes:
+      - certbot_webroot:/var/www/certbot
+      - certbot_etc:/etc/letsencrypt
+    # 12시간마다 갱신 시도 (Let's Encrypt 30d cutoff 이전에 자동 renew)
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
+
+volumes:
+  pg_data:
+    name: a-idol-stg-pg-data
+  redis_data:
+    name: a-idol-stg-redis-data
+  backend_uploads:
+    name: a-idol-stg-uploads
+  certbot_webroot:
+    name: a-idol-stg-certbot-webroot
+  certbot_etc:
+    name: a-idol-stg-certbot-etc

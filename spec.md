@@ -86,16 +86,16 @@ CONNECTION_URL: postgresql://aidol:aidol_dev@localhost:5433/aidol?schema=public
 ### 인증 (Identity)
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| POST | `/1/auth/signup` | 회원가입 (이메일) |
-| POST | `/1/auth/login` | 로그인 |  
-| POST | `/1/auth/refresh` | 토큰 갱신 |
-| GET | `/1/me` | 내 정보 조회 |
+| POST | `/api/v1/auth/signup` | 회원가입 (이메일) |
+| POST | `/api/v1/auth/login` | 로그인 |  
+| POST | `/api/v1/auth/refresh` | 토큰 갱신 |
+| GET | `/api/v1/me` | 내 정보 조회 |
 
 ### 카탈로그 (Catalog)
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| GET | `/1/idols` | 아이돌 목록 조회 |
-| GET | `/1/idols/{id}` | 아이돌 상세 조회 |
+| GET | `/api/v1/idols` | 아이돌 목록 조회 |
+| GET | `/api/v1/idols/{id}` | 아이돌 상세 조회 |
 
 ### 헬스체크
 | Method | Endpoint | 설명 | 상태 |

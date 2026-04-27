@@ -470,7 +470,8 @@ services:
 | 축 | 값 |
 |---|---|
 | **프로젝트명** | A-idol (AI 아이돌 팬덤 플랫폼) |
-| **MVP GA** | 2026-08-29 |
+| **MVP GA** | 2026-08-01 (2026-04-27 조정 — 기존 8-29에서 4주 단축) |
+| **API path** | `/api/v1/<resource>` (URI versioning, [ADR-022](../adr/ADR-022-api-versioning-policy.md)) · probe(`/health`, `/metrics`) prefix 없음 |
 | **아키텍처** | Clean Architecture 4-layer (domain → application → infrastructure → presentation) |
 | **백엔드** | NestJS 10.3.10 + TypeScript 5.5.4 + Node ≥20.10 |
 | **ORM** | Prisma 5.18.0 ([ADR-020](../adr/ADR-020-orm-prisma-over-typeorm.md)) |
@@ -534,3 +535,4 @@ make reset && make migrate && make seed
 | Version | Date | Author | Changes |
 |---|---|---|---|
 | v1.0 | 2026-04-24 | Gray Kim | 초기 작성 — 95 HTTP 엔드포인트 · 6 WS 이벤트 · 32 Prisma 모델 · 4 Docker 서비스 · 4 포트 전수 조사. 기술 스택 25개 라이브러리 버전 명시. WBS 진척도 65% → 70% 상향 조정 (k6 부하 테스트 scaffolded 발견) |
+| v1.1 | 2026-04-27 | Gray Kim | API 경로 표준화 — §4 95개 라우트 표 모두에 `/api/v1/` prefix 명시 (기존엔 prefix 누락). §10.1 "한 페이지 치트시트"에 API path 행 추가 + MVP GA 날짜 동기화 (2026-08-01). 근거: [ADR-022](../adr/ADR-022-api-versioning-policy.md) |

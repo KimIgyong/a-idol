@@ -47,3 +47,10 @@ packages/backend/test/load/*.json
 # misc
 *.swp
 *.tmp
+
+# 서버 접속 정보 (자격증명 포함 — 절대 커밋 금지)
+env-info.md
+
+# Staging / prod 운영 시크릿 (.example 만 commit)
+deploy/staging/.env.staging
+deploy/prod/.env.prod

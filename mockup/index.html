@@ -345,7 +345,7 @@ html,body{
   const { useState, useEffect, useCallback, useMemo } = React;
 
   // ── API client (same as before) ────────────────────────────────
-  const API_BASE = "http://localhost:3000/1";
+  const API_BASE = "http://localhost:3000/api/v1";
   const AT_KEY = "a-idol.at";
   const RT_KEY = "a-idol.rt";
 
@@ -1250,7 +1250,7 @@ html,body{
         </div>
 
         <p className="fineprint" style={{maxWidth:520,margin:'28px auto 0',lineHeight:1.7}}>
-          백엔드 <code>/1/auth/*</code>, <code>/1/idols</code>, <code>/1/me</code> 는 실제 API 호출이며,
+          백엔드 <code>/api/v1/auth/*</code>, <code>/api/v1/idols</code>, <code>/api/v1/me</code> 는 실제 API 호출이며,
           캐릭터 일러스트·하트·채팅 등 팬덤 모듈(FR-120~)은 목업 데이터입니다.<br/>
           실제 React Native 앱은 <code>packages/mobile</code>에 구현되어 있습니다.
         </p>

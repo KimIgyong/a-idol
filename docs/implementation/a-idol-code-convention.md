@@ -513,12 +513,31 @@ export const useToggleHeart = () => {
 
 ### 8.1 API Path Rules (API 경로 규칙)
 
-```
-Mobile / public: /<resource>                 e.g., /idols, /auth/login, /fan-clubs/:id/join
-Admin (CMS):      /admin/<resource>           e.g., /admin/idols, /admin/auditions/:id/rounds
+A-idol uses **`/api/v1/` URI versioning** (see [ADR-022](../adr/ADR-022-api-versioning-policy.md)). Routing is enforced in [`packages/backend/src/main.ts`](../../packages/backend/src/main.ts) via:
+
+```typescript
+app.setGlobalPrefix('api', { exclude: ['/health', '/metrics'] });
+app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });  // prefix='v' (default)
 ```
 
-> A-idol does **not** use `/api/v1/` prefix as of v0.1.0. If API versioning is introduced (Phase D or beyond), an ADR MUST be filed.
+Resulting path patterns:
+
+```
+Mobile / public:    /api/v1/<resource>            e.g., /api/v1/idols, /api/v1/auth/login, /api/v1/fan-clubs/:id/join
+Admin (CMS):        /api/v1/admin/<resource>      e.g., /api/v1/admin/idols, /api/v1/admin/auditions/:id/rounds
+Probe (no version): /<resource>                   e.g., /health, /metrics  (VERSION_NEUTRAL + setGlobalPrefix exclude)
+```
+
+**Path component rules**:
+
+| Category (구분) | Case (케이스) | Example (예시) |
+|------|--------|------|
+| API prefix | literal `/api` | `/api/...` |
+| Version segment | `v<digit>` | `v1` (current) |
+| Resource | kebab-case | `/auth`, `/fan-clubs`, `/auto-messages` |
+| Path parameter (id) | camelCase | `:idolId`, `:roundId` |
+
+> **Future versions**: introducing `/api/v2/...` requires a follow-up ADR + per-controller `@Version('2')` decorator on migrated controllers. v1 controllers remain reachable in parallel until deprecation.
 
 ### 8.2 HTTP Method Usage (HTTP 메서드)
 
@@ -899,3 +918,4 @@ This table consolidates every deviation from [`amoeba_code_convention_v2.md`](..
 | v1.0 | 2026-04-24 | Gray Kim | Initial — derived from amoeba_code_convention_v2.md, adapted for A-idol's Prisma + Clean Architecture + 2-level RBAC + 4-language i18n + single-tenant model |
 | v1.1 | 2026-04-24 | Gray Kim | §4.2 Table Naming: sub-domain prefix 권장 조항 명문화 + prefix 없음 정책의 `idol_` 충돌 근거 추가. §16 deviation 표에 RPT-260424-B / RPT-260424-C 참조 링크 추가. §17 Database checklist에 sub-domain prefix 체크 항목 추가. 근거: [RPT-260424-C Phase D 권고 §5.4](../report/RPT_260424_naming-prefix-tradeoff.md) |
 | v1.2 | 2026-04-24 | Gray Kim | §4.2 + §16 갱신 — `aid_` 전역 prefix 재검토 결과(7 risks 식별, 결론 "조건부 가능" → "미권고") 반영. PostgreSQL schema namespace 대안 명시. 근거: [RPT-260424-D](../report/RPT_260424_aid-prefix-reexamination.md) |
+| v1.3 | 2026-04-27 | Gray Kim | §8.1 API Path Rules 전면 정정 — 기존 "does not use `/api/v1/` prefix" 기재가 코드(`enableVersioning prefix:false` → `/1/...`)와도 불일치하던 사실 발견. **`/api/v1/` URI versioning 표준으로 통일**: backend `setGlobalPrefix('api') + enableVersioning` 변경, CMS(49) / Mobile(5) / integration tests(232+) / smoke / 8개 docs 일괄 마이그레이션. 근거: [ADR-022](../adr/ADR-022-api-versioning-policy.md) |

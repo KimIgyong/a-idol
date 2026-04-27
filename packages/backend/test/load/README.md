@@ -53,7 +53,7 @@ k6 run -e K6_NO_SIGNUP=1 test/load/mixed-read.js
 
 | Var | Default | Purpose |
 |---|---|---|
-| `BASE_URL` | `http://localhost:3000/1` | API root (versioned) |
+| `BASE_URL` | `http://localhost:3000/api/v1` | API root (versioned) |
 | `ROUND_ID` | discovered from `/rounds/active` | leaderboard + vote target |
 | `AUD_ID` | discovered from `/auditions` | audition detail target |
 | `K6_NO_SIGNUP` | unset | skip signup + write path |

@@ -9,6 +9,7 @@ import type {
   AutoMessageStatus,
   AutoMessageTemplateDto,
   CreateDesignAssetDto,
+  CreateProjectDocDto,
   DesignAssetDto,
   IdolScheduleDto,
   IdolScheduleType,
@@ -17,9 +18,14 @@ import type {
   PhotocardSetDto,
   PhotocardSetListItemDto,
   ProductKind,
+  ProjectDocCategory,
+  ProjectDocDto,
+  ProjectDocStatus,
+  ProjectDocSummaryDto,
   PurchaseProductDto,
   RoundDto,
   UpdateDesignAssetDto,
+  UpdateProjectDocDto,
   VoteRuleDto,
 } from '@a-idol/shared';
 import { apiFetch } from './api';
@@ -401,6 +407,34 @@ export const adminApi = {
     }),
   deleteDesignAsset: (id: string) =>
     apiFetch<void>(`/api/v1/admin/design-assets/${id}`, {
+      method: 'DELETE',
+      token: token(),
+    }),
+
+  // -- Project Documents (ADR / 설계 / WBS / 산출물) -----------------------
+  listProjectDocs: (filter?: { category?: ProjectDocCategory; status?: ProjectDocStatus }) => {
+    const qs = new URLSearchParams();
+    if (filter?.category) qs.set('category', filter.category);
+    if (filter?.status) qs.set('status', filter.status);
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return apiFetch<ProjectDocSummaryDto[]>(`/api/v1/admin/project-docs${suffix}`, { token: token() });
+  },
+  getProjectDoc: (slug: string) =>
+    apiFetch<ProjectDocDto>(`/api/v1/admin/project-docs/${encodeURIComponent(slug)}`, { token: token() }),
+  createProjectDoc: (body: CreateProjectDocDto) =>
+    apiFetch<ProjectDocDto>('/api/v1/admin/project-docs', {
+      method: 'POST',
+      body,
+      token: token(),
+    }),
+  updateProjectDoc: (id: string, body: UpdateProjectDocDto) =>
+    apiFetch<ProjectDocDto>(`/api/v1/admin/project-docs/${id}`, {
+      method: 'PATCH',
+      body,
+      token: token(),
+    }),
+  deleteProjectDoc: (id: string) =>
+    apiFetch<void>(`/api/v1/admin/project-docs/${id}`, {
       method: 'DELETE',
       token: token(),
     }),

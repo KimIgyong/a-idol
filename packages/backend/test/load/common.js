@@ -3,7 +3,7 @@
  * the per-scenario files (smoke.js, mixed-read.js).
  *
  * Env vars:
- *   BASE_URL   — target API root (default http://localhost:3000/1)
+ *   BASE_URL   — target API root (default http://localhost:3000/api/v1)
  *   AUD_ID     — audition id to hit on /auditions/:id (optional)
  *   ROUND_ID   — active round id for vote + leaderboard (optional)
  *
@@ -14,7 +14,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000/1';
+export const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000/api/v1';
 
 export function discover() {
   const idols = http.get(`${BASE_URL}/idols?size=20`);
