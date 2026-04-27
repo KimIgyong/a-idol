@@ -34,7 +34,7 @@ describe('ITC-IDOL-AUTHZ — public idol detail visibility', () => {
     const res = await env.http
       .post('/api/v1/admin/catalog/idols')
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ agencyId, name })
+      .send({ agency_id: agencyId, name })
       .expect(201);
     return res.body.id as string;
   }

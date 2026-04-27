@@ -228,25 +228,26 @@ export interface AdminIdolDto {
   updatedAt: string;
 }
 
+// ADR-023 — Request body 는 snake_case (amb-starter-kit v2.0).
 export interface UpdateIdolDto {
   name?: string;
-  stageName?: string | null;
+  stage_name?: string | null;
   mbti?: string | null;
   bio?: string | null;
-  heroImageUrl?: string | null;
+  hero_image_url?: string | null;
   birthdate?: string | null; // ISO date (YYYY-MM-DD)
-  agencyId?: string;
+  agency_id?: string;
 }
 
 export interface CreateIdolDto {
-  agencyId: string;
+  agency_id: string;
   name: string;
-  stageName?: string | null;
+  stage_name?: string | null;
   mbti?: string | null;
   bio?: string | null;
-  heroImageUrl?: string | null;
+  hero_image_url?: string | null;
   birthdate?: string | null; // ISO date
-  publishImmediately?: boolean;
+  publish_immediately?: boolean;
 }
 
 export type IdolScheduleType =
@@ -272,8 +273,8 @@ export interface CreateScheduleDto {
   type?: IdolScheduleType;
   title: string;
   location?: string | null;
-  startAt: string;
-  endAt?: string | null;
+  start_at: string;
+  end_at?: string | null;
   notes?: string | null;
 }
 

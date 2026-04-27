@@ -144,10 +144,10 @@ export class AdminCatalogController {
     // apiFetch forwards `If-None-Match` automatically on GETs; a match
     // short-circuits before the findMany + toAdminIdolDto fan-out.
     const identity = await this.listIdols.getIdentity({
-      includeDeleted: q.includeDeleted,
+      includeDeleted: q.include_deleted,
     });
     const stamp = identity.maxUpdatedAt ? identity.maxUpdatedAt.getTime() : 0;
-    const etag = `W/"admin-idols-${identity.total}-${stamp}-p${q.page}-s${q.size}-d${q.includeDeleted ? 1 : 0}"`;
+    const etag = `W/"admin-idols-${identity.total}-${stamp}-p${q.page}-s${q.size}-d${q.include_deleted ? 1 : 0}"`;
     res.setHeader('ETag', etag);
     res.setHeader('Cache-Control', 'private, max-age=0, must-revalidate');
 
@@ -159,7 +159,7 @@ export class AdminCatalogController {
     const list = await this.listIdols.execute({
       page: q.page,
       size: q.size,
-      includeDeleted: q.includeDeleted,
+      includeDeleted: q.include_deleted,
     });
     return {
       items: list.items.map(toAdminIdolDto),
@@ -181,7 +181,16 @@ export class AdminCatalogController {
   @HttpCode(201)
   @ApiOperation({ summary: 'Create a new idol (auto-creates a free fan club)' })
   async postIdol(@Body() body: CreateIdolDto): Promise<AdminIdolDto> {
-    const row = await this.createIdol.execute(body);
+    const row = await this.createIdol.execute({
+      agencyId: body.agency_id,
+      name: body.name,
+      stageName: body.stage_name,
+      mbti: body.mbti,
+      bio: body.bio,
+      heroImageUrl: body.hero_image_url,
+      birthdate: body.birthdate,
+      publishImmediately: body.publish_immediately,
+    });
     return toAdminIdolDto(row);
   }
 
@@ -191,7 +200,15 @@ export class AdminCatalogController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateIdolDto,
   ): Promise<AdminIdolDto> {
-    const row = await this.updateIdol.execute(id, body);
+    const row = await this.updateIdol.execute(id, {
+      name: body.name,
+      stageName: body.stage_name,
+      mbti: body.mbti,
+      bio: body.bio,
+      heroImageUrl: body.hero_image_url,
+      birthdate: body.birthdate,
+      agencyId: body.agency_id,
+    });
     return toAdminIdolDto(row);
   }
 
@@ -236,7 +253,14 @@ export class AdminCatalogController {
     @Param('id', new ParseUUIDPipe()) idolId: string,
     @Body() body: CreateScheduleDto,
   ): Promise<IdolScheduleDto> {
-    const row = await this.createSchedule.execute(idolId, body);
+    const row = await this.createSchedule.execute(idolId, {
+      type: body.type,
+      title: body.title,
+      location: body.location,
+      startAt: body.start_at,
+      endAt: body.end_at,
+      notes: body.notes,
+    });
     return toScheduleDto(row);
   }
 

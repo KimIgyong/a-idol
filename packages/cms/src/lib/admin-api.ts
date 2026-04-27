@@ -60,11 +60,13 @@ export const adminApi = {
     }),
 
   // -- idols -----------------------------------------------------------
+  // ADR-023 — wire shape 은 snake_case. UI 는 camelCase 유지하고 본 메서드가
+  // boundary 에서 snake_case 로 transform.
   listIdols: (opts: { page?: number; size?: number; includeDeleted?: boolean } = {}) => {
     const q = new URLSearchParams();
     if (opts.page) q.set('page', String(opts.page));
     if (opts.size) q.set('size', String(opts.size));
-    if (opts.includeDeleted) q.set('includeDeleted', 'true');
+    if (opts.includeDeleted) q.set('include_deleted', 'true');
     const qs = q.toString();
     return apiFetch<PaginatedResponseDto<AdminIdolDto>>(
       `/api/v1/admin/catalog/idols${qs ? '?' + qs : ''}`,
@@ -87,7 +89,15 @@ export const adminApi = {
   ) =>
     apiFetch<AdminIdolDto>(`/api/v1/admin/catalog/idols/${id}`, {
       method: 'PATCH',
-      body,
+      body: {
+        name: body.name,
+        stage_name: body.stageName,
+        mbti: body.mbti,
+        bio: body.bio,
+        hero_image_url: body.heroImageUrl,
+        birthdate: body.birthdate,
+        agency_id: body.agencyId,
+      },
       token: token(),
     }),
   publishIdol: (id: string) =>
@@ -112,7 +122,16 @@ export const adminApi = {
   }) =>
     apiFetch<AdminIdolDto>('/api/v1/admin/catalog/idols', {
       method: 'POST',
-      body,
+      body: {
+        agency_id: body.agencyId,
+        name: body.name,
+        stage_name: body.stageName,
+        mbti: body.mbti,
+        bio: body.bio,
+        hero_image_url: body.heroImageUrl,
+        birthdate: body.birthdate,
+        publish_immediately: body.publishImmediately,
+      },
       token: token(),
     }),
   deleteIdol: (id: string) =>
@@ -139,7 +158,14 @@ export const adminApi = {
   ) =>
     apiFetch<IdolScheduleDto>(`/api/v1/admin/catalog/idols/${idolId}/schedules`, {
       method: 'POST',
-      body,
+      body: {
+        type: body.type,
+        title: body.title,
+        location: body.location,
+        start_at: body.startAt,
+        end_at: body.endAt,
+        notes: body.notes,
+      },
       token: token(),
     }),
   deleteSchedule: (id: string) =>

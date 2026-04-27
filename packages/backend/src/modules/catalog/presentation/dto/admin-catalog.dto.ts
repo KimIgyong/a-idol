@@ -14,6 +14,9 @@ import {
   MinLength,
 } from 'class-validator';
 
+// ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0). Response DTO 는
+// camelCase (별도 표준). 각 컨트롤러가 snake → camel domain 으로 매핑.
+
 // Accept any UUID-shaped string (any version, incl. seed ids whose
 // version bits are 0). Existence is checked in the usecase layer.
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -55,11 +58,11 @@ export class UpdateIdolDto {
   @MaxLength(40)
   name?: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ nullable: true, name: 'stage_name' })
   @IsOptional()
   @IsString()
   @MaxLength(40)
-  stageName?: string | null;
+  stage_name?: string | null;
 
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()
@@ -73,29 +76,29 @@ export class UpdateIdolDto {
   @MaxLength(4000)
   bio?: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ nullable: true, name: 'hero_image_url' })
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  heroImageUrl?: string | null;
+  hero_image_url?: string | null;
 
   @ApiPropertyOptional({ nullable: true, example: '2002-05-14' })
   @IsOptional()
   @IsISO8601()
   birthdate?: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'agency_id' })
   @IsOptional()
   @IsString()
-  @Matches(UUID_REGEX, { message: 'agencyId must be a UUID' })
-  agencyId?: string;
+  @Matches(UUID_REGEX, { message: 'agency_id must be a UUID' })
+  agency_id?: string;
 }
 
 export class CreateIdolDto {
-  @ApiProperty()
+  @ApiProperty({ name: 'agency_id' })
   @IsString()
-  @Matches(UUID_REGEX, { message: 'agencyId must be a UUID' })
-  agencyId!: string;
+  @Matches(UUID_REGEX, { message: 'agency_id must be a UUID' })
+  agency_id!: string;
 
   @ApiProperty()
   @IsString()
@@ -103,11 +106,11 @@ export class CreateIdolDto {
   @MaxLength(40)
   name!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ nullable: true, name: 'stage_name' })
   @IsOptional()
   @IsString()
   @MaxLength(40)
-  stageName?: string | null;
+  stage_name?: string | null;
 
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()
@@ -121,21 +124,21 @@ export class CreateIdolDto {
   @MaxLength(4000)
   bio?: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ nullable: true, name: 'hero_image_url' })
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  heroImageUrl?: string | null;
+  hero_image_url?: string | null;
 
   @ApiPropertyOptional({ nullable: true, example: '2002-05-14' })
   @IsOptional()
   @IsISO8601()
   birthdate?: string | null;
 
-  @ApiPropertyOptional({ default: false })
+  @ApiPropertyOptional({ default: false, name: 'publish_immediately' })
   @IsOptional()
   @IsBoolean()
-  publishImmediately?: boolean;
+  publish_immediately?: boolean;
 }
 
 export const SCHEDULE_TYPES = ['BROADCAST', 'CONCERT', 'FANMEETING', 'STREAMING', 'OTHER'] as const;
@@ -159,14 +162,14 @@ export class CreateScheduleDto {
   @MaxLength(120)
   location?: string | null;
 
-  @ApiProperty({ example: '2026-04-24T17:00:00Z' })
+  @ApiProperty({ example: '2026-04-24T17:00:00Z', name: 'start_at' })
   @IsISO8601()
-  startAt!: string;
+  start_at!: string;
 
-  @ApiPropertyOptional({ nullable: true, example: '2026-04-24T18:30:00Z' })
+  @ApiPropertyOptional({ nullable: true, example: '2026-04-24T18:30:00Z', name: 'end_at' })
   @IsOptional()
   @IsISO8601()
-  endAt?: string | null;
+  end_at?: string | null;
 
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()
@@ -191,9 +194,9 @@ export class ListAdminIdolsQuery {
   @Max(200)
   size: number = 50;
 
-  @ApiPropertyOptional({ default: false })
+  @ApiPropertyOptional({ default: false, name: 'include_deleted' })
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
-  includeDeleted: boolean = false;
+  include_deleted: boolean = false;
 }

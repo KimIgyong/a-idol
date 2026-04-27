@@ -62,7 +62,7 @@ describe('ITC-LBCACHE — leaderboard cache write-through invalidation', () => {
       await env.http
         .patch(`/api/v1/admin/catalog/idols/${idolId}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ stageName: newStageName })
+        .send({ stage_name: newStageName })
         .expect(200);
 
       const afterLeaderboard = await env.http
@@ -76,7 +76,7 @@ describe('ITC-LBCACHE — leaderboard cache write-through invalidation', () => {
       await env.http
         .patch(`/api/v1/admin/catalog/idols/${idolId}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ stageName: originalStageName })
+        .send({ stage_name: originalStageName })
         .expect(200);
     }
   });
