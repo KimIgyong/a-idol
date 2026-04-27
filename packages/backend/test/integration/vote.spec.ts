@@ -44,7 +44,7 @@ describe('ITC-VOTE — TICKET vote flow', () => {
       await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: ticketProduct.id })
+        .send({ product_id: ticketProduct.id })
         .expect(200);
 
       const before = await env.http

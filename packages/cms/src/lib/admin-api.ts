@@ -333,7 +333,14 @@ export const adminApi = {
   }) =>
     apiFetch<PurchaseProductDto>('/api/v1/admin/commerce/products', {
       method: 'POST',
-      body,
+      body: {
+        sku: body.sku,
+        kind: body.kind,
+        title: body.title,
+        description: body.description,
+        price_krw: body.priceKrw,
+        delivery_payload: body.deliveryPayload,
+      },
       token: token(),
     }),
   updateProduct: (
@@ -348,7 +355,13 @@ export const adminApi = {
   ) =>
     apiFetch<PurchaseProductDto>(`/api/v1/admin/commerce/products/${id}`, {
       method: 'PATCH',
-      body,
+      body: {
+        title: body.title,
+        description: body.description,
+        price_krw: body.priceKrw,
+        delivery_payload: body.deliveryPayload,
+        is_active: body.isActive,
+      },
       token: token(),
     }),
 

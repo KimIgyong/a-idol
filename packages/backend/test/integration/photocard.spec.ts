@@ -50,7 +50,7 @@ describe('ITC-PHOTOCARD — pack purchase → grouped collection', () => {
       const buy = await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: pack5ProductId })
+        .send({ product_id: pack5ProductId })
         .expect(200);
       expect(buy.body.status).toBe('FULFILLED');
 
@@ -86,7 +86,7 @@ describe('ITC-PHOTOCARD — pack purchase → grouped collection', () => {
         await env.http
           .post('/api/v1/commerce/purchases')
           .set('Authorization', `Bearer ${accessToken}`)
-          .send({ productId: pack5ProductId })
+          .send({ product_id: pack5ProductId })
           .expect(200);
       }
 

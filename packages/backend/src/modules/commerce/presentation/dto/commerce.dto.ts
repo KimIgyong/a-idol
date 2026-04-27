@@ -50,14 +50,15 @@ export class CreateProductBody {
   @MaxLength(2000)
   description?: string | null;
 
-  @ApiProperty({ minimum: 0 })
+  // ADR-023 — Request DTO 는 snake_case (amb-starter-kit v2.0).
+  @ApiProperty({ minimum: 0, name: 'price_krw' })
   @IsInt()
   @Min(0)
-  priceKrw!: number;
+  price_krw!: number;
 
-  @ApiProperty({ type: Object })
+  @ApiProperty({ type: Object, name: 'delivery_payload' })
   @IsObject()
-  deliveryPayload!: Record<string, unknown>;
+  delivery_payload!: Record<string, unknown>;
 }
 
 export class UpdateProductBody {
@@ -74,39 +75,39 @@ export class UpdateProductBody {
   @MaxLength(2000)
   description?: string | null;
 
-  @ApiPropertyOptional({ minimum: 0 })
+  @ApiPropertyOptional({ minimum: 0, name: 'price_krw' })
   @IsOptional()
   @IsInt()
   @Min(0)
-  priceKrw?: number;
+  price_krw?: number;
 
-  @ApiPropertyOptional({ type: Object })
+  @ApiPropertyOptional({ type: Object, name: 'delivery_payload' })
   @IsOptional()
   @IsObject()
-  deliveryPayload?: Record<string, unknown>;
+  delivery_payload?: Record<string, unknown>;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'is_active' })
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  is_active?: boolean;
 }
 
 export class CreatePurchaseBody {
-  @ApiProperty()
+  @ApiProperty({ name: 'product_id' })
   @IsString()
-  @Matches(UUID_REGEX, { message: 'productId must be a UUID' })
-  productId!: string;
+  @Matches(UUID_REGEX, { message: 'product_id must be a UUID' })
+  product_id!: string;
 
   @ApiPropertyOptional({ enum: PAYMENT_PROVIDERS, default: 'DEV_SANDBOX' })
   @IsOptional()
   @IsIn(PAYMENT_PROVIDERS)
   provider?: PaymentProvider;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ name: 'provider_tx_id' })
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  providerTxId?: string;
+  provider_tx_id?: string;
 
   // Apple StoreKit v2 compact JWS (ADR-019). Accepted but unused until
   // `JoseAppleReceiptVerifier` lands (Phase 1 W2 — awaiting `jose`
@@ -116,9 +117,10 @@ export class CreatePurchaseBody {
   @ApiPropertyOptional({
     description:
       'StoreKit v2 compact JWS. Required once APPLE_IAP goes live; ignored today.',
+    name: 'receipt_jws',
   })
   @IsOptional()
   @IsString()
   @MaxLength(8192)
-  receiptJws?: string;
+  receipt_jws?: string;
 }

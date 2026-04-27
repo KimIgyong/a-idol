@@ -55,7 +55,14 @@ export class AdminCommerceController {
   @ApiOperation({ summary: 'Create product (admin only)' })
   @Roles('admin')
   async post(@Body() body: CreateProductBody): Promise<PurchaseProductDto> {
-    const product = await this.create.execute(body);
+    const product = await this.create.execute({
+      sku: body.sku,
+      kind: body.kind,
+      title: body.title,
+      description: body.description,
+      priceKrw: body.price_krw,
+      deliveryPayload: body.delivery_payload,
+    });
     return toProductDto(product);
   }
 
@@ -64,7 +71,13 @@ export class AdminCommerceController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateProductBody,
   ): Promise<PurchaseProductDto> {
-    const product = await this.updateUc.execute(id, body);
+    const product = await this.updateUc.execute(id, {
+      title: body.title,
+      description: body.description,
+      priceKrw: body.price_krw,
+      deliveryPayload: body.delivery_payload,
+      isActive: body.is_active,
+    });
     return toProductDto(product);
   }
 }

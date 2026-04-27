@@ -95,7 +95,7 @@ describe('ITC-AUDITION — round close → snapshot → rejects further votes', 
       await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: ticketProduct.id })
+        .send({ product_id: ticketProduct.id })
         .expect(200);
 
       const res = await env.http

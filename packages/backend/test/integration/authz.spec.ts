@@ -69,8 +69,8 @@ describe('ITC-AUTHZ — role gates', () => {
         sku: `authz-op-${Date.now()}`,
         kind: 'CHAT_COUPON',
         title: 'op-forbidden',
-        priceKrw: 1000,
-        deliveryPayload: { couponAmount: 1 },
+        price_krw: 1000,
+        delivery_payload: { couponAmount: 1 },
       })
       .expect(403);
     // RolesGuard throws ForbiddenException; body shape is Nest default.
@@ -86,8 +86,8 @@ describe('ITC-AUTHZ — role gates', () => {
         sku,
         kind: 'CHAT_COUPON',
         title: 'admin-ok',
-        priceKrw: 1000,
-        deliveryPayload: { couponAmount: 1 },
+        price_krw: 1000,
+        delivery_payload: { couponAmount: 1 },
       })
       .expect(201);
     expect(res.body.sku).toBe(sku);

@@ -28,7 +28,7 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
       const buy = await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: chatCouponProductId })
+        .send({ product_id: chatCouponProductId })
         .expect(200);
 
       expect(buy.body).toMatchObject({
@@ -54,13 +54,13 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
       await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: chatCouponProductId, providerTxId })
+        .send({ product_id: chatCouponProductId, provider_tx_id: providerTxId })
         .expect(200);
 
       const second = await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: chatCouponProductId, providerTxId })
+        .send({ product_id: chatCouponProductId, provider_tx_id: providerTxId })
         .expect(409);
 
       expect(second.body).toMatchObject({ code: 'DUPLICATE_RECEIPT' });
@@ -75,7 +75,7 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
       const res = await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: chatCouponProductId, provider: 'APPLE_IAP' })
+        .send({ product_id: chatCouponProductId, provider: 'APPLE_IAP' })
         .expect(400);
       expect(res.body).toMatchObject({ code: 'PROVIDER_NOT_SUPPORTED' });
     } finally {
@@ -89,7 +89,7 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
       const res = await env.http
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ productId: 'deadbeef-cafe-4bad-8c0d-000000000099' })
+        .send({ product_id: 'deadbeef-cafe-4bad-8c0d-000000000099' })
         .expect(404);
       expect(res.body).toMatchObject({ code: 'PRODUCT_NOT_FOUND' });
     } finally {
@@ -107,8 +107,8 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
-          productId: chatCouponProductId,
-          receiptJws: 'eyJhbGciOiJFUzI1NiJ9.ignored-in-dev-sandbox.sig',
+          product_id: chatCouponProductId,
+          receipt_jws: 'eyJhbGciOiJFUzI1NiJ9.ignored-in-dev-sandbox.sig',
         })
         .expect(200);
       expect(res.body.status).toBe('FULFILLED');
@@ -124,9 +124,9 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
-          productId: chatCouponProductId,
+          product_id: chatCouponProductId,
           provider: 'APPLE_IAP',
-          receiptJws: 'eyJhbGciOiJFUzI1NiJ9.whatever.sig',
+          receipt_jws: 'eyJhbGciOiJFUzI1NiJ9.whatever.sig',
         })
         .expect(400);
       expect(res.body).toMatchObject({ code: 'PROVIDER_NOT_SUPPORTED' });
@@ -143,8 +143,8 @@ describe('ITC-COMMERCE — DEV_SANDBOX purchase flow', () => {
         .post('/api/v1/commerce/purchases')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
-          productId: chatCouponProductId,
-          receiptJws: huge,
+          product_id: chatCouponProductId,
+          receipt_jws: huge,
         })
         .expect(400);
     } finally {

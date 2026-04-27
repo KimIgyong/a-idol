@@ -92,7 +92,7 @@ export function usePurchase(token: string | null) {
       setError(null);
       setErrorRequestId(null);
       try {
-        const res = await api.createPurchase({ productId }, token);
+        const res = await api.createPurchase({ product_id: productId }, token);
         setLastResult(res);
         return res;
       } catch (e) {

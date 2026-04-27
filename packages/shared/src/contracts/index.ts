@@ -756,16 +756,17 @@ export interface PurchaseTransactionDto {
   createdAt: string;
 }
 
+// ADR-023 — Request body 는 snake_case (amb-starter-kit v2.0).
 export interface CreatePurchaseDto {
-  productId: string;
+  product_id: string;
   provider?: PaymentProvider;
-  providerTxId?: string;
+  provider_tx_id?: string;
   /**
    * StoreKit v2 compact JWS (ADR-019). Required when `provider === 'APPLE_IAP'`
    * once the Apple adapter ships; ignored for DEV_SANDBOX. Max 8 KB —
    * Apple tokens are ~2-3 KB but pad for future receipt types.
    */
-  receiptJws?: string;
+  receipt_jws?: string;
 }
 
 // -- Photocard ----------------------------------------------------------

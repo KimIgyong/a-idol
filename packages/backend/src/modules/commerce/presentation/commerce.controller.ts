@@ -78,10 +78,10 @@ export class CommerceController {
   ): Promise<PurchaseTransactionDto> {
     const tx = await this.purchase.execute({
       userId: user.id,
-      productId: body.productId,
+      productId: body.product_id,
       provider: body.provider,
-      providerTxId: body.providerTxId,
-      receiptJws: body.receiptJws,
+      providerTxId: body.provider_tx_id,
+      receiptJws: body.receipt_jws,
     });
     return toTransactionDto(tx);
   }
