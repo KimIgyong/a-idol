@@ -9,10 +9,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-    // pnpm 모노레포에서 mobile (Expo) + cms 가 react 18.2.0 으로 align —
-    // dedupe 로 root hoist 와 packages/* 사이 react 단일화 (RTL 의 createRoot 가
-    // mismatch 시 silent render fail 되는 문제 회피).
-    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 5173,
