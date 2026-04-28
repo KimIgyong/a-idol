@@ -1,0 +1,69 @@
+# Build context exclusions — keep image small and avoid copying host
+# pnpm symlinks (which break BuildKit COPY into overlayfs).
+
+# pnpm / node — let docker run pnpm install fresh
+node_modules/
+**/node_modules/
+
+# Build artifacts — backend build stage produces its own dist
+dist/
+**/dist/
+.next/
+**/.next/
+build/
+**/build/
+coverage/
+**/coverage/
+.turbo/
+**/.turbo/
+
+# VCS + IDE
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs / OS
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Secrets — only .env.example is intended to ship
+.env
+.env.*
+!.env.example
+
+# Tests / fixtures not needed at runtime
+**/*.spec.ts
+**/*.spec.tsx
+**/*.test.ts
+**/*.test.tsx
+**/__tests__/
+**/__mocks__/
+
+# Local docker / deploy artifacts
+deploy/staging/.env.staging
+docker-compose*.override.yml
+
+# Editor / docs / heavy directories that don't belong in the image
+docs/
+sql/
+*.md
+!packages/*/README.md
+
+# Misc
+.cache/
+.eslintcache
+*.tsbuildinfo
+**/*.tsbuildinfo
+# tsc emit artifacts that may sit alongside .ts sources from prior builds —
+# letting them into the context confuses tsc (treats as already-emitted, skips
+# regeneration in composite mode).
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map

@@ -1,0 +1,93 @@
+# A-idol staging — shared-host variant.
+# amoeba 사내 VPS 가 multi-tenant 라 host-level nginx (1.24, *.amoeba.site
+# wildcard cert) 가 80/443 을 점유. 이 compose 는 backend 만 127.0.0.1:3001
+# 에 노출하고, host nginx 가 a-idol-stg.amoeba.site → 127.0.0.1:3001 forward.
+# CMS dist 는 host 의 /var/www/a-idol-cms 로 deploy.sh 가 rsync.
+#
+# 참고: 단독 VPS 시나리오용 docker-compose.staging.yml 은 nginx + certbot 도
+# 포함된 stand-alone 배포. 환경에 맞게 둘 중 하나 선택.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: a-idol-stg-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    expose:
+      - "5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: a-idol-stg-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    expose:
+      - "6379"
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: packages/backend/Dockerfile
+    container_name: a-idol-stg-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      REDIS_URL: redis://redis:6379/0
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-14d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      THROTTLE_LIMIT_PER_MINUTE: ${THROTTLE_LIMIT_PER_MINUTE:-200}
+      HIBP_CHECK_ENABLED: ${HIBP_CHECK_ENABLED:-1}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      GIT_SHA: ${GIT_SHA:-}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - backend_uploads:/app/packages/backend/uploads
+    # host nginx 가 forward — 외부 직접 접근 불가, 반드시 localhost 만.
+    ports:
+      - "127.0.0.1:3001:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  pg_data:
+    name: a-idol-stg-pg-data
+  redis_data:
+    name: a-idol-stg-redis-data
+  backend_uploads:
+    name: a-idol-stg-uploads

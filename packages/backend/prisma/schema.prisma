@@ -6,6 +6,10 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = []
+  // native: 로컬 dev (macOS/linux). linux-musl-openssl-3.0.x: alpine 3.20+ 런타임
+  // (libssl.so.3) 컨테이너용. 기본 linux-musl 은 libssl 1.1 가정이라 alpine
+  // 최신 base 에서는 `Error loading shared library libssl.so.1.1` 로 부팅 실패.
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
