@@ -81,6 +81,13 @@ rsync -az --delete \
 rsync -az --delete -e "ssh ${SSH_OPTS}" \
   packages/cms/dist/ "${SSH_USER}@${SSH_HOST}:${RELEASE_DIR}/packages/cms/dist/"
 
+# RPT-260506 — host nginx 가 /var/www/a-idol-cms 에서 정적 자산을 직접 서빙한다.
+# release 디렉터리만 갱신하면 신규 CMS 가 활성화되지 않으므로 webroot 도 같이 동기화.
+CMS_WEBROOT="${CMS_WEBROOT:-/var/www/a-idol-cms}"
+echo "🎨  rsync CMS dist → ${SSH_HOST}:${CMS_WEBROOT}"
+rsync -az --delete -e "ssh ${SSH_OPTS}" \
+  packages/cms/dist/ "${SSH_USER}@${SSH_HOST}:${CMS_WEBROOT}/"
+
 # .env.staging 은 별도로 보내고 release 안에 위치 (compose 의 --env-file 에서 사용)
 scp ${SSH_OPTS} deploy/staging/.env.staging \
   "${SSH_USER}@${SSH_HOST}:${RELEASE_DIR}/deploy/staging/.env.staging"

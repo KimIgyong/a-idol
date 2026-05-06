@@ -49,15 +49,12 @@ pnpm-debug.log*
 deploy/staging/.env.staging
 docker-compose*.override.yml
 
-# Editor / docs / heavy directories that don't belong in the image
-docs/
+# Editor / heavy directories that don't belong in the image
+# RPT-260506 — docs/ 는 backend project-doc sync (admin sync-from-repo API +
+# Dockerfile 의 COPY docs/ docs/) 가 read-only 로 사용하므로 제외하지 않는다.
 sql/
 *.md
 !packages/*/README.md
-# RPT-260506 — backend project-doc sync 가 docs/ 를 read-only 로 사용. 이미지에
-# 포함시켜야 admin sync-from-repo API 가 동작 (Dockerfile 의 COPY docs/ docs/).
-!docs/
-!docs/**
 
 # Misc
 .cache/
