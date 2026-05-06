@@ -46,9 +46,22 @@ GIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo "${RELEASE_TS}")"
 echo "🏷  release tag: ${GIT_SHA}"
 
 # -------- 1) 로컬 빌드 ----------
+# Vite 는 빌드 시점에 import.meta.env.* 를 정적 치환하므로 staging 배포에서는
+# VITE_API_BASE_URL 을 반드시 staging origin 으로 주입해야 한다 (미주입 시
+# packages/cms/src/env.ts 의 zod default 인 http://localhost:3000 이 박혀
+# CORS 차단됨).
+VITE_API_BASE_URL="${VITE_API_BASE_URL:-https://a-idol-stg.amoeba.site}"
+VITE_MOBILE_PREVIEW_URL="${VITE_MOBILE_PREVIEW_URL:-https://a-idol-stg.amoeba.site/m}"
+VITE_APP_ENV="${VITE_APP_ENV:-staging}"
+
 if [[ $DO_CMS_BUILD -eq 1 ]]; then
-  echo "📦  build CMS (vite production) — VITE_GIT_SHA=${GIT_SHA}"
-  VITE_GIT_SHA="${GIT_SHA}" pnpm --filter @a-idol/cms build
+  echo "📦  build CMS — VITE_GIT_SHA=${GIT_SHA} VITE_API_BASE_URL=${VITE_API_BASE_URL}"
+  VITE_GIT_SHA="${GIT_SHA}" \
+  VITE_API_BASE_URL="${VITE_API_BASE_URL}" \
+  VITE_MOBILE_PREVIEW_URL="${VITE_MOBILE_PREVIEW_URL}" \
+  VITE_APP_ENV="${VITE_APP_ENV}" \
+  VITE_SENTRY_DSN="${VITE_SENTRY_DSN:-}" \
+    pnpm --filter @a-idol/cms build
 fi
 
 echo "📦  build shared package"
