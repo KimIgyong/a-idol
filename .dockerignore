@@ -54,6 +54,10 @@ docs/
 sql/
 *.md
 !packages/*/README.md
+# RPT-260506 — backend project-doc sync 가 docs/ 를 read-only 로 사용. 이미지에
+# 포함시켜야 admin sync-from-repo API 가 동작 (Dockerfile 의 COPY docs/ docs/).
+!docs/
+!docs/**
 
 # Misc
 .cache/

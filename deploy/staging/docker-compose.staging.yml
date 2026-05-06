@@ -75,6 +75,11 @@ services:
     volumes:
       # 업로드 자산 영속화 (SVG placeholder + 향후 idol 이미지)
       - backend_uploads:/app/packages/backend/uploads
+    # RPT-260506 — 호스트 nginx (`/etc/nginx/sites-enabled/a-idol-stg.amoeba.site`)
+    # 가 `proxy_pass http://127.0.0.1:3001` 로 잡혀있어 컨테이너 포트를 호스트
+    # loopback 으로 publish 한다. 0.0.0.0 노출은 피하고 127.0.0.1 바인딩만 허용.
+    ports:
+      - "127.0.0.1:3001:3000"
     expose:
       - "3000"
     healthcheck:
@@ -86,7 +91,13 @@ services:
 
   # Vite 빌드 결과 (dist/) 를 nginx 컨테이너로 그대로 마운트해 정적 서빙.
   # CMS 빌드는 deploy.sh 가 build 단계에서 packages/cms/dist/ 로 미리 만들어둠.
+  #
+  # RPT-260506 — 이 호스트는 호스트 nginx (sites-enabled/a-idol-stg.amoeba.site)
+  # 가 80/443 을 점유하고 정적 자산을 `/var/www/a-idol-cms` 에서 직접 서빙한다.
+  # 그래서 컨테이너 nginx 는 기본 비활성화 (`profiles`). docker-managed reverse
+  # proxy 가 필요한 호스트에서만 `--profile docker-nginx` 로 명시적으로 켠다.
   nginx:
+    profiles: ["docker-nginx"]
     image: nginx:1.27-alpine
     container_name: a-idol-stg-nginx
     restart: unless-stopped

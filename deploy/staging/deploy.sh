@@ -66,7 +66,10 @@ rsync -az --delete \
   --exclude 'packages/backend/dist' \
   --exclude 'packages/backend/uploads' \
   --exclude 'packages/shared/dist' \
-  --exclude 'packages/mobile' \
+  --include 'packages/mobile/' \
+  --include 'packages/mobile/package.json' \
+  --exclude 'packages/mobile/*' \
+  --exclude 'packages/mobile/**' \
   --exclude '.git' \
   --exclude '.env' \
   --exclude '.env.local' \
