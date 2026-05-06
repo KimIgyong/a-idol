@@ -54,8 +54,6 @@ interface AttachmentResponseDto {
 
 @ApiTags('admin-attachments')
 @Controller('admin/attachments')
-@UseGuards(AdminJwtAuthGuard, RolesGuard)
-@Roles('admin', 'operator')
 @ApiBearerAuth()
 export class AdminAttachmentsController {
   constructor(
@@ -66,6 +64,8 @@ export class AdminAttachmentsController {
 
   @Post()
   @HttpCode(201)
+  @UseGuards(AdminJwtAuthGuard, RolesGuard)
+  @Roles('admin', 'operator')
   @ApiOperation({ summary: '첨부파일 업로드 (multipart). owner_type=DRAFT 로 우선 업로드 후 entity 저장 시 link.' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -108,7 +108,12 @@ export class AdminAttachmentsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: '첨부 다운로드 / 인라인 표시 (이미지)' })
+  @ApiOperation({
+    summary:
+      '첨부 다운로드 / 인라인 표시 (이미지). UUID-capability 모델 — 인증 없이 접근 가능. ' +
+      'browser <img src> 가 Authorization 헤더를 못 붙이는 문제 해결을 위해 의도적 공개. ' +
+      'prod 적용 전 signed URL + TTL 로 강화 (RPT-260507 후속).',
+  })
   async download(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Res() res: Response,
@@ -127,6 +132,8 @@ export class AdminAttachmentsController {
 
   @Delete(':id')
   @HttpCode(204)
+  @UseGuards(AdminJwtAuthGuard, RolesGuard)
+  @Roles('admin', 'operator')
   @ApiOperation({ summary: '첨부 삭제' })
   async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
     await this.deleteUC.execute(id);
