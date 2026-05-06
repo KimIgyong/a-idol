@@ -460,9 +460,9 @@ export const adminApi = {
     }),
 
   // -- operators (admin role only) ------------------------------------
-  // Read-only first slice (RPT-260426-B §5). Write actions land in a
-  // follow-up — viewer/operator는 backend RolesGuard에서 403, frontend도
-  // 메뉴 자체를 admin role에만 노출.
+  // List + unlock (T-082). Create + role-change (FR-102, REQ-260507 CMS slice).
+  // viewer/operator 는 backend RolesGuard 에서 403, frontend 도 메뉴 / 버튼을
+  // admin 에게만 노출.
   listOperators: () =>
     apiFetch<AdminUserDto[]>('/api/v1/admin/operators', { token: token() }),
   /** T-082 — 잠긴 사용자/운영자 계정 즉시 해제. admin role 전용. */
@@ -470,6 +470,25 @@ export const adminApi = {
     apiFetch<{ unlocked: true }>('/api/v1/admin/operators/unlock-account', {
       method: 'POST',
       body: { email },
+      token: token(),
+    }),
+  /** FR-102 — 신규 어드민 등록 (admin only). */
+  createOperator: (body: {
+    email: string;
+    display_name: string;
+    password: string;
+    role: 'admin' | 'operator' | 'viewer';
+  }) =>
+    apiFetch<AdminUserDto>('/api/v1/admin/operators', {
+      method: 'POST',
+      body,
+      token: token(),
+    }),
+  /** FR-102 — 역할 변경 (admin only). */
+  updateOperatorRole: (id: string, role: 'admin' | 'operator' | 'viewer') =>
+    apiFetch<AdminUserDto>(`/api/v1/admin/operators/${id}/role`, {
+      method: 'PATCH',
+      body: { role },
       token: token(),
     }),
 

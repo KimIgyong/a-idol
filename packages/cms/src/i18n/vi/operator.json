@@ -1,0 +1,58 @@
+{
+  "title": "Quản lý người vận hành",
+  "subtitle": "Tài khoản CMS admin / operator / viewer. Mở khóa, đăng ký, đổi vai trò.",
+  "actions": {
+    "create": "Admin mới",
+    "role_change": "Đổi vai trò",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "register": "Đăng ký",
+    "confirm": "Xác nhận",
+    "close": "Đóng"
+  },
+  "field": {
+    "email": "Email",
+    "display_name": "Tên hiển thị",
+    "password": "Mật khẩu",
+    "role": "Vai trò",
+    "current_role": "Vai trò hiện tại",
+    "target": "Đối tượng"
+  },
+  "role": {
+    "admin": "admin",
+    "operator": "operator",
+    "viewer": "viewer"
+  },
+  "create_modal": {
+    "title": "Đăng ký admin mới",
+    "password_hint": "8 ký tự trở lên · chữ cái + số + ký tự đặc biệt",
+    "handover_notice": "Sau khi đăng ký, hãy chuyển mật khẩu cho người dùng mới qua kênh an toàn. Hệ thống không tự gửi."
+  },
+  "role_change_modal": {
+    "title": "Đổi vai trò",
+    "demotion_warning": "Không thể hạ cấp khi chỉ còn 1 tài khoản admin."
+  },
+  "password_shown": {
+    "title": "Đã đăng ký admin",
+    "warning": "Mật khẩu chỉ hiển thị một lần. Hãy chuyển cho người dùng qua kênh an toàn.",
+    "show": "Hiện",
+    "hide": "Ẩn",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép"
+  },
+  "errors": {
+    "email_duplicate": "Email đã được đăng ký.",
+    "limit_exceeded": "Tối đa 3 tài khoản admin.",
+    "last_admin_demotion": "Không thể hạ cấp tài khoản admin cuối cùng.",
+    "self_modification": "Không thể đổi vai trò của chính mình.",
+    "weak_password": "Mật khẩu không đáp ứng chính sách (8 ký tự+, tránh mẫu phổ biến).",
+    "generic": "Đã có lỗi."
+  },
+  "toast": {
+    "created": "Đã đăng ký admin.",
+    "role_updated": "Đã đổi vai trò."
+  },
+  "menu": {
+    "self_disabled_tooltip": "Không thể đổi vai trò của chính mình."
+  }
+}

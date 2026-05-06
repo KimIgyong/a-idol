@@ -1,0 +1,58 @@
+{
+  "title": "运营者管理",
+  "subtitle": "CMS admin / operator / viewer 账户。解锁、注册、更改角色。",
+  "actions": {
+    "create": "新建 admin",
+    "role_change": "更改角色",
+    "cancel": "取消",
+    "save": "保存",
+    "register": "注册",
+    "confirm": "确认",
+    "close": "关闭"
+  },
+  "field": {
+    "email": "邮箱",
+    "display_name": "显示名",
+    "password": "密码",
+    "role": "角色",
+    "current_role": "当前角色",
+    "target": "对象"
+  },
+  "role": {
+    "admin": "admin",
+    "operator": "operator",
+    "viewer": "viewer"
+  },
+  "create_modal": {
+    "title": "注册新 admin",
+    "password_hint": "8 位以上 · 字母 + 数字 + 特殊字符",
+    "handover_notice": "注册后请通过安全渠道将密码交给新用户。系统不会自动发送。"
+  },
+  "role_change_modal": {
+    "title": "更改角色",
+    "demotion_warning": "仅剩 1 位 admin 时无法降级。"
+  },
+  "password_shown": {
+    "title": "admin 已注册",
+    "warning": "该密码仅显示一次。请通过安全渠道交付给用户。",
+    "show": "显示",
+    "hide": "隐藏",
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "errors": {
+    "email_duplicate": "该邮箱已注册。",
+    "limit_exceeded": "admin 账户最多 3 个。",
+    "last_admin_demotion": "无法降级最后一个 admin。",
+    "self_modification": "无法更改自己的角色。",
+    "weak_password": "密码不符合策略（8 位以上、避免常见模式）。",
+    "generic": "发生错误。"
+  },
+  "toast": {
+    "created": "admin 已注册。",
+    "role_updated": "已更改角色。"
+  },
+  "menu": {
+    "self_disabled_tooltip": "无法更改自己的角色。"
+  }
+}

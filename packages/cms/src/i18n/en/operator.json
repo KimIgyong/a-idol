@@ -1,0 +1,58 @@
+{
+  "title": "Operators",
+  "subtitle": "CMS admin / operator / viewer accounts. Unlock, register, change role.",
+  "actions": {
+    "create": "New admin",
+    "role_change": "Change role",
+    "cancel": "Cancel",
+    "save": "Save",
+    "register": "Register",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "field": {
+    "email": "Email",
+    "display_name": "Display name",
+    "password": "Password",
+    "role": "Role",
+    "current_role": "Current role",
+    "target": "Target"
+  },
+  "role": {
+    "admin": "admin",
+    "operator": "operator",
+    "viewer": "viewer"
+  },
+  "create_modal": {
+    "title": "Register new admin",
+    "password_hint": "8+ chars · letters + numbers + special character",
+    "handover_notice": "After registration, deliver the password to the new user via a secure channel. The system does not send it automatically."
+  },
+  "role_change_modal": {
+    "title": "Change role",
+    "demotion_warning": "Cannot change role from admin if only one admin remains."
+  },
+  "password_shown": {
+    "title": "Admin registered",
+    "warning": "This password is shown only once. Deliver it to the user via a secure channel.",
+    "show": "Show",
+    "hide": "Hide",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "errors": {
+    "email_duplicate": "Email is already registered.",
+    "limit_exceeded": "Maximum 3 admin accounts allowed.",
+    "last_admin_demotion": "Cannot demote the last admin account.",
+    "self_modification": "Cannot change your own role.",
+    "weak_password": "Password does not meet policy (8+ chars, no common patterns).",
+    "generic": "An error occurred."
+  },
+  "toast": {
+    "created": "Admin registered.",
+    "role_updated": "Role updated."
+  },
+  "menu": {
+    "self_disabled_tooltip": "Cannot change your own role."
+  }
+}

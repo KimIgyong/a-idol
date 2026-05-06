@@ -6,18 +6,22 @@ import koCommon from './ko/common.json';
 import koNav from './ko/nav.json';
 import koIssue from './ko/issue.json';
 import koNote from './ko/note.json';
+import koOperator from './ko/operator.json';
 import enCommon from './en/common.json';
 import enNav from './en/nav.json';
 import enIssue from './en/issue.json';
 import enNote from './en/note.json';
+import enOperator from './en/operator.json';
 import viCommon from './vi/common.json';
 import viNav from './vi/nav.json';
 import viIssue from './vi/issue.json';
 import viNote from './vi/note.json';
+import viOperator from './vi/operator.json';
 import zhCNCommon from './zh-CN/common.json';
 import zhCNNav from './zh-CN/nav.json';
 import zhCNIssue from './zh-CN/issue.json';
 import zhCNNote from './zh-CN/note.json';
+import zhCNOperator from './zh-CN/operator.json';
 
 // 코드 컨벤션 §14 — 4 locale × namespace 구조.
 // 신규 namespace 추가 시: 각 locale 폴더에 JSON 추가 + 아래 resources 등록.
@@ -34,10 +38,16 @@ export const LOCALE_LABEL: Record<SupportedLocale, string> = {
 const STORAGE_KEY = 'a-idol.cms.lang';
 
 export const resources = {
-  ko: { common: koCommon, nav: koNav, issue: koIssue, note: koNote },
-  en: { common: enCommon, nav: enNav, issue: enIssue, note: enNote },
-  vi: { common: viCommon, nav: viNav, issue: viIssue, note: viNote },
-  'zh-CN': { common: zhCNCommon, nav: zhCNNav, issue: zhCNIssue, note: zhCNNote },
+  ko: { common: koCommon, nav: koNav, issue: koIssue, note: koNote, operator: koOperator },
+  en: { common: enCommon, nav: enNav, issue: enIssue, note: enNote, operator: enOperator },
+  vi: { common: viCommon, nav: viNav, issue: viIssue, note: viNote, operator: viOperator },
+  'zh-CN': {
+    common: zhCNCommon,
+    nav: zhCNNav,
+    issue: zhCNIssue,
+    note: zhCNNote,
+    operator: zhCNOperator,
+  },
 } as const;
 
 void i18n
@@ -48,7 +58,7 @@ void i18n
     fallbackLng: 'ko',
     supportedLngs: [...SUPPORTED_LOCALES],
     nonExplicitSupportedLngs: true, // `zh` → `zh-CN` 매핑
-    ns: ['common', 'nav', 'issue', 'note'],
+    ns: ['common', 'nav', 'issue', 'note', 'operator'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     detection: {
