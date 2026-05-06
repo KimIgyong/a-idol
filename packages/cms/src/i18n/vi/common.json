@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "A-idol CMS",
+    "subtitle": "Bảng điều khiển quản trị"
+  },
+  "actions": {
+    "logout": "Đăng xuất",
+    "loggingOut": "Đang đăng xuất..."
+  },
+  "loading": "Đang tải...",
+  "error": "Đã xảy ra lỗi.",
+  "language": {
+    "label": "Ngôn ngữ"
+  }
+}

@@ -8,5 +8,5 @@
     },
     "noEmit": true
   },
-  "include": ["prisma/seed.ts", "prisma/seeds/**/*.ts"]
+  "include": ["prisma/seed.ts", "prisma/seeds/**/*.ts", "scripts/**/*.ts", "src/lib/**/*.ts"]
 }

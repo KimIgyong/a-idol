@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "A-idol",
+    "tagline": "AI 아이돌 팬덤 플랫폼"
+  },
+  "loading": "불러오는 중...",
+  "back": "뒤로 가기",
+  "settings": {
+    "title": "설정",
+    "language": "언어"
+  }
+}

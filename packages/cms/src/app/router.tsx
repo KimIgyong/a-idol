@@ -31,6 +31,7 @@ const DocEditPage = lazyNamed(() => import('@/features/project/doc-edit-page'), 
 const DeliverablesPage = lazyNamed(() => import('@/features/project/deliverables-page'), 'DeliverablesPage');
 const WbsPage = lazyNamed(() => import('@/features/project/wbs-page'), 'WbsPage');
 const TasksPage = lazyNamed(() => import('@/features/project/tasks-page'), 'TasksPage');
+const IssuesPage = lazyNamed(() => import('@/features/project/issues-page'), 'IssuesPage');
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -144,6 +145,7 @@ export const router = createBrowserRouter([
           { path: 'deliverables', element: <DeliverablesPage /> },
           { path: 'wbs', element: <WbsPage /> },
           { path: 'tasks', element: <TasksPage /> },
+          { path: 'issues', element: <IssuesPage /> },
         ],
       },
     ],

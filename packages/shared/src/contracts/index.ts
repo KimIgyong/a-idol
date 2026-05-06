@@ -853,3 +853,62 @@ export interface CreatePhotocardTemplateDto {
   rarity?: PhotocardRarity;
   dropWeight?: number;
 }
+
+// -- Issue tracker (RPT-260506) ------------------------------------------
+import type { IssueType, IssueStatus, IssuePriority } from '../domain/issue';
+
+/** Response 측 단일 이슈 (camelCase). */
+export interface IssueDto {
+  id: string;
+  key: string;
+  title: string;
+  description: string | null;
+  type: IssueType;
+  status: IssueStatus;
+  priority: IssuePriority;
+  orderInColumn: number;
+  assigneeAdminId: string | null;
+  assigneeName: string | null;
+  reporterAdminId: string | null;
+  reporterName: string | null;
+  dueDate: string | null;
+  labels: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 칸반 보드 응답 — 컬럼별로 그룹핑된 이슈. */
+export interface KanbanIssuesDto {
+  columns: Array<{
+    status: IssueStatus;
+    issues: IssueDto[];
+  }>;
+}
+
+// ADR-023 — Request body 는 snake_case.
+export interface CreateIssueDto {
+  title: string;
+  description?: string | null;
+  type?: IssueType;
+  status?: IssueStatus;
+  priority?: IssuePriority;
+  assignee_admin_id?: string | null;
+  due_date?: string | null;
+  labels?: string | null;
+}
+
+export interface UpdateIssueDto {
+  title?: string;
+  description?: string | null;
+  type?: IssueType;
+  status?: IssueStatus;
+  priority?: IssuePriority;
+  assignee_admin_id?: string | null;
+  due_date?: string | null;
+  labels?: string | null;
+}
+
+export interface MoveIssueDto {
+  to_status: IssueStatus;
+  to_index: number;
+}

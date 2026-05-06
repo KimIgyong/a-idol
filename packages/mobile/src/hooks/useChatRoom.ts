@@ -44,7 +44,7 @@ export function useChatRoom(idolId: string | undefined, token: string | null) {
   useEffect(() => {
     if (!roomId || !token) return;
 
-    const base = (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ?? 'http://localhost:3000/api/v1';
+    const base = process.env.EXPO_PUBLIC_API_BASE_URL ?? (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ?? 'http://localhost:3000/api/v1';
     // Strip the "/api/v1" version prefix — WS uses a separate `/chat` namespace.
     const origin = base.replace(/\/1$/, '');
     const socket = io(`${origin}/chat`, {

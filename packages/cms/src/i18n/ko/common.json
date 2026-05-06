@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "A-idol CMS",
+    "subtitle": "관리자 콘솔"
+  },
+  "actions": {
+    "logout": "로그아웃",
+    "loggingOut": "로그아웃 중..."
+  },
+  "loading": "불러오는 중...",
+  "error": "오류가 발생했습니다.",
+  "language": {
+    "label": "언어"
+  }
+}

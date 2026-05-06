@@ -1,8 +1,10 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { THEME_LABEL, THEME_NAMES, fontSize, radius, spacing, type ThemeName } from '../../../src/theme/tokens';
+import { LOCALE_LABEL, SUPPORTED_LOCALES, changeLanguage, type SupportedLocale } from '../../../src/i18n/i18n';
 
 /**
  * SCR-025 — 설정 (5 테마 전환).
@@ -16,6 +18,12 @@ import { THEME_LABEL, THEME_NAMES, fontSize, radius, spacing, type ThemeName } f
 export default function SettingsScreen() {
   const router = useRouter();
   const { colors, name, setTheme } = useTheme();
+  const { t, i18n } = useTranslation('common');
+  const currentLocale: SupportedLocale = (SUPPORTED_LOCALES as readonly string[]).includes(
+    i18n.resolvedLanguage ?? '',
+  )
+    ? (i18n.resolvedLanguage as SupportedLocale)
+    : 'ko';
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.pageBg }]} edges={['top']}>
@@ -24,13 +32,49 @@ export default function SettingsScreen() {
           onPress={() => router.back()}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="뒤로 가기"
+          accessibilityLabel={t('back')}
           style={[styles.backBtn, { backgroundColor: colors.bg, borderColor: colors.borderMd }]}
         >
           <Text style={[styles.backText, { color: colors.text1 }]}>‹</Text>
         </Pressable>
-        <Text style={[styles.title, { color: colors.text1 }]}>설정</Text>
+        <Text style={[styles.title, { color: colors.text1 }]}>{t('settings.title')}</Text>
         <View style={{ width: 32 }} />
+      </View>
+
+      <View style={[styles.section, { backgroundColor: colors.bg, borderColor: colors.border }]}>
+        <Text style={[styles.sectionLabel, { color: colors.text2 }]}>{t('settings.language')}</Text>
+        <View style={styles.langList}>
+          {SUPPORTED_LOCALES.map((code) => {
+            const active = code === currentLocale;
+            return (
+              <Pressable
+                key={code}
+                onPress={() => void changeLanguage(code)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                style={({ pressed }) => [
+                  styles.langRow,
+                  {
+                    borderColor: active ? colors.accent : colors.border,
+                    backgroundColor: active ? colors.accentLt : colors.bg,
+                    opacity: pressed ? 0.85 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.langCheck, { color: active ? colors.accent : 'transparent' }]}>✓</Text>
+                <Text
+                  style={[
+                    styles.langLabel,
+                    { color: active ? colors.accent : colors.text1, fontWeight: active ? '700' : '500' },
+                  ]}
+                >
+                  {LOCALE_LABEL[code]}
+                </Text>
+                <Text style={[styles.langCode, { color: colors.text3 }]}>{code.toUpperCase()}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.bg, borderColor: colors.border }]}>
@@ -161,6 +205,21 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
+  langList: {
+    gap: spacing.sm,
+  },
+  langRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  langCheck: { fontSize: fontSize.body, width: 16, fontWeight: '700' },
+  langLabel: { flex: 1, fontSize: fontSize.body },
+  langCode: { fontSize: fontSize.caption, letterSpacing: 0.5 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',

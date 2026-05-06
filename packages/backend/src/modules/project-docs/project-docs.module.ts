@@ -8,6 +8,7 @@ import {
   ListProjectDocsUseCase,
   UpdateProjectDocUseCase,
 } from './application/project-doc.usecases';
+import { SyncProjectDocsFromRepoUseCase } from './application/sync-from-repo.usecase';
 import { PROJECT_DOC_REPOSITORY } from './application/interfaces';
 import { PrismaProjectDocRepository } from './infrastructure/prisma-project-doc.repository';
 
@@ -20,6 +21,7 @@ import { PrismaProjectDocRepository } from './infrastructure/prisma-project-doc.
     CreateProjectDocUseCase,
     UpdateProjectDocUseCase,
     DeleteProjectDocUseCase,
+    SyncProjectDocsFromRepoUseCase,
     { provide: PROJECT_DOC_REPOSITORY, useClass: PrismaProjectDocRepository },
   ],
 })

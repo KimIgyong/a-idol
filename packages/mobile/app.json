@@ -19,10 +19,12 @@
       "output": "single"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-localization"
     ],
     "experiments": {
-      "typedRoutes": false
+      "typedRoutes": false,
+      "baseUrl": "/m"
     },
     "extra": {
       "apiBaseUrl": "http://localhost:3000/api/v1"

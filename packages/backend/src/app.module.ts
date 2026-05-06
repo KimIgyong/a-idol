@@ -24,6 +24,7 @@ import { CommerceModule } from './modules/commerce/commerce.module';
 import { PhotocardModule } from './modules/photocard/photocard.module';
 import { DesignAssetsModule } from './modules/design-assets/design-assets.module';
 import { ProjectDocsModule } from './modules/project-docs/project-docs.module';
+import { IssueTrackerModule } from './modules/issue-tracker/issue-tracker.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { ProjectDocsModule } from './modules/project-docs/project-docs.module';
     CommerceModule,
     DesignAssetsModule,
     ProjectDocsModule,
+    IssueTrackerModule,
   ],
   providers: [
     // 글로벌 ThrottlerGuard — 모든 요청에 default rate-limit 적용. 라우트별

@@ -32,6 +32,8 @@ import {
   ListProjectDocsUseCase,
   UpdateProjectDocUseCase,
 } from '../application/project-doc.usecases';
+import { SyncProjectDocsFromRepoUseCase } from '../application/sync-from-repo.usecase';
+import type { ProjectDocSyncResult } from '../../../lib/project-doc-sync';
 import {
   CreateProjectDocBody,
   UpdateProjectDocBody,
@@ -56,6 +58,7 @@ export class AdminProjectDocsController {
     private readonly createUC: CreateProjectDocUseCase,
     private readonly updateUC: UpdateProjectDocUseCase,
     private readonly deleteUC: DeleteProjectDocUseCase,
+    private readonly syncUC: SyncProjectDocsFromRepoUseCase,
   ) {}
 
   @Get()
@@ -129,5 +132,23 @@ export class AdminProjectDocsController {
   @ApiOperation({ summary: '산출물 삭제 (admin only)' })
   async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
     await this.deleteUC.execute(id);
+  }
+
+  /**
+   * RPT-260506 — repo 의 docs/**.md 을 운영 DB 로 동기화.
+   * created/updated/unchanged/archived 카운트와 소요 시간을 반환.
+   * version 은 content 변경 시에만 증가, archived 은 소스 파일이 사라진 경우.
+   */
+  @Post('sync-from-repo')
+  @HttpCode(200)
+  @Roles('admin')
+  @ApiOperation({
+    summary:
+      'repo 의 docs/**.md 파일을 project_documents 테이블로 동기화 (admin only)',
+  })
+  async syncFromRepo(
+    @CurrentAdmin() admin: CurrentAdminContext,
+  ): Promise<ProjectDocSyncResult> {
+    return this.syncUC.execute(admin.id);
   }
 }

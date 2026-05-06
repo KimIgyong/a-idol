@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
   Bell,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { hasRole, useAuthStore } from '@/features/auth/auth-store';
 import { useLogout } from '@/features/auth/use-logout';
 
@@ -23,30 +25,32 @@ import { useLogout } from '@/features/auth/use-logout';
 // (RequireRole)에서도 막히지만, sidebar에서 미리 숨겨야 UX 일관성.
 type NavItem = {
   to: string;
-  label: string;
+  /** i18n key under the `nav` namespace. */
+  labelKey: string;
   icon: typeof LayoutDashboard;
   adminOnly?: boolean;
 };
 
 const NAV: readonly NavItem[] = [
-  { to: '/dashboard', label: '대시보드', icon: LayoutDashboard },
-  { to: '/idols', label: '아이돌 관리', icon: Mic2 },
-  { to: '/agencies', label: '소속사', icon: Building2 },
-  { to: '/auditions', label: '오디션', icon: Trophy },
-  { to: '/announcements', label: '자동 메시지', icon: Bell },
-  { to: '/photocards', label: '포토카드', icon: Images },
-  { to: '/commerce', label: '상품/결제', icon: ShoppingBag },
-  { to: '/design-assets', label: '디자인 자산', icon: Palette },
-  { to: '/project', label: '프로젝트 관리', icon: FolderKanban },
-  { to: '/preview', label: '앱 미리보기', icon: Smartphone },
-  { to: '/analytics', label: '분석', icon: BarChart3, adminOnly: true },
-  { to: '/operators', label: '운영자 관리', icon: ShieldCheck, adminOnly: true },
+  { to: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
+  { to: '/idols', labelKey: 'idols', icon: Mic2 },
+  { to: '/agencies', labelKey: 'agencies', icon: Building2 },
+  { to: '/auditions', labelKey: 'auditions', icon: Trophy },
+  { to: '/announcements', labelKey: 'announcements', icon: Bell },
+  { to: '/photocards', labelKey: 'photocards', icon: Images },
+  { to: '/commerce', labelKey: 'commerce', icon: ShoppingBag },
+  { to: '/design-assets', labelKey: 'designAssets', icon: Palette },
+  { to: '/project', labelKey: 'project', icon: FolderKanban },
+  { to: '/preview', labelKey: 'preview', icon: Smartphone },
+  { to: '/analytics', labelKey: 'analytics', icon: BarChart3, adminOnly: true },
+  { to: '/operators', labelKey: 'operators', icon: ShieldCheck, adminOnly: true },
 ];
 
 export function AppShell() {
   const session = useAuthStore((s) => s.session);
   const { logout, pending: logoutPending } = useLogout();
   const location = useLocation();
+  const { t } = useTranslation(['common', 'nav']);
 
   if (!session) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
@@ -58,8 +62,8 @@ export function AppShell() {
         <div className="flex items-center gap-2 px-6 py-5">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-500" />
           <div>
-            <div className="text-sm font-bold leading-none">A-idol CMS</div>
-            <div className="mt-1 text-[11px] text-slate-500">관리자 콘솔</div>
+            <div className="text-sm font-bold leading-none">{t('common:app.title')}</div>
+            <div className="mt-1 text-[11px] text-slate-500">{t('common:app.subtitle')}</div>
           </div>
         </div>
         <nav className="flex-1 px-3 py-2">
@@ -77,7 +81,7 @@ export function AppShell() {
               }
             >
               <item.icon className="h-4 w-4" />
-              {item.label}
+              {t(`nav:${item.labelKey}`)}
             </NavLink>
           ))}
         </nav>
@@ -87,6 +91,7 @@ export function AppShell() {
             <div className="truncate">{session.user.email}</div>
             <div className="mt-1 uppercase tracking-wide text-slate-400">{session.user.role}</div>
           </div>
+          <LanguageSwitcher className="mb-3" />
           <Button
             variant="outline"
             size="sm"
@@ -94,7 +99,7 @@ export function AppShell() {
             onClick={() => void logout()}
             disabled={logoutPending}
           >
-            {logoutPending ? '로그아웃 중...' : '로그아웃'}
+            {logoutPending ? t('common:actions.loggingOut') : t('common:actions.logout')}
           </Button>
         </div>
       </aside>
@@ -102,7 +107,7 @@ export function AppShell() {
         <Suspense
           fallback={
             <div className="flex h-full items-center justify-center text-sm text-slate-500">
-              불러오는 중...
+              {t('common:loading')}
             </div>
           }
         >

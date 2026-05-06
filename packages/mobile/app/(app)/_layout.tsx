@@ -1,13 +1,19 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
-  return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.6 }}>{emoji}</Text>;
+// Mobile 모든 메뉴 아이콘은 단색 외곽선만 (코드 컴벤션 §14.5).
+// Feather = lucide 의 모회사 — outline 일관성 + Expo 51 번들 포함.
+type FeatherName = React.ComponentProps<typeof Feather>['name'];
+
+function TabIcon({ name, color }: { name: FeatherName; color: string }) {
+  return <Feather name={name} size={22} color={color} />;
 }
 
 export default function AppTabsLayout() {
   const { colors } = useTheme();
+  const { t } = useTranslation('nav');
   return (
     <Tabs
       screenOptions={{
@@ -26,29 +32,29 @@ export default function AppTabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🎤" focused={focused} />,
+          title: t('home'),
+          tabBarIcon: ({ color }) => <TabIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="auditions/index"
         options={{
-          title: '오디션',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🏆" focused={focused} />,
+          title: t('auditions'),
+          tabBarIcon: ({ color }) => <TabIcon name="award" color={color} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
-          title: '상점',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🛒" focused={focused} />,
+          title: t('shop'),
+          tabBarIcon: ({ color }) => <TabIcon name="shopping-bag" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: '프로필',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="👤" focused={focused} />,
+          title: t('profile'),
+          tabBarIcon: ({ color }) => <TabIcon name="user" color={color} />,
         }}
       />
       <Tabs.Screen name="idol/[id]" options={{ href: null }} />

@@ -17,7 +17,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "seed": "ts-node --transpile-only prisma/seed.ts"
+    "seed": "ts-node --transpile-only prisma/seed.ts",
+    "sync-docs": "ts-node --transpile-only -P tsconfig.seed.json scripts/sync-docs.ts"
   },
   "dependencies": {
     "@a-idol/shared": "workspace:*",

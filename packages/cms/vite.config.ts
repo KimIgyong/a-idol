@@ -8,6 +8,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // RPT-260506 — @a-idol/shared 는 `tsc` 가 CJS 로 emit. Vite dev (esbuild)
+      // 는 CJS→ESM interop 가능하지만 production Rollup 은 named export 추출
+      // 실패 (예: ISSUE_KANBAN_COLUMNS). TS 소스로 직접 alias 해서 dev/prod
+      // 모두 동일하게 ESM 으로 소비.
+      '@a-idol/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
   server: {

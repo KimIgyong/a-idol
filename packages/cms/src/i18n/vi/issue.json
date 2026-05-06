@@ -1,0 +1,68 @@
+{
+  "title": "Vấn đề",
+  "subtitle": "Theo dõi công việc dự án (Danh sách · Kanban)",
+  "view": {
+    "list": "Danh sách",
+    "kanban": "Kanban"
+  },
+  "actions": {
+    "create": "Tạo vấn đề",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "close": "Đóng"
+  },
+  "filter": {
+    "all": "Tất cả",
+    "type": "Loại",
+    "status": "Trạng thái",
+    "priority": "Ưu tiên",
+    "assignee": "Người phụ trách",
+    "search": "Tìm theo tiêu đề / mã"
+  },
+  "field": {
+    "key": "Mã",
+    "title": "Tiêu đề",
+    "description": "Mô tả",
+    "type": "Loại",
+    "status": "Trạng thái",
+    "priority": "Ưu tiên",
+    "assignee": "Người phụ trách",
+    "reporter": "Người tạo",
+    "dueDate": "Hạn chót",
+    "labels": "Nhãn (cách bởi dấu phẩy)",
+    "createdAt": "Tạo lúc",
+    "updatedAt": "Cập nhật",
+    "unassigned": "Chưa gán"
+  },
+  "type": {
+    "TASK": "Tác vụ",
+    "BUG": "Lỗi",
+    "STORY": "Câu chuyện",
+    "RISK": "Rủi ro"
+  },
+  "status": {
+    "BACKLOG": "Tồn đọng",
+    "TODO": "Chờ làm",
+    "IN_PROGRESS": "Đang làm",
+    "REVIEW": "Đánh giá",
+    "DONE": "Xong",
+    "CANCELED": "Hủy"
+  },
+  "priority": {
+    "P0": "P0 — Khẩn",
+    "P1": "P1 — Cao",
+    "P2": "P2 — Trung bình",
+    "P3": "P3 — Thấp"
+  },
+  "empty": "Không có vấn đề.",
+  "createDialog": {
+    "title": "Tạo vấn đề"
+  },
+  "editDialog": {
+    "title": "Sửa vấn đề"
+  },
+  "deleteConfirm": "Xóa vấn đề \"{{key}}\"?",
+  "moveError": "Di chuyển thất bại: {{message}}"
+}

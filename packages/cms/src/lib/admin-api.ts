@@ -22,6 +22,14 @@ import type {
   ProjectDocDto,
   ProjectDocStatus,
   ProjectDocSummaryDto,
+  CreateIssueDto,
+  IssueDto,
+  IssuePriority,
+  IssueStatus,
+  IssueType,
+  KanbanIssuesDto,
+  MoveIssueDto,
+  UpdateIssueDto,
   PurchaseProductDto,
   RoundDto,
   UpdateDesignAssetDto,
@@ -513,4 +521,67 @@ export const adminApi = {
       method: 'DELETE',
       token: token(),
     }),
+
+  /**
+   * RPT-260506 — repo 의 docs/**.md 을 DB 로 동기화.
+   * admin role 전용. {created, updated, unchanged, archived, durationMs, scannedFiles} 반환.
+   */
+  syncProjectDocsFromRepo: () =>
+    apiFetch<{
+      created: number;
+      updated: number;
+      unchanged: number;
+      archived: number;
+      durationMs: number;
+      scannedFiles: number;
+    }>('/api/v1/admin/project-docs/sync-from-repo', {
+      method: 'POST',
+      token: token(),
+    }),
+
+  // -- Issue tracker (RPT-260506) --------------------------------------
+  listIssues: (filter?: {
+    status?: IssueStatus;
+    type?: IssueType;
+    priority?: IssuePriority;
+    assigneeAdminId?: string;
+    q?: string;
+  }) => {
+    const qs = new URLSearchParams();
+    if (filter?.status) qs.set('status', filter.status);
+    if (filter?.type) qs.set('type', filter.type);
+    if (filter?.priority) qs.set('priority', filter.priority);
+    if (filter?.assigneeAdminId) qs.set('assignee_admin_id', filter.assigneeAdminId);
+    if (filter?.q) qs.set('q', filter.q);
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return apiFetch<IssueDto[]>(`/api/v1/admin/issues${suffix}`, { token: token() });
+  },
+  getIssueBoard: (filter?: {
+    type?: IssueType;
+    priority?: IssuePriority;
+    assigneeAdminId?: string;
+    q?: string;
+  }) => {
+    const qs = new URLSearchParams();
+    if (filter?.type) qs.set('type', filter.type);
+    if (filter?.priority) qs.set('priority', filter.priority);
+    if (filter?.assigneeAdminId) qs.set('assignee_admin_id', filter.assigneeAdminId);
+    if (filter?.q) qs.set('q', filter.q);
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return apiFetch<KanbanIssuesDto>(`/api/v1/admin/issues/board${suffix}`, { token: token() });
+  },
+  getIssue: (idOrKey: string) =>
+    apiFetch<IssueDto>(`/api/v1/admin/issues/${encodeURIComponent(idOrKey)}`, { token: token() }),
+  createIssue: (body: CreateIssueDto) =>
+    apiFetch<IssueDto>('/api/v1/admin/issues', { method: 'POST', body, token: token() }),
+  updateIssue: (id: string, body: UpdateIssueDto) =>
+    apiFetch<IssueDto>(`/api/v1/admin/issues/${id}`, { method: 'PATCH', body, token: token() }),
+  moveIssue: (id: string, body: MoveIssueDto) =>
+    apiFetch<IssueDto>(`/api/v1/admin/issues/${id}/move`, {
+      method: 'PATCH',
+      body,
+      token: token(),
+    }),
+  deleteIssue: (id: string) =>
+    apiFetch<void>(`/api/v1/admin/issues/${id}`, { method: 'DELETE', token: token() }),
 };

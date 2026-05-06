@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "A-idol",
+    "tagline": "AI Idol Fandom Platform"
+  },
+  "loading": "Loading...",
+  "back": "Back",
+  "settings": {
+    "title": "Settings",
+    "language": "Language"
+  }
+}

@@ -15,9 +15,10 @@ import { QK } from '@/lib/query-keys';
  * 0 (RPT-260426-B 옵션 A).
  *
  * 알려진 제약:
- *  - Expo web dev server가 localhost:8081에 떠 있어야 iframe이 로드됨.
- *    `pnpm --filter @a-idol/mobile web`으로 별도 기동 필요. 미기동 시
- *    iframe은 connection refused 표시.
+ *  - 로컬: Expo web dev server가 localhost:8081/m 에 떠 있어야 iframe이 로드됨
+ *    (`pnpm --filter @a-idol/mobile web`). app.json experiments.baseUrl='/m'.
+ *  - 스테이징/운영: deploy.sh 가 mobile web을 빌드해 nginx /m/ 에 정적
+ *    서빙하고, CMS 빌드 시 VITE_MOBILE_PREVIEW_URL=https://<도메인>/m 주입.
  *  - 일부 RN-only 기능 (네이티브 카메라/푸시/IAP)은 Expo web에서 동작 안
  *    함. UI/UX 미리보기 용도지 기능 검증용 아님.
  *  - VITE_MOBILE_PREVIEW_URL='' 설정 시 안내만 노출 (preview 비활성).
@@ -95,7 +96,7 @@ export function PreviewPage() {
               <code className="rounded bg-white px-1.5 py-0.5">VITE_MOBILE_PREVIEW_URL</code>{' '}
               환경 변수가 설정되어 있지 않습니다. <code>.env</code>에{' '}
               <code className="rounded bg-white px-1.5 py-0.5">
-                VITE_MOBILE_PREVIEW_URL=http://localhost:8081
+                VITE_MOBILE_PREVIEW_URL=http://localhost:8081/m
               </code>{' '}
               추가 후 dev 서버 재시작.
             </p>

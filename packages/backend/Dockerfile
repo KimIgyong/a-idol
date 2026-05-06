@@ -58,6 +58,10 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 COPY --from=build /repo/packages/shared/dist packages/shared/dist
 COPY --from=build /repo/packages/backend/dist packages/backend/dist
 COPY --from=build /repo/packages/backend/prisma packages/backend/prisma
+# RPT-260506 — project-doc sync usecase reads `${PROJECT_DOCS_REPO_ROOT or cwd}/docs/**`.
+# 컨테이너 cwd 는 /app 이라 docs/ 가 같이 와야 admin sync-from-repo 가 동작.
+# read-only 사용 (admin POST 가 fs.read 만), 이미지 크기 영향 ≈ 수 MB.
+COPY docs/ docs/
 # Prisma generate output — build 가 이미 만든 .prisma/client 를 통째로 가져옴.
 # `node_modules/.prisma/client` 와 `node_modules/@prisma/client` 두 디렉토리.
 COPY --from=build /repo/node_modules/.prisma node_modules/.prisma

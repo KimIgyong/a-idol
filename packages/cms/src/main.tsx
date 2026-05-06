@@ -7,6 +7,7 @@ import { RouterProvider } from 'react-router-dom';
 import { env } from '@/env';
 import { queryClient } from '@/lib/query-client';
 import { router } from '@/app/router';
+import '@/i18n/i18n';
 import './index.css';
 
 interface BoundaryProps {
@@ -49,7 +50,7 @@ async function bootstrap() {
   const root = ReactDOM.createRoot(document.getElementById('root')!);
   root.render(
     <React.StrictMode>
-      <Boundary fallback={<div style={{ padding: 24 }}>오류가 발생했습니다.</div>}>
+      <Boundary fallback={<div style={{ padding: 24 }}>Something went wrong.</div>}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
         </QueryClientProvider>

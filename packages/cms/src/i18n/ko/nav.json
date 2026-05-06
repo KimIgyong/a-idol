@@ -1,0 +1,15 @@
+{
+  "dashboard": "대시보드",
+  "idols": "아이돌 관리",
+  "agencies": "소속사",
+  "auditions": "오디션",
+  "announcements": "자동 메시지",
+  "photocards": "포토카드",
+  "commerce": "상품/결제",
+  "designAssets": "디자인 자산",
+  "project": "프로젝트 관리",
+  "issues": "이슈",
+  "preview": "앱 미리보기",
+  "analytics": "분석",
+  "operators": "운영자 관리"
+}

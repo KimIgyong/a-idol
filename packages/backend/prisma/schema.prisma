@@ -841,3 +841,59 @@ model ProjectDocument {
   @@index([status])
   @@map("project_documents")
 }
+
+// -- Issue Tracker (RPT-260506) ----------------------------------------
+// CMS \ub0b4 \uc774\uc288 \ucd94\uc801 (\ubaa9\ub85d/\uce78\ubc18 \ubdf0). admin/operator \ub294 \uc77d\uae30+\ub4f1\ub85d/\uc218\uc815/\uc774\ub3d9,
+// viewer \ub294 \uc77d\uae30 only. AdminUser FK (assignee/reporter) \ub294 nullable \uc73c\ub85c \ub450\uc5b4
+// \uc6b4\uc601\uc790 \uc0ad\uc81c \uc2dc cascade null. UI key \ub294 'IIS-N' \uc0c1\uc774\uc801 \uc99d\uac00 (sequence).
+enum IssueType {
+  TASK
+  BUG
+  STORY
+  RISK
+}
+
+enum IssueStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+  CANCELED
+}
+
+enum IssuePriority {
+  P0
+  P1
+  P2
+  P3
+}
+
+model Issue {
+  id              String        @id @default(uuid()) @db.Uuid
+  /// 'IIS-1', 'IIS-2', ... — DB sequence `issue_key_seq` 로 발급. UNIQUE.
+  key             String        @unique @db.VarChar(20)
+  title           String        @db.VarChar(200)
+  description     String?       @db.Text
+  type            IssueType     @default(TASK)
+  status          IssueStatus   @default(BACKLOG)
+  priority        IssuePriority @default(P2)
+  /// kanban 열 내 정렬 순서 — 작은 값이 위. 같은 status 안에서만 의미 있음.
+  orderInColumn   Int           @default(0) @map("order_in_column")
+  /// 담당 운영자. 운영자 삭제 시 null.
+  assigneeAdminId String?       @map("assignee_admin_id") @db.Uuid
+  /// \ub4f1\ub85d\uc790 (\ud544\uc218). \uc6b4\uc601\uc790 \uc0ad\uc81c \uc2dc null \ud5c8\uc6a9 (\uae30\ub85d \ubcf4\uc874).
+  reporterAdminId String?       @map("reporter_admin_id") @db.Uuid
+  dueDate         DateTime?     @map("due_date") @db.Date
+  /// \ucf64\ub9c8 \uad6c\ubd84 \ud0dc\uadf8 (\uacb0\uc815: 'frontend,bug,p1' \ub4f1).
+  labels          String?       @db.VarChar(500)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([status, orderInColumn])
+  @@index([assigneeAdminId])
+  @@index([reporterAdminId])
+  @@index([type])
+  @@index([priority])
+  @@map("issues")
+}

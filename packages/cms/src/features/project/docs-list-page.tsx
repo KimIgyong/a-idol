@@ -1,8 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { RefreshCw } from 'lucide-react';
 import type { ProjectDocCategory, ProjectDocStatus } from '@a-idol/shared';
 import { adminApi } from '@/lib/admin-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { hasRole, useAuthStore } from '@/features/auth/auth-store';
 
 const CATEGORY_LABEL: Record<ProjectDocCategory, string> = {
   ADR: 'ADR',
@@ -33,10 +37,28 @@ const STATUS_BADGE: Record<ProjectDocStatus, string> = {
 export function DocsListPage() {
   const [params, setParams] = useSearchParams();
   const category = (params.get('category') as ProjectDocCategory | null) || undefined;
+  const session = useAuthStore((s) => s.session);
+  const isAdmin = hasRole(session, 'admin');
+  const queryClient = useQueryClient();
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   const docsQ = useQuery({
     queryKey: ['admin', 'project-docs', { category: category ?? null }],
     queryFn: () => adminApi.listProjectDocs({ category }),
+  });
+
+  const syncM = useMutation({
+    mutationFn: () => adminApi.syncProjectDocsFromRepo(),
+    onSuccess: (r) => {
+      setSyncMessage(
+        `동기화 완료 — 신규 ${r.created} · 갱신 ${r.updated} · 변동없음 ${r.unchanged} · 보관 ${r.archived} (${r.durationMs}ms)`,
+      );
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'project-docs'] });
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : '알 수 없는 오류';
+      setSyncMessage(`동기화 실패 — ${msg}`);
+    },
   });
 
   const docs = (docsQ.data ?? []).filter((d) => d.category !== 'DELIVERABLE');
@@ -48,6 +70,35 @@ export function DocsListPage() {
           <h1 className="text-2xl font-bold">프로젝트 문서</h1>
           <p className="text-sm text-slate-500">ADR · 설계 · 구현 · 리포트 등 마크다운 산출물</p>
         </div>
+        {isAdmin ? (
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={syncM.isPending}
+              onClick={() => {
+                if (
+                  !window.confirm(
+                    '리포지토리(docs/**.md)에서 문서를 다시 가져옵니다. 운영 DB가 갱신됩니다. 계속할까요?',
+                  )
+                ) {
+                  return;
+                }
+                setSyncMessage(null);
+                syncM.mutate();
+              }}
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${syncM.isPending ? 'animate-spin' : ''}`}
+              />
+              리포지토리에서 다시 가져오기
+            </Button>
+            {syncMessage ? (
+              <span className="text-xs text-slate-600">{syncMessage}</span>
+            ) : null}
+          </div>
+        ) : null}
       </header>
 
       <div className="flex flex-wrap gap-2">

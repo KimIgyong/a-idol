@@ -1,5 +1,10 @@
-# A-idol Staging — Single-VPS 배포 가이드
+# A-idol Staging — Single-VPS 배포 가이드 (Standalone 변형)
 
+> **이 문서는 standalone 변형 상세본입니다.** 두 변형(standalone vs shared-host)
+> 비교와 어떤 변형을 쓸지 / 공통 사전 준비 / 트러블슈팅은 상위 가이드
+> [`staging-deploy-ko.md`](./staging-deploy-ko.md) 참조. 현재 운영(2026-05-02)은
+> shared-host 변형이며, 본 문서는 단독 호스트(AWS 등)로 이전 시 사용.
+>
 > 배경: [`staging-infra-checklist-ko.md`](./staging-infra-checklist-ko.md) 의 AWS plan 은
 > 6월 후반 ETA. **2026-04-27 PO 결정** — 1차 staging 은 amoeba 사내 VPS
 > (`a-idol-stg.amoeba.site` / `125.133.49.165`) 1대로 시작. AWS 이전은 ARR / k6 50k

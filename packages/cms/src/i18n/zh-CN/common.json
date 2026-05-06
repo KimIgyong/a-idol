@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "A-idol CMS",
+    "subtitle": "管理控制台"
+  },
+  "actions": {
+    "logout": "退出登录",
+    "loggingOut": "退出中..."
+  },
+  "loading": "加载中...",
+  "error": "发生错误。",
+  "language": {
+    "label": "语言"
+  }
+}

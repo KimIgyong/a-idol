@@ -2,9 +2,11 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from '../src/auth/AuthContext';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 import { fontSize, spacing } from '../src/theme/tokens';
+import { initI18n } from '../src/i18n/i18n';
 
 /**
  * SCR-001 Splash + 인증 분기 게이트 — 와이어프레임 v2.
@@ -22,7 +24,9 @@ function Gate() {
   const { colors, name: themeName } = useTheme();
   const segments = useSegments();
   const router = useRouter();
+  const { t } = useTranslation('common');
   const [minSplashElapsed, setMinSplashElapsed] = useState(false);
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMinSplashElapsed(true), 1000);
@@ -30,16 +34,20 @@ function Gate() {
   }, []);
 
   useEffect(() => {
-    if (!ready || !minSplashElapsed) return;
+    void initI18n().then(() => setI18nReady(true));
+  }, []);
+
+  useEffect(() => {
+    if (!ready || !minSplashElapsed || !i18nReady) return;
     const inAuth = segments[0] === '(auth)';
     const onExtra = segments[1] === 'extra';
     if (!user && !inAuth) router.replace('/(auth)/login');
     // SCR-004 추가 정보(/auth/extra)는 가입 직후 signed-in 상태에서 노출되는
     // 1회성 화면 — auth group에 있어도 redirect 안 함.
     if (user && inAuth && !onExtra) router.replace('/(app)');
-  }, [ready, minSplashElapsed, user, segments, router]);
+  }, [ready, minSplashElapsed, i18nReady, user, segments, router]);
 
-  if (!ready || !minSplashElapsed) {
+  if (!ready || !minSplashElapsed || !i18nReady) {
     return (
       <View
         style={{
@@ -51,10 +59,10 @@ function Gate() {
         }}
       >
         <Text style={{ color: '#FFFFFF', fontSize: fontSize.display, fontWeight: '800', letterSpacing: -0.5 }}>
-          A-idol
+          {i18nReady ? t('app.title') : 'A-idol'}
         </Text>
         <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: fontSize.body }}>
-          AI 아이돌 팬덤 플랫폼
+          {i18nReady ? t('app.tagline') : 'AI 아이돌 팬덤 플랫폼'}
         </Text>
       </View>
     );

@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { FileText, Folder, ListTodo, ListChecks, ScrollText } from 'lucide-react';
+import { FileText, Folder, KanbanSquare, ListTodo, ListChecks, ScrollText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SUB_NAV = [
@@ -8,6 +8,7 @@ const SUB_NAV = [
   { to: '/project/deliverables', label: '산출물', icon: FileText },
   { to: '/project/wbs', label: 'WBS', icon: ListChecks },
   { to: '/project/tasks', label: '작업 태스크', icon: ListTodo },
+  { to: '/project/issues', label: '이슈', icon: KanbanSquare },
 ];
 
 export function ProjectLayout() {

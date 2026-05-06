@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "A-idol",
+    "tagline": "Nền tảng fandom thần tượng AI"
+  },
+  "loading": "Đang tải...",
+  "back": "Quay lại",
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ"
+  }
+}

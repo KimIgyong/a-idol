@@ -4,8 +4,8 @@
  * and a few supporting idols. Run with `pnpm seed`.
  */
 import 'dotenv/config';
-import { readdirSync, readFileSync, existsSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { hash } from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
@@ -386,107 +386,15 @@ async function main() {
   const totalAssets = await prisma.designAsset.count();
 
   // ---- Project Documents (ADR / 설계 / WBS / 산출물) ---------------------
-  // 기존 마크다운 파일 (docs/adr, docs/design, docs/implementation, docs/feature, docs/report)
-  // 을 ProjectDocument 로 등록한다. content 는 파일 본문, sourceType=FILE, sourcePath 보존.
-  // 재실행 시 slug 기반 upsert (idempotent + 본문은 항상 최신 파일 내용으로 갱신).
+  // RPT-260506 — FILE 기반 동기화 로직은 src/lib/project-doc-sync.ts 로 추출.
+  // INLINE placeholder (사용자가 CMS 에서 직접 작성하는 산출물 템플릿) 은
+  // 아래에서 별도로 upsert.
+  const { syncProjectDocs } = await import('../src/lib/project-doc-sync');
   const repoRoot = join(__dirname, '..', '..', '..');
-  const projectDocSeeds: Array<{
-    relPath: string;
-    category: 'ADR' | 'DESIGN' | 'IMPLEMENTATION' | 'DELIVERABLE' | 'REPORT' | 'OPS';
-    orderIndex: number;
-    tags?: string;
-  }> = [];
-
-  function pickFiles(dir: string, category: typeof projectDocSeeds[number]['category'], tags?: string) {
-    const abs = join(repoRoot, dir);
-    if (!existsSync(abs)) return;
-    const files = readdirSync(abs)
-      .filter((f) => f.endsWith('.md') && f !== 'README.md')
-      .sort();
-    files.forEach((f, idx) => {
-      projectDocSeeds.push({ relPath: join(dir, f), category, orderIndex: idx, tags });
-    });
-  }
-  pickFiles('docs/adr', 'ADR', 'architecture-decision');
-  pickFiles('docs/design', 'DESIGN', 'design');
-  pickFiles('docs/implementation', 'IMPLEMENTATION', 'wbs,plan,convention');
-  pickFiles('docs/report', 'REPORT', 'report');
-  pickFiles('docs/feature/design-asset-cms', 'DELIVERABLE', 'design-asset,t-085');
-
-  function slugify(p: string): string {
-    // 슬래시는 URL path 충돌을 일으키므로 `-` 로 치환. 결과 슬러그는 단일 path segment.
-    return p
-      .replace(/^docs\//, '')
-      .replace(/\.md$/, '')
-      .toLowerCase()
-      .replace(/[/_]+/g, '-')
-      .replace(/[^a-z0-9-]+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-  function extractTitle(content: string, fallback: string): string {
-    // 1) YAML frontmatter `title: ...` (ADR 양식)
-    const fm = content.match(/^---\s*\n([\s\S]*?)\n---/);
-    if (fm) {
-      const t = fm[1].match(/^title:\s*(.+?)\s*$/m);
-      if (t) return t[1].replace(/^["']|["']$/g, '').slice(0, 200);
-    }
-    // 2) 첫 H1 / H2
-    const h1 = content.match(/^#\s+(.+)$/m);
-    if (h1) return h1[1].trim().slice(0, 200);
-    const h2 = content.match(/^##\s+(.+)$/m);
-    if (h2) return h2[1].trim().slice(0, 200);
-    // 3) 파일명 fallback
-    return fallback.replace(/^docs\//, '').replace(/\.md$/, '').slice(0, 200);
-  }
-  function extractSummary(content: string): string | null {
-    const lines = content.split('\n').slice(0, 60);
-    for (const l of lines) {
-      const trimmed = l.trim();
-      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('|') || trimmed.startsWith('-')) continue;
-      return trimmed.slice(0, 500);
-    }
-    return null;
-  }
-
-  for (const ds of projectDocSeeds) {
-    const abs = join(repoRoot, ds.relPath);
-    const content = readFileSync(abs, 'utf-8');
-    const slug = slugify(ds.relPath);
-    const title = extractTitle(content, ds.relPath);
-    const summary = extractSummary(content);
-    const id = stableUuidFor(`project-doc-${slug}`);
-    await prisma.projectDocument.upsert({
-      where: { slug },
-      update: {
-        title,
-        category: ds.category,
-        sourcePath: ds.relPath,
-        sourceType: 'FILE',
-        summary,
-        content,
-        tags: ds.tags ?? null,
-        orderIndex: ds.orderIndex,
-        updatedBy: adminId,
-      },
-      create: {
-        id,
-        slug,
-        title,
-        category: ds.category,
-        status: 'APPROVED',
-        sourceType: 'FILE',
-        sourcePath: ds.relPath,
-        summary,
-        content,
-        tags: ds.tags ?? null,
-        orderIndex: ds.orderIndex,
-        version: 1,
-        createdBy: adminId,
-        updatedBy: adminId,
-      },
-    });
-  }
+  const docSyncResult = await syncProjectDocs({ prisma, repoRoot, adminId });
+  console.log(
+    `   📄 project-docs sync — created=${docSyncResult.created} updated=${docSyncResult.updated} unchanged=${docSyncResult.unchanged} archived=${docSyncResult.archived} (${docSyncResult.durationMs}ms)`,
+  );
 
   // INLINE 산출물 placeholder — 사용자가 CMS 에서 직접 작성 가능.
   // 이미 같은 slug 의 FILE 산출물이 있으면 skip (충돌 방지).

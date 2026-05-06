@@ -1,0 +1,68 @@
+{
+  "title": "议题",
+  "subtitle": "项目任务追踪（列表 · 看板）",
+  "view": {
+    "list": "列表",
+    "kanban": "看板"
+  },
+  "actions": {
+    "create": "新建议题",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭"
+  },
+  "filter": {
+    "all": "全部",
+    "type": "类型",
+    "status": "状态",
+    "priority": "优先级",
+    "assignee": "负责人",
+    "search": "搜索标题 / 编号"
+  },
+  "field": {
+    "key": "编号",
+    "title": "标题",
+    "description": "描述",
+    "type": "类型",
+    "status": "状态",
+    "priority": "优先级",
+    "assignee": "负责人",
+    "reporter": "创建者",
+    "dueDate": "截止日期",
+    "labels": "标签（逗号分隔）",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间",
+    "unassigned": "未分配"
+  },
+  "type": {
+    "TASK": "任务",
+    "BUG": "缺陷",
+    "STORY": "故事",
+    "RISK": "风险"
+  },
+  "status": {
+    "BACKLOG": "待办池",
+    "TODO": "待处理",
+    "IN_PROGRESS": "进行中",
+    "REVIEW": "评审",
+    "DONE": "完成",
+    "CANCELED": "取消"
+  },
+  "priority": {
+    "P0": "P0 — 致命",
+    "P1": "P1 — 高",
+    "P2": "P2 — 中",
+    "P3": "P3 — 低"
+  },
+  "empty": "暂无议题。",
+  "createDialog": {
+    "title": "新建议题"
+  },
+  "editDialog": {
+    "title": "编辑议题"
+  },
+  "deleteConfirm": "删除议题 \"{{key}}\"？",
+  "moveError": "移动失败：{{message}}"
+}

@@ -32,6 +32,10 @@ import type {
 } from '@a-idol/shared';
 
 const apiBaseUrl =
+  // EXPO_PUBLIC_* env vars are inlined by Metro at build time. Set this in
+  // CI / staging build (e.g. EXPO_PUBLIC_API_BASE_URL=https://a-idol-stg.amoeba.site/api/v1)
+  // so the same Expo web bundle can target the staging backend.
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
   (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ??
   'http://localhost:3000/api/v1';
 

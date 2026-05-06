@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "A-idol",
+    "tagline": "AI 偶像粉丝平台"
+  },
+  "loading": "加载中...",
+  "back": "返回",
+  "settings": {
+    "title": "设置",
+    "language": "语言"
+  }
+}

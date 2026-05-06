@@ -1,0 +1,15 @@
+{
+  "app": {
+    "title": "A-idol CMS",
+    "subtitle": "Admin Console"
+  },
+  "actions": {
+    "logout": "Sign out",
+    "loggingOut": "Signing out..."
+  },
+  "loading": "Loading...",
+  "error": "Something went wrong.",
+  "language": {
+    "label": "Language"
+  }
+}

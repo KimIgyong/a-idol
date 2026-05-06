@@ -1,0 +1,68 @@
+{
+  "title": "Issues",
+  "subtitle": "Project task tracker (List · Kanban)",
+  "view": {
+    "list": "List",
+    "kanban": "Kanban"
+  },
+  "actions": {
+    "create": "New issue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  },
+  "filter": {
+    "all": "All",
+    "type": "Type",
+    "status": "Status",
+    "priority": "Priority",
+    "assignee": "Assignee",
+    "search": "Search title / key"
+  },
+  "field": {
+    "key": "Key",
+    "title": "Title",
+    "description": "Description",
+    "type": "Type",
+    "status": "Status",
+    "priority": "Priority",
+    "assignee": "Assignee",
+    "reporter": "Reporter",
+    "dueDate": "Due date",
+    "labels": "Labels (comma-separated)",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "unassigned": "Unassigned"
+  },
+  "type": {
+    "TASK": "Task",
+    "BUG": "Bug",
+    "STORY": "Story",
+    "RISK": "Risk"
+  },
+  "status": {
+    "BACKLOG": "Backlog",
+    "TODO": "To do",
+    "IN_PROGRESS": "In progress",
+    "REVIEW": "Review",
+    "DONE": "Done",
+    "CANCELED": "Canceled"
+  },
+  "priority": {
+    "P0": "P0 — Critical",
+    "P1": "P1 — High",
+    "P2": "P2 — Normal",
+    "P3": "P3 — Low"
+  },
+  "empty": "No issues.",
+  "createDialog": {
+    "title": "Create issue"
+  },
+  "editDialog": {
+    "title": "Edit issue"
+  },
+  "deleteConfirm": "Delete issue \"{{key}}\"?",
+  "moveError": "Move failed: {{message}}"
+}
