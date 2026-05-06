@@ -104,12 +104,16 @@ export class AppExceptionFilter implements ExceptionFilter {
       case ErrorCodes.ROUND_INVALID_TRANSITION:
       case ErrorCodes.AUDITION_MUST_BE_DRAFT:
       case ErrorCodes.AUDITION_NOT_ACTIVE:
+      case ErrorCodes.ADMIN_EMAIL_DUPLICATE:
+      case ErrorCodes.ADMIN_LIMIT_EXCEEDED:
+      case ErrorCodes.ADMIN_LAST_ADMIN_DEMOTION:
         return HttpStatus.CONFLICT;
       case ErrorCodes.UNDER_AGE:
       case ErrorCodes.BREACHED_PASSWORD:
       case ErrorCodes.CHAT_MESSAGE_TOO_LONG:
       case ErrorCodes.AUDITION_INVALID_DATE_RANGE:
       case ErrorCodes.VOTE_RULE_INVALID_WEIGHTS:
+      case ErrorCodes.ISSUE_INVALID_DATE_RANGE:
         return HttpStatus.UNPROCESSABLE_ENTITY;
       case ErrorCodes.INVALID_RECEIPT:
         // IAP receipt verification failure — caller sent a malformed /
@@ -124,6 +128,8 @@ export class AppExceptionFilter implements ExceptionFilter {
       case ErrorCodes.VOTE_METHOD_NOT_ALLOWED:
       case ErrorCodes.IDOL_NOT_IN_AUDITION:
       case ErrorCodes.IDOL_ELIMINATED:
+      case ErrorCodes.ADMIN_SELF_MODIFICATION_FORBIDDEN:
+      case ErrorCodes.NOTE_FORBIDDEN:
         return HttpStatus.FORBIDDEN;
       case ErrorCodes.VOTE_DAILY_LIMIT_EXCEEDED:
         return HttpStatus.TOO_MANY_REQUESTS;
@@ -131,6 +137,10 @@ export class AppExceptionFilter implements ExceptionFilter {
         // 423 Locked — RFC 4918. NestJS HttpStatus enum 미정의 라 숫자 직접.
         // Retry-After 헤더는 별도 슬라이스에서 보강.
         return 423;
+      case ErrorCodes.ATTACHMENT_TOO_LARGE:
+        return HttpStatus.PAYLOAD_TOO_LARGE;
+      case ErrorCodes.ATTACHMENT_MIME_NOT_ALLOWED:
+        return HttpStatus.UNSUPPORTED_MEDIA_TYPE;
       case ErrorCodes.IDOL_NOT_FOUND:
       case ErrorCodes.AGENCY_NOT_FOUND:
       case ErrorCodes.FAN_CLUB_NOT_FOUND:
@@ -145,6 +155,9 @@ export class AppExceptionFilter implements ExceptionFilter {
       case ErrorCodes.PHOTOCARD_SET_EMPTY:
       case ErrorCodes.PRODUCT_NOT_FOUND:
       case ErrorCodes.TRANSACTION_NOT_FOUND:
+      case ErrorCodes.ADMIN_NOT_FOUND:
+      case ErrorCodes.ATTACHMENT_NOT_FOUND:
+      case ErrorCodes.NOTE_NOT_FOUND:
         return HttpStatus.NOT_FOUND;
       case ErrorCodes.AUTO_MESSAGE_PAST_SCHEDULE:
         return HttpStatus.UNPROCESSABLE_ENTITY;

@@ -30,6 +30,7 @@
     "priority": "Priority",
     "assignee": "Assignee",
     "reporter": "Reporter",
+    "startAt": "Start date",
     "dueDate": "Due date",
     "labels": "Labels (comma-separated)",
     "createdAt": "Created",

@@ -30,6 +30,11 @@ import { Label } from '@/components/ui/label';
 import { Modal } from '@/components/ui/modal';
 import { hasRole, useAuthStore } from '@/features/auth/auth-store';
 import { cn } from '@/lib/utils';
+import {
+  RichEditor,
+  RichHtmlView,
+  type AttachmentRef,
+} from '@/shared/rich-editor/rich-editor';
 
 type ViewMode = 'list' | 'kanban';
 const VIEW_KEY = 'a-idol.cms.issues.view';
@@ -281,6 +286,8 @@ function IssuesListView({
             <th className="px-3 py-2 text-left">{t('field.status')}</th>
             <th className="px-3 py-2 text-left">{t('field.priority')}</th>
             <th className="px-3 py-2 text-left">{t('field.assignee')}</th>
+            <th className="px-3 py-2 text-left">{t('field.reporter')}</th>
+            <th className="px-3 py-2 text-left">{t('field.startAt')}</th>
             <th className="px-3 py-2 text-left">{t('field.dueDate')}</th>
           </tr>
         </thead>
@@ -307,6 +314,10 @@ function IssuesListView({
               <td className="px-3 py-2 text-xs text-slate-600">
                 {r.assigneeName ?? <span className="text-slate-400">{t('field.unassigned')}</span>}
               </td>
+              <td className="px-3 py-2 text-xs text-slate-600">
+                {r.reporterName ?? <span className="text-slate-400">—</span>}
+              </td>
+              <td className="px-3 py-2 text-xs text-slate-600">{r.startAt ?? '—'}</td>
               <td className="px-3 py-2 text-xs text-slate-600">{r.dueDate ?? '—'}</td>
             </tr>
           ))}
@@ -476,7 +487,13 @@ function KanbanColumn({
                 <span className={cn('rounded px-1.5 py-0.5', typeBadge[issue.type])}>
                   {typeLabelOf(issue.type)}
                 </span>
-                <span className="text-slate-500">{issue.assigneeName ?? '—'}</span>
+                <span className="text-slate-500">👤 {issue.assigneeName ?? '—'}</span>
+              </div>
+              <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+                <span className="truncate">✍ {issue.reporterName ?? '—'}</span>
+                {issue.startAt || issue.dueDate ? (
+                  <span className="shrink-0">📅 {issue.startAt ?? '?'} → {issue.dueDate ?? '?'}</span>
+                ) : null}
               </div>
             </button>
           </div>
@@ -572,6 +589,8 @@ function IssueDetailDrawer({
           <dd>{issue.assigneeName ?? t('field.unassigned')}</dd>
           <dt className="text-slate-500">{t('field.reporter')}</dt>
           <dd>{issue.reporterName ?? '—'}</dd>
+          <dt className="text-slate-500">{t('field.startAt')}</dt>
+          <dd>{issue.startAt ?? '—'}</dd>
           <dt className="text-slate-500">{t('field.dueDate')}</dt>
           <dd>{issue.dueDate ?? '—'}</dd>
           <dt className="text-slate-500">{t('field.labels')}</dt>
@@ -581,8 +600,8 @@ function IssueDetailDrawer({
           <dt className="text-slate-500">{t('field.updatedAt')}</dt>
           <dd className="text-xs text-slate-500">{issue.updatedAt}</dd>
           <dt className="col-span-2 mt-3 text-slate-500">{t('field.description')}</dt>
-          <dd className="col-span-2 whitespace-pre-wrap rounded border border-slate-100 bg-slate-50 p-3 text-sm">
-            {issue.description ?? '—'}
+          <dd className="col-span-2 rounded border border-slate-100 bg-slate-50 p-3 text-sm">
+            {issue.description ? <RichHtmlView html={issue.description} /> : '—'}
           </dd>
         </dl>
       ) : null}
@@ -608,8 +627,21 @@ function IssueFormDialog({
   const [type, setType] = useState<IssueType>(initial?.type ?? 'TASK');
   const [status, setStatus] = useState<IssueStatus>(initial?.status ?? 'BACKLOG');
   const [priority, setPriority] = useState<IssuePriority>(initial?.priority ?? 'P2');
+  const [startAt, setStartAt] = useState(initial?.startAt ?? '');
   const [dueDate, setDueDate] = useState(initial?.dueDate ?? '');
   const [labels, setLabels] = useState(initial?.labels ?? '');
+  const [attachments, setAttachments] = useState<AttachmentRef[]>([]);
+
+  const handleUpload = async (file: File): Promise<AttachmentRef> => {
+    const r = await adminApi.uploadAttachment(file, initial ? 'ISSUE' : 'DRAFT', initial?.id);
+    return {
+      id: r.id,
+      filename: r.filename,
+      mimeType: r.mimeType,
+      sizeBytes: r.sizeBytes,
+      url: r.url,
+    };
+  };
 
   const createM = useMutation({
     mutationFn: (body: CreateIssueDto) => adminApi.createIssue(body),
@@ -634,8 +666,10 @@ function IssueFormDialog({
       type,
       status,
       priority,
+      start_at: startAt || null,
       due_date: dueDate || null,
       labels: labels || null,
+      attachment_ids: attachments.length ? attachments.map((a) => a.id) : undefined,
     };
     if (mode === 'create') {
       createM.mutate(body as CreateIssueDto);
@@ -715,7 +749,15 @@ function IssueFormDialog({
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label>{t('field.startAt')}</Label>
+            <Input
+              type="date"
+              value={startAt}
+              onChange={(e) => setStartAt(e.target.value)}
+            />
+          </div>
           <div className="space-y-1">
             <Label>{t('field.dueDate')}</Label>
             <Input
@@ -729,13 +771,20 @@ function IssueFormDialog({
             <Input value={labels} onChange={(e) => setLabels(e.target.value)} placeholder="bug,urgent" />
           </div>
         </div>
+        {initial ? (
+          <div className="rounded border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            ✍ {t('field.reporter')}: <strong>{initial.reporterName ?? '—'}</strong>
+            <span className="ml-3">📅 {t('field.createdAt')}: {initial.createdAt}</span>
+          </div>
+        ) : null}
         <div className="space-y-1">
           <Label>{t('field.description')}</Label>
-          <textarea
+          <RichEditor
             value={description ?? ''}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={6}
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            onChange={(html) => setDescription(html)}
+            onUploadFile={handleUpload}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
           />
         </div>
         {error ? <p className="text-sm text-red-600">{error.message}</p> : null}

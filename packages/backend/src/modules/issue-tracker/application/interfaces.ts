@@ -21,8 +21,10 @@ export interface CreateIssueInput {
   priority?: IssuePriority;
   assigneeAdminId?: string | null;
   reporterAdminId: string;
+  startAt?: string | null;
   dueDate?: string | null;
   labels?: string | null;
+  attachmentIds?: string[];
 }
 
 export interface UpdateIssueInput {
@@ -32,8 +34,10 @@ export interface UpdateIssueInput {
   status?: IssueStatus;
   priority?: IssuePriority;
   assigneeAdminId?: string | null;
+  startAt?: string | null;
   dueDate?: string | null;
   labels?: string | null;
+  attachmentIds?: string[];
 }
 
 export interface MoveIssueInput {

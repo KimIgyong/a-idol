@@ -11,6 +11,11 @@ import { UnlockAccountUseCase } from './application/unlock-account.usecase';
 import { GetAdminAnalyticsOverviewUseCase } from './application/get-analytics-overview.usecase';
 import { ListOperatorsUseCase } from './application/list-operators.usecase';
 import {
+  CreateAdminOperatorUseCase,
+  CreateAdminOperatorService,
+} from './application/create-admin-operator.usecase';
+import { UpdateAdminRoleUseCase } from './application/update-admin-role.usecase';
+import {
   ADMIN_AUTH_SESSION_REPOSITORY,
   ADMIN_TOKEN_SERVICE,
   ADMIN_USER_REPOSITORY,
@@ -38,6 +43,9 @@ import { AdminOperatorsController } from './presentation/admin-operators.control
     UnlockAccountUseCase,
     GetAdminAnalyticsOverviewUseCase,
     ListOperatorsUseCase,
+    CreateAdminOperatorUseCase,
+    CreateAdminOperatorService,
+    UpdateAdminRoleUseCase,
     { provide: ADMIN_USER_REPOSITORY, useClass: PrismaAdminUserRepository },
     { provide: ADMIN_AUTH_SESSION_REPOSITORY, useClass: PrismaAdminAuthSessionRepository },
     { provide: ADMIN_TOKEN_SERVICE, useClass: AdminJwtTokenService },

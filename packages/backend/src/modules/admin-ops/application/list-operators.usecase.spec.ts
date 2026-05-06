@@ -23,6 +23,9 @@ describe('ListOperatorsUseCase', () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       touchLastLogin: jest.fn(),
+      create: jest.fn(),
+      updateRole: jest.fn(),
+      countByRole: jest.fn(),
       listAll: jest.fn(async () => [
         makeAdmin('admin-1', 'admin'),
         makeAdmin('op-1', 'operator'),
@@ -41,6 +44,9 @@ describe('ListOperatorsUseCase', () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       touchLastLogin: jest.fn(),
+      create: jest.fn(),
+      updateRole: jest.fn(),
+      countByRole: jest.fn(),
       listAll: jest.fn(async () => []),
     };
     const uc = new ListOperatorsUseCase(repo);

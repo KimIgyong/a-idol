@@ -14,6 +14,7 @@ export interface IssueRecord {
   orderInColumn: number;
   assigneeAdminId: string | null;
   reporterAdminId: string | null;
+  startAt: Date | null;
   dueDate: Date | null;
   labels: string | null;
   createdAt: Date;

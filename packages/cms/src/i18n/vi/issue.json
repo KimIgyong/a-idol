@@ -30,6 +30,7 @@
     "priority": "Ưu tiên",
     "assignee": "Người phụ trách",
     "reporter": "Người tạo",
+    "startAt": "Ngày bắt đầu",
     "dueDate": "Hạn chót",
     "labels": "Nhãn (cách bởi dấu phẩy)",
     "createdAt": "Tạo lúc",

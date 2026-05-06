@@ -25,6 +25,9 @@ describe('GetAdminMeUseCase', () => {
       findById: jest.fn(async () => admin),
       touchLastLogin: jest.fn(),
       listAll: jest.fn(),
+      create: jest.fn(),
+      updateRole: jest.fn(),
+      countByRole: jest.fn(),
     };
     const uc = new GetAdminMeUseCase(repo);
     const out = await uc.execute('admin-1');
@@ -37,6 +40,9 @@ describe('GetAdminMeUseCase', () => {
       findById: jest.fn(async () => null),
       touchLastLogin: jest.fn(),
       listAll: jest.fn(),
+      create: jest.fn(),
+      updateRole: jest.fn(),
+      countByRole: jest.fn(),
     };
     const uc = new GetAdminMeUseCase(repo);
     await expect(uc.execute('missing')).rejects.toMatchObject({ code: 'SESSION_NOT_FOUND' });

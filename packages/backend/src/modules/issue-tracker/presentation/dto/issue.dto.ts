@@ -3,6 +3,8 @@
  * ADR-023: Request 는 snake_case, Response 는 camelCase.
  */
 import {
+  ArrayMaxSize,
+  IsArray,
   IsDateString,
   IsEnum,
   IsInt,
@@ -49,10 +51,16 @@ export class CreateIssueBody {
   assignee_admin_id?: string | null;
 
   @IsOptional() @IsDateString()
+  start_at?: string | null;
+
+  @IsOptional() @IsDateString()
   due_date?: string | null;
 
   @IsOptional() @IsString() @MaxLength(500)
   labels?: string | null;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(20) @IsUUID('4', { each: true })
+  attachment_ids?: string[];
 }
 
 export class UpdateIssueBody {
@@ -75,10 +83,16 @@ export class UpdateIssueBody {
   assignee_admin_id?: string | null;
 
   @IsOptional() @IsDateString()
+  start_at?: string | null;
+
+  @IsOptional() @IsDateString()
   due_date?: string | null;
 
   @IsOptional() @IsString() @MaxLength(500)
   labels?: string | null;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(20) @IsUUID('4', { each: true })
+  attachment_ids?: string[];
 }
 
 export class MoveIssueBody {
@@ -103,6 +117,7 @@ export function toIssueDto(r: IssueWithReporters): IssueDto {
     assigneeName: r.assigneeName,
     reporterAdminId: r.reporterAdminId,
     reporterName: r.reporterName,
+    startAt: r.startAt ? r.startAt.toISOString().slice(0, 10) : null,
     dueDate: r.dueDate ? r.dueDate.toISOString().slice(0, 10) : null,
     labels: r.labels,
     createdAt: r.createdAt.toISOString(),

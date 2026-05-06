@@ -25,6 +25,8 @@ import { PhotocardModule } from './modules/photocard/photocard.module';
 import { DesignAssetsModule } from './modules/design-assets/design-assets.module';
 import { ProjectDocsModule } from './modules/project-docs/project-docs.module';
 import { IssueTrackerModule } from './modules/issue-tracker/issue-tracker.module';
+import { MediaModule } from './modules/media/media.module';
+import { ProjectNotesModule } from './modules/project-notes/project-notes.module';
 
 @Module({
   imports: [
@@ -106,6 +108,8 @@ import { IssueTrackerModule } from './modules/issue-tracker/issue-tracker.module
     DesignAssetsModule,
     ProjectDocsModule,
     IssueTrackerModule,
+    MediaModule,
+    ProjectNotesModule,
   ],
   providers: [
     // 글로벌 ThrottlerGuard — 모든 요청에 default rate-limit 적용. 라우트별

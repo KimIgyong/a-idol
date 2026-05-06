@@ -1,0 +1,44 @@
+{
+  "title": "笔记",
+  "subtitle": "项目资料 / 会议记录 / 决策（独立于 issue）",
+  "actions": {
+    "create": "新建笔记",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "pin": "置顶",
+    "unpin": "取消置顶"
+  },
+  "filter": {
+    "all_categories": "全部分类",
+    "search": "搜索标题/正文",
+    "pinned_only": "📌 仅置顶"
+  },
+  "field": {
+    "title": "标题",
+    "category": "分类",
+    "pinned": "置顶",
+    "body": "正文"
+  },
+  "category": {
+    "NOTE": "笔记",
+    "MEETING": "会议",
+    "DECISION": "决策",
+    "LINK": "链接",
+    "OTHER": "其他"
+  },
+  "section": {
+    "pinned": "已置顶",
+    "all": "全部"
+  },
+  "createDialog": {
+    "title": "创建笔记"
+  },
+  "editDialog": {
+    "title": "编辑笔记"
+  },
+  "empty": "暂无笔记。",
+  "deleteConfirm": "删除笔记 \"{{title}}\"?"
+}

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AdminOpsModule } from '../admin-ops/admin-ops.module';
+import { MediaModule } from '../media/media.module';
 import {
   CreateIssueUseCase,
   DeleteIssueUseCase,
@@ -13,7 +14,7 @@ import { PrismaIssueRepository } from './infrastructure/prisma-issue.repository'
 import { AdminIssuesController } from './presentation/admin-issues.controller';
 
 @Module({
-  imports: [AdminOpsModule],
+  imports: [AdminOpsModule, MediaModule],
   controllers: [AdminIssuesController],
   providers: [
     ListIssuesUseCase,

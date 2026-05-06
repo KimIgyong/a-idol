@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { IsStrongPassword } from './password.validator';
+import { IsStrongPassword } from '../../../../shared/validators/strong-password.validator';
 
 export class SignupDto {
   @ApiProperty({ example: 'demo@a-idol.dev' })

@@ -1,0 +1,44 @@
+{
+  "title": "노트",
+  "subtitle": "프로젝트 자료/회의록/결정사항 보관 (이슈와 별개)",
+  "actions": {
+    "create": "새 노트",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "close": "닫기",
+    "pin": "상단 고정",
+    "unpin": "고정 해제"
+  },
+  "filter": {
+    "all_categories": "전체 카테고리",
+    "search": "제목/본문 검색",
+    "pinned_only": "📌 핀만 보기"
+  },
+  "field": {
+    "title": "제목",
+    "category": "카테고리",
+    "pinned": "상단 고정",
+    "body": "본문"
+  },
+  "category": {
+    "NOTE": "메모",
+    "MEETING": "회의록",
+    "DECISION": "결정사항",
+    "LINK": "외부 링크",
+    "OTHER": "기타"
+  },
+  "section": {
+    "pinned": "상단 고정",
+    "all": "전체"
+  },
+  "createDialog": {
+    "title": "새 노트 작성"
+  },
+  "editDialog": {
+    "title": "노트 수정"
+  },
+  "empty": "노트가 없습니다.",
+  "deleteConfirm": "노트 \"{{title}}\"를 삭제하시겠습니까?"
+}

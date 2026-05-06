@@ -71,6 +71,9 @@ describe('RefreshAdminTokenUseCase', () => {
       ),
       touchLastLogin: jest.fn(),
       listAll: jest.fn(),
+      create: jest.fn(),
+      updateRole: jest.fn(),
+      countByRole: jest.fn(),
     };
     return { tokens, sessions, repo, revokedIds, rotated };
   };

@@ -29,6 +29,38 @@ export class PrismaAdminUserRepository implements AdminUserRepository {
     return rows.map((r) => this.toDomain(r));
   }
 
+  async create(input: {
+    email: string;
+    passwordHash: string;
+    displayName: string;
+    role: AdminRole;
+  }): Promise<AdminUser> {
+    const row = await this.prisma.adminUser.create({
+      data: {
+        email: input.email,
+        passwordHash: input.passwordHash,
+        displayName: input.displayName,
+        role: input.role,
+      },
+    });
+    return this.toDomain(row);
+  }
+
+  async updateRole(id: string, role: AdminRole): Promise<AdminUser | null> {
+    try {
+      const row = await this.prisma.adminUser.update({ where: { id }, data: { role } });
+      return this.toDomain(row);
+    } catch (err) {
+      // P2025 — record not found
+      if ((err as { code?: string }).code === 'P2025') return null;
+      throw err;
+    }
+  }
+
+  async countByRole(role: AdminRole): Promise<number> {
+    return this.prisma.adminUser.count({ where: { role } });
+  }
+
   private toDomain(row: {
     id: string;
     email: string;

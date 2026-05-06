@@ -1,0 +1,44 @@
+{
+  "title": "Ghi chú",
+  "subtitle": "Tài liệu / biên bản họp / quyết định của dự án (tách biệt với issue)",
+  "actions": {
+    "create": "Ghi chú mới",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "close": "Đóng",
+    "pin": "Ghim",
+    "unpin": "Bỏ ghim"
+  },
+  "filter": {
+    "all_categories": "Tất cả danh mục",
+    "search": "Tìm tiêu đề / nội dung",
+    "pinned_only": "📌 Chỉ ghim"
+  },
+  "field": {
+    "title": "Tiêu đề",
+    "category": "Danh mục",
+    "pinned": "Ghim",
+    "body": "Nội dung"
+  },
+  "category": {
+    "NOTE": "Ghi chú",
+    "MEETING": "Họp",
+    "DECISION": "Quyết định",
+    "LINK": "Liên kết",
+    "OTHER": "Khác"
+  },
+  "section": {
+    "pinned": "Đã ghim",
+    "all": "Tất cả"
+  },
+  "createDialog": {
+    "title": "Tạo ghi chú"
+  },
+  "editDialog": {
+    "title": "Sửa ghi chú"
+  },
+  "empty": "Không có ghi chú.",
+  "deleteConfirm": "Xóa ghi chú \"{{title}}\"?"
+}

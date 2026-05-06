@@ -116,8 +116,10 @@ export class AdminIssuesController {
       priority: body.priority,
       assigneeAdminId: body.assignee_admin_id,
       reporterAdminId: admin.id,
+      startAt: body.start_at,
       dueDate: body.due_date,
       labels: body.labels,
+      attachmentIds: body.attachment_ids,
     });
     return toIssueDto(r);
   }
@@ -136,8 +138,10 @@ export class AdminIssuesController {
       status: body.status,
       priority: body.priority,
       assigneeAdminId: body.assignee_admin_id,
+      startAt: body.start_at,
       dueDate: body.due_date,
       labels: body.labels,
+      attachmentIds: body.attachment_ids,
     });
     return toIssueDto(r);
   }

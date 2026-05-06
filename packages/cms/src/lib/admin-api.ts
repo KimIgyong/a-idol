@@ -36,7 +36,7 @@ import type {
   UpdateProjectDocDto,
   VoteRuleDto,
 } from '@a-idol/shared';
-import { apiFetch } from './api';
+import { apiFetch, apiUpload } from './api';
 import { useAuthStore } from '@/features/auth/auth-store';
 
 function token(): string {
@@ -584,4 +584,91 @@ export const adminApi = {
     }),
   deleteIssue: (id: string) =>
     apiFetch<void>(`/api/v1/admin/issues/${id}`, { method: 'DELETE', token: token() }),
+
+  // -- attachments (REQ-260507 P3) ----------------------------------------
+  uploadAttachment: (
+    file: File,
+    ownerType: 'ISSUE' | 'NOTE' | 'DOC' | 'DRAFT',
+    ownerId?: string,
+  ) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('owner_type', ownerType);
+    if (ownerId) fd.append('owner_id', ownerId);
+    return apiUpload<{
+      id: string;
+      ownerType: string;
+      ownerId: string | null;
+      filename: string;
+      mimeType: string;
+      sizeBytes: number;
+      url: string;
+      createdAt: string;
+    }>('/api/v1/admin/attachments', fd, { token: token() });
+  },
+  deleteAttachment: (id: string) =>
+    apiFetch<void>(`/api/v1/admin/attachments/${id}`, { method: 'DELETE', token: token() }),
+
+  // -- project notes (REQ-260507 P4) --------------------------------------
+  listProjectNotes: (filter?: {
+    category?: 'NOTE' | 'MEETING' | 'DECISION' | 'LINK' | 'OTHER';
+    pinnedOnly?: boolean;
+    q?: string;
+  }) => {
+    const qs = new URLSearchParams();
+    if (filter?.category) qs.set('category', filter.category);
+    if (filter?.pinnedOnly) qs.set('pinned_only', '1');
+    if (filter?.q) qs.set('q', filter.q);
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return apiFetch<ProjectNoteDto[]>(`/api/v1/admin/project-notes${suffix}`, { token: token() });
+  },
+  getProjectNote: (id: string) =>
+    apiFetch<ProjectNoteDto>(`/api/v1/admin/project-notes/${id}`, { token: token() }),
+  createProjectNote: (body: {
+    title: string;
+    body: string;
+    category?: 'NOTE' | 'MEETING' | 'DECISION' | 'LINK' | 'OTHER';
+    pinned?: boolean;
+    attachment_ids?: string[];
+  }) =>
+    apiFetch<ProjectNoteDto>('/api/v1/admin/project-notes', {
+      method: 'POST',
+      body,
+      token: token(),
+    }),
+  updateProjectNote: (
+    id: string,
+    body: {
+      title?: string;
+      body?: string;
+      category?: 'NOTE' | 'MEETING' | 'DECISION' | 'LINK' | 'OTHER';
+      pinned?: boolean;
+      attachment_ids?: string[];
+    },
+  ) =>
+    apiFetch<ProjectNoteDto>(`/api/v1/admin/project-notes/${id}`, {
+      method: 'PATCH',
+      body,
+      token: token(),
+    }),
+  togglePinProjectNote: (id: string, pinned: boolean) =>
+    apiFetch<ProjectNoteDto>(`/api/v1/admin/project-notes/${id}/pin`, {
+      method: 'PATCH',
+      body: { pinned },
+      token: token(),
+    }),
+  deleteProjectNote: (id: string) =>
+    apiFetch<void>(`/api/v1/admin/project-notes/${id}`, { method: 'DELETE', token: token() }),
 };
+
+export interface ProjectNoteDto {
+  id: string;
+  title: string;
+  body: string;
+  category: 'NOTE' | 'MEETING' | 'DECISION' | 'LINK' | 'OTHER';
+  pinned: boolean;
+  authorAdminId: string;
+  authorName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

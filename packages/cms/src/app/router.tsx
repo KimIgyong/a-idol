@@ -32,6 +32,7 @@ const DeliverablesPage = lazyNamed(() => import('@/features/project/deliverables
 const WbsPage = lazyNamed(() => import('@/features/project/wbs-page'), 'WbsPage');
 const TasksPage = lazyNamed(() => import('@/features/project/tasks-page'), 'TasksPage');
 const IssuesPage = lazyNamed(() => import('@/features/project/issues-page'), 'IssuesPage');
+const NotesPage = lazyNamed(() => import('@/features/project/notes-page'), 'NotesPage');
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -132,8 +133,24 @@ export const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <ProjectOverviewPage /> },
-          { path: 'docs', element: <DocsListPage /> },
-          { path: 'docs/:slug', element: <DocDetailPage /> },
+          { path: 'issues', element: <IssuesPage /> },
+          { path: 'notes', element: <NotesPage /> },
+          {
+            path: 'docs',
+            element: (
+              <RequireRole allow={['admin']}>
+                <DocsListPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'docs/:slug',
+            element: (
+              <RequireRole allow={['admin']}>
+                <DocDetailPage />
+              </RequireRole>
+            ),
+          },
           {
             path: 'docs/:slug/edit',
             element: (
@@ -142,10 +159,30 @@ export const router = createBrowserRouter([
               </RequireRole>
             ),
           },
-          { path: 'deliverables', element: <DeliverablesPage /> },
-          { path: 'wbs', element: <WbsPage /> },
-          { path: 'tasks', element: <TasksPage /> },
-          { path: 'issues', element: <IssuesPage /> },
+          {
+            path: 'deliverables',
+            element: (
+              <RequireRole allow={['admin']}>
+                <DeliverablesPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'wbs',
+            element: (
+              <RequireRole allow={['admin']}>
+                <WbsPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'tasks',
+            element: (
+              <RequireRole allow={['admin']}>
+                <TasksPage />
+              </RequireRole>
+            ),
+          },
         ],
       },
     ],

@@ -33,6 +33,7 @@ function makeRow(over: Partial<IssueWithReporters> = {}): IssueWithReporters {
     assigneeName: over.assigneeName ?? null,
     reporterAdminId: over.reporterAdminId ?? 'rep-1',
     reporterName: over.reporterName ?? 'Reporter',
+    startAt: over.startAt ?? null,
     dueDate: over.dueDate ?? null,
     labels: over.labels ?? null,
     createdAt: over.createdAt ?? new Date('2026-05-06T00:00:00Z'),
@@ -56,7 +57,10 @@ class FakeRepo implements IssueRepository {
       id: `id-${this.rows.size + 1}`,
       key: `IIS-${this.rows.size + 1}`,
       title: input.title,
+      description: input.description ?? null,
       reporterAdminId: input.reporterAdminId,
+      startAt: input.startAt ? new Date(input.startAt) : null,
+      dueDate: input.dueDate ? new Date(input.dueDate) : null,
     });
     this.rows.set(row.id, row);
     return row;
@@ -135,5 +139,53 @@ describe('Issue use cases', () => {
     await expect(
       new MoveIssueUseCase(repo).execute(created.id, { toStatus: 'TODO', toIndex: -1 }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('TC-ISS-006: create rejects startAt > dueDate (FR-103-C)', async () => {
+    const repo = new FakeRepo();
+    await expect(
+      new CreateIssueUseCase(repo).execute({
+        title: 'A',
+        reporterAdminId: 'r',
+        startAt: '2026-05-15',
+        dueDate: '2026-05-10',
+      }),
+    ).rejects.toMatchObject({ code: 'ISSUE_INVALID_DATE_RANGE' });
+  });
+
+  it('TC-ISS-007: create accepts startAt <= dueDate', async () => {
+    const repo = new FakeRepo();
+    const out = await new CreateIssueUseCase(repo).execute({
+      title: 'A',
+      reporterAdminId: 'r',
+      startAt: '2026-05-08',
+      dueDate: '2026-05-10',
+    });
+    expect(out.id).toBeDefined();
+  });
+
+  it('TC-ISS-008: update merges with existing dates for range check', async () => {
+    const repo = new FakeRepo();
+    const created = await new CreateIssueUseCase(repo).execute({
+      title: 'A',
+      reporterAdminId: 'r',
+      startAt: '2026-05-08',
+      dueDate: '2026-05-10',
+    });
+    await expect(
+      new UpdateIssueUseCase(repo).execute(created.id, { dueDate: '2026-05-07' }),
+    ).rejects.toMatchObject({ code: 'ISSUE_INVALID_DATE_RANGE' });
+  });
+
+  it('TC-ISS-009: create sanitizes script tags from description (FR-103-D)', async () => {
+    const repo = new FakeRepo();
+    const out = await new CreateIssueUseCase(repo).execute({
+      title: 'A',
+      reporterAdminId: 'r',
+      description: '<p>hi</p><script>alert(1)</script><img src=x onerror=alert(1)>',
+    });
+    expect(out.description).toContain('<p>hi</p>');
+    expect(out.description).not.toContain('<script>');
+    expect(out.description).not.toContain('onerror');
   });
 });

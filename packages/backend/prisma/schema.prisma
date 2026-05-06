@@ -884,6 +884,8 @@ model Issue {
   assigneeAdminId String?       @map("assignee_admin_id") @db.Uuid
   /// \ub4f1\ub85d\uc790 (\ud544\uc218). \uc6b4\uc601\uc790 \uc0ad\uc81c \uc2dc null \ud5c8\uc6a9 (\uae30\ub85d \ubcf4\uc874).
   reporterAdminId String?       @map("reporter_admin_id") @db.Uuid
+  /// FR-103-C — 시작일 (선택). startAt 과 dueDate 가 둘 다 있으면 startAt <= dueDate.
+  startAt         DateTime?     @map("start_at") @db.Date
   dueDate         DateTime?     @map("due_date") @db.Date
   /// \ucf64\ub9c8 \uad6c\ubd84 \ud0dc\uadf8 (\uacb0\uc815: 'frontend,bug,p1' \ub4f1).
   labels          String?       @db.VarChar(500)
@@ -896,4 +898,55 @@ model Issue {
   @@index([type])
   @@index([priority])
   @@map("issues")
+}
+
+// -- Attachments / Project Notes (REQ-260507) --------------------------
+enum AttachmentOwnerType {
+  ISSUE
+  NOTE
+  DOC
+  DRAFT
+}
+
+model Attachment {
+  id           String              @id @default(uuid()) @db.Uuid
+  ownerType    AttachmentOwnerType @map("owner_type")
+  /// 신규 entity 생성 직전 업로드(draft)는 nullable. 저장 완료 시 link.
+  ownerId      String?             @map("owner_id") @db.Uuid
+  filename     String              @db.VarChar(255)
+  mimeType     String              @map("mime_type") @db.VarChar(120)
+  sizeBytes    Int                 @map("size_bytes")
+  /// LocalDiskStorage 는 filesystem path, S3 어댑터는 bucket key.
+  storageKey   String              @map("storage_key") @db.VarChar(500)
+  uploadedById String              @map("uploaded_by_id") @db.Uuid
+  createdAt    DateTime            @default(now()) @map("created_at")
+
+  @@index([ownerType, ownerId])
+  @@index([uploadedById])
+  @@map("attachments")
+}
+
+enum ProjectNoteCategory {
+  NOTE
+  MEETING
+  DECISION
+  LINK
+  OTHER
+}
+
+model ProjectNote {
+  id            String              @id @default(uuid()) @db.Uuid
+  title         String              @db.VarChar(120)
+  /// sanitize-html 통과한 HTML.
+  body          String              @db.Text
+  category      ProjectNoteCategory @default(NOTE)
+  pinned        Boolean             @default(false)
+  authorAdminId String              @map("author_admin_id") @db.Uuid
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([pinned, updatedAt(sort: Desc)])
+  @@index([authorAdminId])
+  @@map("project_notes")
 }

@@ -871,6 +871,7 @@ export interface IssueDto {
   assigneeName: string | null;
   reporterAdminId: string | null;
   reporterName: string | null;
+  startAt: string | null;
   dueDate: string | null;
   labels: string | null;
   createdAt: string;
@@ -893,6 +894,7 @@ export interface CreateIssueDto {
   status?: IssueStatus;
   priority?: IssuePriority;
   assignee_admin_id?: string | null;
+  start_at?: string | null;
   due_date?: string | null;
   labels?: string | null;
 }
@@ -904,6 +906,7 @@ export interface UpdateIssueDto {
   status?: IssueStatus;
   priority?: IssuePriority;
   assignee_admin_id?: string | null;
+  start_at?: string | null;
   due_date?: string | null;
   labels?: string | null;
 }

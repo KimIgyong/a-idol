@@ -28,6 +28,7 @@ type IssueRow = {
   orderInColumn: number;
   assigneeAdminId: string | null;
   reporterAdminId: string | null;
+  startAt: Date | null;
   dueDate: Date | null;
   labels: string | null;
   createdAt: Date;
@@ -100,6 +101,7 @@ export class PrismaIssueRepository implements IssueRepository {
         orderInColumn,
         assigneeAdminId: input.assigneeAdminId ?? null,
         reporterAdminId: input.reporterAdminId,
+        startAt: input.startAt ? new Date(input.startAt) : null,
         dueDate: input.dueDate ? new Date(input.dueDate) : null,
         labels: input.labels ?? null,
       },
@@ -115,6 +117,9 @@ export class PrismaIssueRepository implements IssueRepository {
     if (input.type !== undefined) data.type = input.type;
     if (input.priority !== undefined) data.priority = input.priority;
     if (input.labels !== undefined) data.labels = input.labels;
+    if (input.startAt !== undefined) {
+      data.startAt = input.startAt ? new Date(input.startAt) : null;
+    }
     if (input.dueDate !== undefined) {
       data.dueDate = input.dueDate ? new Date(input.dueDate) : null;
     }
@@ -232,6 +237,7 @@ export class PrismaIssueRepository implements IssueRepository {
       assigneeName: r.assigneeAdminId ? nameMap.get(r.assigneeAdminId) ?? null : null,
       reporterAdminId: r.reporterAdminId,
       reporterName: r.reporterAdminId ? nameMap.get(r.reporterAdminId) ?? null : null,
+      startAt: r.startAt,
       dueDate: r.dueDate,
       labels: r.labels,
       createdAt: r.createdAt,

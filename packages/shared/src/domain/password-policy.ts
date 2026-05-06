@@ -1,9 +1,3 @@
-import {
-  registerDecorator,
-  type ValidationArguments,
-  type ValidationOptions,
-} from 'class-validator';
-
 /**
  * NIST SP 800-63B §5.1.1.2 정렬 — "memorized secrets shall be checked against
  * a list that contains values known to be commonly-used, expected, or
@@ -15,6 +9,8 @@ import {
  *  - "password" 류 root 가 들어있고 길이 ≤ 12 → reject (e.g. "password123")
  *
  * 길이 ≥ 12 인 passphrase 는 통과 (NIST 권장 — 강제 복잡도 대신 길이).
+ *
+ * identity / admin-ops 등 비밀번호를 받는 모든 모듈에서 공유.
  */
 
 const COMMON_BLOCKLIST = [
@@ -53,38 +49,14 @@ const COMMON_BLOCKLIST = [
 
 const COMMON_ROOTS = ['password', 'qwerty', 'iloveyou', 'admin', 'a-idol', 'aidol'];
 
-/**
- * @internal 테스트와 사용처를 위해 export. 컨트롤러에서 직접 호출 가능.
- */
 export function isWeakPassword(value: string): boolean {
   if (typeof value !== 'string') return true;
   const lower = value.toLowerCase();
-  // 정확 일치
   if (COMMON_BLOCKLIST.includes(lower)) return true;
-  // 짧은 길이(≤12) + 흔한 root 포함 — passphrase 예외 (≥13자)
   if (value.length <= 12) {
     for (const root of COMMON_ROOTS) {
       if (lower.includes(root)) return true;
     }
   }
   return false;
-}
-
-export function IsStrongPassword(options?: ValidationOptions) {
-  return function (object: object, propertyName: string) {
-    registerDecorator({
-      name: 'isStrongPassword',
-      target: object.constructor,
-      propertyName,
-      options,
-      validator: {
-        validate(value: unknown) {
-          return typeof value === 'string' && !isWeakPassword(value);
-        },
-        defaultMessage(args: ValidationArguments) {
-          return `${args.property}는 흔한 패턴이거나 추측되기 쉽습니다. 13자 이상 passphrase 또는 더 고유한 조합을 사용해 주세요.`;
-        },
-      },
-    });
-  };
 }

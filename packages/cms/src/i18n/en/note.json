@@ -1,0 +1,44 @@
+{
+  "title": "Notes",
+  "subtitle": "Project resources / meeting notes / decisions (separate from issues)",
+  "actions": {
+    "create": "New note",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "pin": "Pin to top",
+    "unpin": "Unpin"
+  },
+  "filter": {
+    "all_categories": "All categories",
+    "search": "Search title / body",
+    "pinned_only": "📌 Pinned only"
+  },
+  "field": {
+    "title": "Title",
+    "category": "Category",
+    "pinned": "Pin to top",
+    "body": "Body"
+  },
+  "category": {
+    "NOTE": "Note",
+    "MEETING": "Meeting",
+    "DECISION": "Decision",
+    "LINK": "Link",
+    "OTHER": "Other"
+  },
+  "section": {
+    "pinned": "Pinned",
+    "all": "All"
+  },
+  "createDialog": {
+    "title": "Create note"
+  },
+  "editDialog": {
+    "title": "Edit note"
+  },
+  "empty": "No notes.",
+  "deleteConfirm": "Delete note \"{{title}}\"?"
+}

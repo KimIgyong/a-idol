@@ -30,6 +30,7 @@
     "priority": "우선순위",
     "assignee": "담당자",
     "reporter": "작성자",
+    "startAt": "시작일",
     "dueDate": "마감일",
     "labels": "라벨 (콤마 구분)",
     "createdAt": "생성일",

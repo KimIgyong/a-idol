@@ -64,6 +64,42 @@ export function invalidateEtagCache(path?: string): void {
   etagCache.delete(path);
 }
 
+/**
+ * Multipart 업로드 전용 fetch — JSON Content-Type 을 강제하지 않고 FormData 그대로 전송.
+ * Browser 가 multipart boundary 를 자동 부여한다.
+ */
+export async function apiUpload<T>(
+  path: string,
+  formData: FormData,
+  init: { token?: string | null } = {},
+): Promise<T> {
+  const requestId = newRequestId();
+  const res = await fetch(`${env.VITE_API_BASE_URL}${path}`, {
+    method: 'POST',
+    headers: {
+      'X-Request-ID': requestId,
+      ...(init.token ? { Authorization: `Bearer ${init.token}` } : {}),
+    },
+    body: formData,
+  });
+  const echoed = res.headers.get('x-request-id') ?? requestId;
+  if (!res.ok) {
+    let code: string | undefined;
+    let message = res.statusText;
+    let details: unknown;
+    try {
+      const payload = (await res.json()) as { code?: string; message?: string; details?: unknown };
+      code = payload.code;
+      message = payload.message ?? message;
+      details = payload.details;
+    } catch {
+      // non-json body
+    }
+    throw new ApiError(res.status, code, message, echoed, details);
+  }
+  return (await res.json()) as T;
+}
+
 export async function apiFetch<T>(path: string, init: ApiRequestInit = {}): Promise<T> {
   const { body, token, headers, useEtagCache, ...rest } = init;
   const method = (init.method ?? 'GET').toUpperCase();

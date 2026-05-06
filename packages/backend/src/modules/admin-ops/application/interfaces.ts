@@ -11,6 +11,17 @@ export interface AdminUserRepository {
    * 캡슐화하므로 controller 측에서 노출되지 않음.
    */
   listAll(): Promise<AdminUser[]>;
+  /** FR-102 — 신규 어드민 등록. */
+  create(input: {
+    email: string;
+    passwordHash: string;
+    displayName: string;
+    role: AdminRole;
+  }): Promise<AdminUser>;
+  /** FR-102 — 역할 변경. 대상 미존재 시 null 반환 (use case 가 ADMIN_NOT_FOUND 으로 매핑). */
+  updateRole(id: string, role: AdminRole): Promise<AdminUser | null>;
+  /** FR-102 — admin 한도 / 마지막 admin 강등 검증용. */
+  countByRole(role: AdminRole): Promise<number>;
 }
 
 /** T-082 (Phase D) — admin refresh token 의 server-side state. */
