@@ -64,23 +64,38 @@ async function detectInitialLanguage(): Promise<SupportedLocale> {
   return normalize(device);
 }
 
+// react-i18next 의 useTranslation 은 hook 호출 시점에 i18n 인스턴스가
+// `initReactI18next` 를 거쳐야만 동작한다. initI18n() 은 async (AsyncStorage
+// 접근) 이라 첫 렌더보다 늦게 끝나, splash 가 useTranslation 을 호출하는 순간
+// "You will need to pass in an i18next instance by using initReactI18next"
+// 경고 + undefined.length 크래시가 발생.
+// → 모듈 로드 시점에 동기 init 으로 fallback locale 을 먼저 활성화하고,
+//   initI18n() 은 stored/device locale 로 비동기 업데이트만 담당.
+if (!i18n.isInitialized) {
+  // eslint-disable-next-line no-void
+  void i18n.use(initReactI18next).init({
+    resources,
+    lng: FALLBACK,
+    fallbackLng: FALLBACK,
+    supportedLngs: [...SUPPORTED_LOCALES],
+    nonExplicitSupportedLngs: true,
+    ns: ['common', 'nav'],
+    defaultNS: 'common',
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false },
+    initImmediate: false, // 동기 init — useTranslation 첫 호출 시점에 ready
+  });
+}
+
 let initPromise: Promise<typeof i18n> | null = null;
 
 export function initI18n(): Promise<typeof i18n> {
   if (initPromise) return initPromise;
   initPromise = (async () => {
     const lng = await detectInitialLanguage();
-    await i18n.use(initReactI18next).init({
-      resources,
-      lng,
-      fallbackLng: FALLBACK,
-      supportedLngs: [...SUPPORTED_LOCALES],
-      nonExplicitSupportedLngs: true,
-      ns: ['common', 'nav'],
-      defaultNS: 'common',
-      interpolation: { escapeValue: false },
-      react: { useSuspense: false },
-    });
+    if (lng !== i18n.language) {
+      await i18n.changeLanguage(lng);
+    }
     return i18n;
   })();
   return initPromise;
