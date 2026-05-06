@@ -179,6 +179,27 @@ async function main() {
     });
   }
 
+  // ── Demo end-user (mobile login pre-fills demo@a-idol.dev / password123) ──
+  // 별도 ADR 없이 dev/staging 편의 — login 화면 placeholder 와 정합. 운영 배포
+  // 시점에 본 블록을 가드하거나 제거할 것 (TODO: ALLOW_DEV_DEMO_USER=0 시 skip).
+  const demoEmail = 'demo@a-idol.dev';
+  const demoPassword = 'password123';
+  const demoHash = await hash(demoPassword, 10);
+  await prisma.user.upsert({
+    where: { email: demoEmail },
+    update: { passwordHash: demoHash, status: 'active' },
+    create: {
+      email: demoEmail,
+      passwordHash: demoHash,
+      provider: 'email',
+      providerUserId: demoEmail,
+      nickname: 'Demo',
+      birthdate: new Date('1995-05-05'),
+      status: 'active',
+    },
+  });
+  console.log(`   · demo end-user upserted: ${demoEmail} / ${demoPassword}`);
+
   // ── Demo user coupons (dev convenience so chat smoke runs past free quota) ──
   const demoUser = await prisma.user.findUnique({ where: { email: 'demo@a-idol.dev' } });
   if (demoUser) {
