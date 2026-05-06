@@ -35,6 +35,9 @@ logs/
 npm-debug.log*
 pnpm-debug.log*
 
+# session logs (Claude Code conversation records)
+docs/log/
+
 # coverage
 coverage/
 .nyc_output/

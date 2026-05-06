@@ -208,6 +208,54 @@ See `.claude/commands/new-feature.md` for an opinionated template.
 - ❌ Don't introduce Entity/Cell/Unit multi-tenancy, `OwnEntityGuard`, or 4-level RBAC — A-idol is B2C single-tenant with a 2-level split.
 - ❌ Don't add `amb_*` table prefixes or 3-letter column prefixes — Prisma `@map` already handles DB casing.
 
+## Workflows
+
+### 요구사항 작업 워크플로우 (`[요구사항]` 타이틀)
+
+`[요구사항]` 타이틀로 요청된 건은 반드시 아래 순서로 진행한다:
+
+1. **요구사항 분석서** → `docs/analysis/REQ-{YYMMDD}-{제목}.md`
+   - AS-IS 현황 분석, TO-BE 요구사항, 갭 분석, 사용자 플로우, 기술 제약사항
+2. **작업 계획서** → `docs/plan/PLN-{YYMMDD}-{제목}.md`
+   - 시스템 개발 현황 분석 기반, 단계별 구현 계획, 사이드 임팩트 분석
+   - **🖼 화면구성도 필수 포함** — UI 변경/추가가 있는 작업이면 화면별 와이어프레임(ASCII / Mermaid / 표 형태도 가능)을 PLN에 함께 작성. 백엔드 전용 작업이면 "본 작업은 백엔드 API만 — 화면구성도 N/A. 후속 CMS/Mobile PLN에서 작성 예정" 라고 명시한다.
+   - **⚠️ 작업 계획서 작성 후 반드시 사용자 확인 및 진행 지시를 받은 뒤에 구현 단계로 넘어간다. 자동으로 구현을 시작하지 않는다.**
+3. **구현** — 작업 계획서에 따른 코드 구현 (사용자 진행 지시 후)
+4. **테스트 케이스** → `docs/test/TCR-{YYMMDD}-{제목}.md`
+   - 단위 테스트 케이스, 통합 테스트 시나리오, 엣지 케이스
+5. **작업 완료 보고** → `docs/implementation/RPT-{YYMMDD}-{제목}.md`
+   - 구현 내용 정리, 변경 파일 목록, 테스트 결과, 배포 상태
+
+### 버그 수정 워크플로우
+
+버그 수정 요청 시 아래 순서로 진행한다:
+
+1. **원인 분석** — 에러 로그 / 재현 경로 기반 근본 원인 파악
+2. **해결 방안 제시** — 수정 방법과 영향 범위 설명
+3. **코드 수정** — 원인에 맞는 최소 범위 수정 적용
+4. **버그 수정 보고서** → `docs/bug-fix/FIX-{YYMMDD}-{버그제목}.md`
+   - 증상, 원인 분석, 수정 내용, 변경 파일 목록, 재발 방지 패턴
+
+### 대화 로그 / 데일리 리포트
+
+세션 간 작업 연속성을 위해 모든 대화 내용을 로컬에 기록한다. `docs/log/`는 `.gitignore`에 등록되어 있다.
+
+**대화 로그**
+- 경로: `docs/log/YYYY-MM-DD/`
+- 파일명: `{HH}_{순번}_{작업요약}.md` (예: `14_01_베트남전자세금계산서구현.md`)
+- 기록 시점: 세션 시작 시 자동으로 로그 파일을 생성하고, 주요 작업 단위마다 갱신한다.
+- 기록 내용:
+  - 사용자 요청 원문
+  - 수행한 작업 내용 요약
+  - 변경된 파일 목록
+  - 발생한 이슈 및 해결 방법
+  - 미완료 항목 (다음 세션에서 이어갈 내용)
+
+**데일리 작업 리포트**
+- 경로: `docs/log/YYYY-MM-DD/DAILY-REPORT.md`
+- 생성 시점: 해당 날짜의 마지막 세션 종료 시 또는 사용자 요청 시
+- 내용: 당일 모든 세션의 작업 내용을 통합 요약 (완료 작업, 변경 파일 전체 목록, 배포 상태, 미해결 이슈 / 다음 작업 예정)
+
 ## Useful URLs (local dev)
 
 - Backend API: http://localhost:3000
