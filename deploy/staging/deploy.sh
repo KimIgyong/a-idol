@@ -62,6 +62,16 @@ if [[ $DO_CMS_BUILD -eq 1 ]]; then
   VITE_APP_ENV="${VITE_APP_ENV}" \
   VITE_SENTRY_DSN="${VITE_SENTRY_DSN:-}" \
     pnpm --filter @a-idol/cms build
+
+  # PLN-260506 — Mobile (Expo Web) 빌드. CMS preview iframe (/m/) 에 서빙할
+  # 정적 SPA. baseUrl=/m 은 packages/mobile/app.json experiments.baseUrl 에서
+  # 설정. 누락 시 /preview 가 host nginx SPA fallback (try_files ... /index.html)
+  # 로 인해 iframe 안에 CMS 가 재귀 렌더됨.
+  EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-${VITE_API_BASE_URL}/api/v1}"
+  echo "📱  build mobile (expo export --platform web) — EXPO_PUBLIC_API_BASE_URL=${EXPO_PUBLIC_API_BASE_URL}"
+  EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL}" \
+  EXPO_PUBLIC_APP_ENV="${VITE_APP_ENV}" \
+    pnpm --filter @a-idol/mobile export:web
 fi
 
 echo "📦  build shared package"
@@ -100,6 +110,18 @@ CMS_WEBROOT="${CMS_WEBROOT:-/var/www/a-idol-cms}"
 echo "🎨  rsync CMS dist → ${SSH_HOST}:${CMS_WEBROOT}"
 rsync -az --delete -e "ssh ${SSH_OPTS}" \
   packages/cms/dist/ "${SSH_USER}@${SSH_HOST}:${CMS_WEBROOT}/"
+
+# PLN-260506 — Mobile (Expo Web) dist → ${CMS_WEBROOT}/m (CMS preview iframe).
+# 같은 webroot 의 서브디렉터리에 두면 host nginx 의 try_files 규칙이 /m/index.html
+# 과 hashed 자산을 모두 정상 서빙. nginx conf 변경 불필요.
+if [[ -d packages/mobile/dist ]]; then
+  echo "📱  rsync mobile dist → ${SSH_HOST}:${CMS_WEBROOT}/m"
+  ssh ${SSH_OPTS} "${SSH_USER}@${SSH_HOST}" "mkdir -p '${CMS_WEBROOT}/m'"
+  rsync -az --delete -e "ssh ${SSH_OPTS}" \
+    packages/mobile/dist/ "${SSH_USER}@${SSH_HOST}:${CMS_WEBROOT}/m/"
+else
+  echo "⚠️  packages/mobile/dist 없음 — preview 미반영. --no-cms-build 로 skip 했다면 export:web 별도 실행 필요."
+fi
 
 # .env.staging 은 별도로 보내고 release 안에 위치 (compose 의 --env-file 에서 사용)
 scp ${SSH_OPTS} deploy/staging/.env.staging \
